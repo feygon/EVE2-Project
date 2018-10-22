@@ -1,0 +1,37 @@
+<html>
+<h1>Industry Page</h1>
+<form id="inventitem" action="/item" method="get">
+    Invent Item: <input type="text" name="name" value="name"><br>
+    <input type="text" name="packaged" value="packaged volume"><br>
+    <input type="text" name="unpackaged" value="unpackaged volume"><br>
+    <select name="type"> 
+        {{#each item}}
+        <option value="{{id}}">Type</option>
+        {{/each}}
+    </select><br>
+    <input type="submit" value="Invent">
+</form>
+
+
+<form id="inventcontainer" action="/container" method="get">
+    Invent Container: <input type="text" name="name" value="name"><br>
+<input type="text" name="capacity" value="Capacity"><br>
+    Is This a Ship?<select name="isitship"> 
+
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select><br>
+
+    <input type="submit" value="Invent">
+</form>
+
+<form id="choose-item" action="/item" method="get">
+    Item: <select name="id"> 
+        {{#each item}}
+        <option value="{{id}}">Item</option>
+        {{/each}}
+    </select><br>
+</form>
+<button onclick="selectitem({{id}})">Buy/Make</button><br>
+
+</html>

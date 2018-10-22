@@ -1,0 +1,69 @@
+<html>
+
+<h3>Space Station</h3>
+<a href="/eve2/out_in_space">undock</a>
+<br/>
+
+<h3>Ships and Containers:</h3>
+<table>
+    <thead> 
+        <th>ID</th> 
+        <th>Pilotable</th> 
+        <th>Capacity</th>  
+        <th>Type</th> 
+        <th>Move Item</th>
+        <th>Give Item</th>
+        <th>Delete Item</th>
+        <th>Repackage Item</th>
+
+    </thead> 
+    <tbody> 
+        {{#each container}}
+        <tr> 
+            <td>{{id}}</td> 
+            <td>{{Pilotable}}</td> 
+            <td>{{capacity}}</td>
+            <td>{{type}}</td>
+            <td>
+            <form id="move-item" action="/item" method="get">
+    <select name="id"> 
+        {{#each item}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+    </form>
+            </td>
+
+            <td><button onclick="deleteItem({{id}})">Give</button></td>
+            <td><button onclick="deleteItem({{id}})">Delete</button></td>
+            <td><button onclick="deleteItem({{id}})">Repackage</button></td>
+
+    <table>
+    <thead> 
+        <th>Inside Item</th> 
+    </thead> 
+    <tbody> 
+        <tr> 
+            <td>{{Item.name}}</td> 
+        </tr>
+    </tbody>    
+    </table>
+
+        </tr> 
+        {{/each}}
+    </tbody> 
+</table> 
+<br/>
+<br/>
+
+<form id="choose-ship" action="/container" method="get">
+    Change Piloting ship: <select name="id"> 
+        {{#each item}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select>
+</form>
+    <button onclick="changeContainer({{id}})">Change</button><br>
+
+</html>
+

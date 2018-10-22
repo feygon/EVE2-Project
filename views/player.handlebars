@@ -1,0 +1,38 @@
+<html>
+
+<h3>Add new player:</h3>
+<form id="newplayer" action="/player" method="get">
+    Name: <input type="text" name="name"><br>
+    <input type="submit" value="Submit">
+ </form>
+<br/>
+<h3>Existing player:</h3>
+<table>
+    <thead> 
+        <th>ID</th> 
+        <th>Name</th> 
+        <th>Piloting Container</th>  
+        <th>Location of Pilot</th> 
+    </thead> 
+    <tbody> 
+        {{#each player}}
+        <tr> 
+            <td>{{id}}</td> 
+            <td>{{name}}</td> 
+            <td>{{piloting_OWNS_id}}</td>
+            <td>{{location}}</td>
+        </tr> 
+        {{/each}}
+    </tbody> 
+</table> 
+<br/>
+<form id="choose-player" action="/player" method="get">
+    Player: <select name="id"> 
+        {{#each player}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+</form>
+    <button onclick="selectPlayer({{id}})">Use</button><br>
+    <button onclick="deletePlayer({{id}})">Delete</button>
+</html>
