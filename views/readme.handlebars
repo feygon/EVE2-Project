@@ -1,0 +1,294 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 12 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:0in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+.MsoPapDefault
+	{margin-bottom:10.0pt;
+	line-height:115%;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US>
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SQL Queries
+for CS340 project</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Requirements:</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>1) Add
+capability for all entities</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>2) Delete
+and update capability for any entity</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>3) Add to
+all relationships</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>4) Add and
+remove to at least one many-to-many relationship</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>5) Search
+using text or filter using dynamically populated list of properties to filter
+on, present for at least one entity (either players on player screen or items
+in industry)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>QUERIES
+BY Requirement</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>1)   Add
+capability for all entities</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
+player entity: Add a new player on the player page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
+player entity: Invent a new container on the industry page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
+items entity: Invent a new item on the industry page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
+locations entity: Chart a wormhole on the out in space page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>2)   Delete
+and update capability for any entity</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Delete a
+player entity record: delete a player on the player page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Update a
+player entity record: Switch ships in the space station page.<br>
+OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Update an
+item emtity record: Unpackage an item in the space station page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>3)   Add to
+all relationships</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “item
+IS container” 1-to-1 relationship: invent a container in the industry view –
+when you create a container record, you must also assign it to an item with the
+selection box.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “player
+OWNS container” many to many relationship: Unpackaging and naming a container
+in the space station view adds an instance of that item to the OWNS table.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the  “owned
+container CONTAINS item” many-to-many relationship:  move an item into a
+container on space station page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “container
+NESTS IN container” many-to-one relationship: move a container into another
+container on space station page</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Dock at a
+station while out in space view. This simply moves the ship container into the
+space station container.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “owned
+container OCCUPIES location” one-to-many relationship: Create a new player on
+the player page. Doing so creates a new container instance in a location.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Unpackage a
+container on a space station page. Doing so also creates a new container
+instance in a location.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “location
+CONNECTS TO location” many-to-many relationship: Chart a wormhole on the out in
+space page. This links a new location to an old location and vice versa (two new
+records on the table).</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the “player
+PILOTS owned container” one-to-one relationship: change ships on space station
+page.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Create a new
+character on the player page. This starts them piloting a ship.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>4)   Add and
+remove to at least one many-to-many relationship</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Adding to a
+many-to-many relationship is already included above.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Remove a
+record from a many-to-many relationship: a player gives a container to another
+player.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>A player moves
+items from one owned container into other owned containers.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>5)   Search
+using text or filter using dynamically populated list</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Sort players
+by name or location: Under construction – sort players by name or location.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Sort items
+and containers by name or type: Table headings on the space station page act as
+hyperlinks to sort tables by that heading, toggling between ascending and
+descending.</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>QUERIES
+BY View</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>--
+Players View</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+create a new player by a form</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+list players by id (hidden), name, piloting container, location for main player
+list and selection box</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE a
+player by ID</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>-- Out in
+space View</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
+dock: move NESTS IN location of container by session player -&gt;
+container_piloting, location id in dropdown</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE* to
+travel: change owned container location and all sub-containers recursively</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE*
+to jettison a container: recursively remove owned container, subcontainers, and
+corresponding items</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
+jettison an item: removes just an item contained in an owned ship container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+chart a wormhole: add a new location by a form and link it to your current
+location</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>-- Space
+Station View</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
+undock: new location NULL</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+view inventory of a specific container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT* to
+generate a tree of containers recursively</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+populate item selection input:                trash an item</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+populate players selection input:             give an item to another player</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+populate container input:                     move an item into another
+container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+unpackage a container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
+repackage a container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+move items into containers</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
+move items out of containers</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE&amp;INSERT*
+to empty container contents recursively</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
+change piloting ships</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'><b>--
+Industry View</b></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+invent an item</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+invent a container</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
+make/buy items</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+get item types</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+get Container types</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
+get item list</p>
+
+</div>
+
+</body>
+
+</html>
