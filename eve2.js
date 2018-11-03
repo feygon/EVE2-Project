@@ -2,7 +2,7 @@ module.exports = function() {
 
     var express = require('express');
     var router = express.Router();
-    
+    var callbacks = req.app.get('callbacks');
 
 
     router.get('/', function(req, res){
@@ -37,10 +37,8 @@ module.exports = function() {
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
-        var callbacks = req.app.get('callbacks');
 
         context = callbacks.cb_indy_getItems(res, mysql, context, complete);
-
         context.jsscripts = []; // none yet
 
         function complete(){
