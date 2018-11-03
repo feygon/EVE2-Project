@@ -13,7 +13,7 @@ module.exports = function() {
           "all_players": "",
           "indy_views_union": "",
           "item_types": "",
-          "container_types",
+          "container_types": "",
           "OCTs_in_OCT_deep": "",
           "items_in_listed_OCTs": "",
           "merged_items_in_OCTnum": "",

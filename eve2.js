@@ -41,7 +41,7 @@ module.exports = function() {
 
         context = callbacks.cb_indy_getItems(res, mysql, context, complete);
 
-        context.jsscripts = []; // non yet
+        context.jsscripts = []; // none yet
 
         function complete(){
             callbackCount++;
