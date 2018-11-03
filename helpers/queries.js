@@ -16,7 +16,8 @@ module.exports = function() {
           "container_types",
           "OCTs_in_OCT_deep": "",
           "items_in_listed_OCTs": "",
-          "merged_items_in_OCTnum": ""
+          "merged_items_in_OCTnum": "",
+          "item_list": ""
         }
       ],
       "update": [
@@ -144,6 +145,7 @@ module.exports = function() {
         + "ORDER BY itemName";
 
     queries.select.item_types = "SELECT items.type FROM EVE2_Items AS items ORDER BY type";
+    queries.select.item_list = "SELECT items.id, items.name FROM EVE2_Items ORDER BY name";
     queries.select.container_types = "SELECT CT.type FROM EVE2_Containers as CT ORDER BY type";
     queries.select.OCTs_in_OCT_deep = ""; // recursive call required. depth unknown, potentially limitless.
     queries.select.items_in_listed_OCTs = "SELECT CTinv.id FROM EVE2_CONTAINS AS CTinv WHERE CTinv.OWNS_id IS IN ";

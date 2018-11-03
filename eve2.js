@@ -94,7 +94,7 @@ function getFactories(res, mysql, context, complete, by){
         sql += queries.select.factories
         var inserts = [req.params.factory, req.params.product];     // these fill in the '?'s sanitarily
 
-        mysql.pool.query(sql, function(error, results, fields){     // get sequel query results
+        mysql.pool.query(sql, inserts, function(error, results, fields){     // get sequel query results
             if(error){
                 res.write(JSON.stringify(error));
                 res.end();
