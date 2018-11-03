@@ -2,7 +2,7 @@ module.exports = function() {
 
     var express = require('express');
     var router = express.Router();
-    var callbacks = require('/helpers/callbacks.js')
+    
 
 
     router.get('/', function(req, res){
@@ -37,12 +37,24 @@ module.exports = function() {
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
-        res.render('industry', context);
-        });
+        var callbacks = req.app.get('callbacks');
+
+        context = callbacks.cb_indy_getItems(res, mysql, context, complete);
+
+        context.jsscripts = []; // non yet
+
+        function complete(){
+            callbackCount++;
+            if (callbackCount >= 1){
+                res.render('industry', context);
+            }
+        }
+        
+    });
 
     router.get('/readMe/', function(req, res){
-	var context = {};
-	res.render('readme', context);
+	   var context = {};
+	   res.render('readme', context);
 	});
 
     return router;

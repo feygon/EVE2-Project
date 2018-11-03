@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var callbacks = require('/helpers/callbacks.js');
 
 app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));
@@ -15,6 +16,7 @@ app.set('mysql', mysql);
 app.set('hbs',handlebars);
 
 app.use('/eve2', require('./eve2.js'));
+
 
 
 app.use(function(req,res){
