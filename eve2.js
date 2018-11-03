@@ -48,22 +48,37 @@ module.exports = function() {
 
 // an example of a fully fleshed out route w/ express-handlebars functionality
 /*    router.get('/factory/', function(req,res){
-        callbackCount = 0;                                          // each callback calls complete() when it finishes. This prevents the function from going forward without finishing its asynchronous calls.
-        var context = {};                                           // the data structure we'll be loading with data in our callbacks
-        var mysql = req.app.get('mysql');                           // getting our previously 'require'd mysql API
-        context.jsscripts = ["recipes.js", "helpers.js"];           // getting our in-app scripts, such as any helpers and partials code we might call upon -- these get appended into the context so they're available to run at runtime
-                                                                    // also a place to hide ugly code.
-        registerHelpers(res, [ <files go here> ], context, complete);   // registers the helpers, making encapsulated code accessible to be called by scripts during runtime.
-        registerPartials(res, [ <files go here> ], context, complete);  // registers the partials, lands their html in context under partialCamelCase names to be scripted in later, I think.
 
-        getFactories(res, mysql, context, complete);                // an example callback -- contains an asychronous sql call to our database
-        getFactories(res, mysql, context, complete, "executes");    // an example callback -- contains a different asynchronous call to our database
-        getBPs(res, mysql, context, complete, "BPC");               // an example callback -- contains a different asynchronous call to our database
+        // each callback calls complete() when it finishes. This prevents the function from going forward without finishing its asynchronous calls.
+        callbackCount = 0;                                          
 
-        function complete(){                                        // called when an asynchronous call is done
-            callbackCount++;                                        // increments counter
-            if(callbackCount >= 3){                                 // checks that counter shows the right number of asynchronous calls completed
-                res.render('Factories', context);                   // renders the page with the loaded context.
+        // the data structure we'll be loading with data in our callbacks
+        var context = {};                                           
+
+        // getting our previously 'require'd mysql API
+        var mysql = req.app.get('mysql');                           
+
+        // getting our in-app scripts, such as any helpers and partials code we might call upon 
+        // -- these get appended into the context so they're available to run at runtime
+        context.jsscripts = ["recipes.js", "helpers.js"];           
+
+        // registers the helpers, making encapsulated code accessible to be called by scripts during runtime.
+        registerHelpers(res, [ <files go here> ], context, complete);   
+
+        // registers the partials, lands their html in context under partialCamelCase names to be scripted in later, I think.
+        registerPartials(res, [ <files go here> ], context, complete);
+
+        // an example callback -- contains an asychronous sql call to our database
+        getFactories(res, mysql, context, complete);                
+
+        // an example callback -- contains a different asynchronous call to our database
+        getBPs(res, mysql, context, complete, "BPC");               
+
+        // where the magic happens after all the prep
+        function complete(){                        // called when an asynchronous call is done
+            callbackCount++;                        // increments counter
+            if(callbackCount >= 3){                 // checks that all asynchronous calls completed
+                res.render('Factories', context);   // renders the page with the loaded context.
             }
         }
     });
