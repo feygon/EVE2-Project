@@ -49,7 +49,8 @@ module.exports = function() {
 // an example of a fully fleshed out route w/ express-handlebars functionality
 /*    router.get('/factory/', function(req,res){
 
-        // each callback calls complete() when it finishes. This prevents the function from going forward without finishing its asynchronous calls.
+        // each callback calls complete() when it finishes. This prevents the
+        // function from going forward without finishing its asynchronous calls.
         callbackCount = 0;                                          
 
         // the data structure we'll be loading with data in our callbacks
