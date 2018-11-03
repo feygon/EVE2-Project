@@ -119,16 +119,17 @@ SELECT
     items.type AS itemType,
     items.vol_packed,
     items.vol_unpacked,
-    CTinv.qty,              -- will always be 1 with an OCT
-    CTinv.packaged          -- will always be 1 with an OCT
-    FROM EVE2_CONTAINS AS CTinv
-    INNER JOIN EVE2_Items AS items ON items.id = CTinv.item_id
-    INNER JOIN EVE2_OWNS AS OWNS ON OWNS.id = CTinv.id
-        AND OWNS.id = ?
-    ORDER BY ?, ?;
+    OCTinv.qty,              -- will always be 1 with an OCT
+    OCTinv.packaged          -- will always be 1 with an OCT
+    FROM EVE2_CONTAINS AS OCTinv
+    INNER JOIN EVE2_Items AS items ON items.id = OCTinv.item_id
+    INNER JOIN EVE2_OWNS AS OWNS ON OWNS.id = OCTinv.id
+        AND OWNS.id = ?;
+
+    -- place in stored procedure with 3 parameters for ?, ?, ?, takes 2 parameters from values
 -- unpackaged containers in that container (inside_OWNS_id = OWNS.id)
-DROP VIEW IF EXISTS unp_CT_in_OCT_?;
-CREATE VIEW unp_CT_in_OCT_? AS
+DROP VIEW IF EXISTS OCTs_in_OCT_?;
+CREATE VIEW OCTs_in_OCT_? AS
 SELECT
     items.id AS itemID,
     items.name AS itemName,
@@ -144,12 +145,12 @@ SELECT
     INNER JOIN EVE2_CONTAINS as CTinv ON CTinv.OWNS_id = OWNS.id
             AND OWNS.inside_OWNS_id = ?;
 -- IDs of items that don't correspond to unpackaged containers
-DROP VIEW IF EXISTS non_CT_items_?;
-CREATE VIEW non_CT_items_? AS
+DROP VIEW IF EXISTS non_CT_items_in_OCT_?;
+CREATE VIEW non_CT_items_in_OCT_? AS
 SELECT
     itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged
     FROM items_in_OCT_?
-    WHERE itemID NOT IN (SELECT itemID FROM unp_CT_in_OCT);
+    WHERE itemID NOT IN (SELECT itemID FROM OCTs_in_OCT_?);
 -- Final query, merging containers with non-containers
 DROP VIEW IF EXISTS merged_items_?;
 CREATE VIEW merged_items_?
@@ -159,10 +160,12 @@ SELECT itemID, itemName, itemType,
 UNION
 SELECT itemID, itemName, itemType, 
     vol_unpacked, NULL, NULL, OCTid, OCTname, OCT_base_id
-    FROM non_CT_items_?;
+    FROM non_CT_items_in_OCT_?
+    ORDER BY ?, ?;
     
-SET @containerCount = (SELECT count(itemID) FROM unp_CT_in_OCT_?);
-SET @totalVol = (SELECT sum(sum(vol_packed)) FROM non_CT_items_?);
+SET @containerCount = (SELECT count(itemID) FROM OCTs_in_OCT_?);
+SET @totalVol = (SELECT sum(sum(vol_packed)) FROM non_CT_items_in_OCT_?);
+SET @totalVolAll = (SELECT sum(vol_packed) FROM items_in_OCT_?);
 
 
 --  SELECT to populate item selection input:                trash an item
@@ -212,7 +215,7 @@ SELECT CT.type FROM EVE2_Containers as CT ORDER BY type;
 
 
 --  SELECT* to generate a tree of containers *recursively*
--- use code from CREATE VIEW unp_CT_in_OCT_? above, recursively?
+-- use code from CREATE VIEW OCTs_in_OCT_? above, recursively?
 /*
 * implement recursion with javascript code concatenation of mysql strings
 *  and adding entries to views tables, later to be dropped. It's brutish,
@@ -222,18 +225,23 @@ SELECT CT.type FROM EVE2_Containers as CT ORDER BY type;
 --  SELECT(&DELETE)* to jettison a container: *recursively* remove owned container, subcontainers, and corresponding items
 -- re-use code above to recursively generate a view of a list of containers.
 
-DROP VIEW IF EXISTS unp_CT_in_OCT_?_twoDeep;
--- Use concat to union all sub-container, and call it 
---  unp_CT_in_OCT_?_twoDeep. Then:
+DROP VIEW IF EXISTS OCTs_in_OCT_?_twoDeep;
+-- Use concat or ?unionall? to union all sub-container, and call it 
+--  OCTs_in_OCT_?_twoDeep. Then:
+
 SELECT CTinv.id FROM EVE2_CONTAINS AS CTinv
-    WHERE CTinv.OWNS_id IS IN (unp_CT_in_OCT_?_twoDeep); -- (above)
+    WHERE CTinv.OWNS_id IS IN (OCTs_in_OCT_?_twoDeep); -- (above)
 DELETE CTinv.id FROM EVE2_CONTAINS AS CTinv
-    WHERE CTinv.OWNS_id IS IN (unp_CT_in_OCT_?_twoDeep); -- (use above to confirm)
+    WHERE CTinv.OWNS_id IS IN (OCTs_in_OCT_?_twoDeep); -- (use above to confirm)
 
 --  SELECT(&DELETE&INSERT)* to empty container contents recursively
 -- re-use code from jettisoning, but before the delete while doing so,
 --  insert the items into another container.
 INSERT INTO CTinv (item_id, OWNS_id, quantity, packaged) VALUES (( SELECT /* Some other stuff */));
+    -- ****unionize the select of what containers are in the top box and the items in just the top box****
+    -- ****delete them from the top container****
+    -- ****insert them into the target container****
+
 
 --  UPDATE to dock: move NESTS IN location of container 
 --          by session player -> container_piloting, location id in dropdown
@@ -332,7 +340,7 @@ UPDATE EVE2_Players SET piloting_OWNS_id = ? WHERE id = ?;
 UPDATE EVE2_OWNS SET EVE2_OWNS.location = ? WHERE id IN (
     SELECT ?
     UNION
-    SELECT (/*get list of containers up to one deep recursively*/)
+    SELECT (/*get list of OWNED container ids recursively*/)
 );
 
 -- -----
@@ -359,6 +367,7 @@ DELETE FROM EVE2_Items WHERE id = ?;
 INSERT INTO EVE2_Players (name, piloting_OWNS_id) VALUES (?,?);
 --  INSERT to chart a wormhole: add a new location by a form and link it to your current location
 INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?);
+--  INSERT to put a container into another container
 INSERT INTO EVE2_CONNECTS (source_id, link_id) VALUES (?,?);
 --  INSERT to unpackage a container
 INSERT INTO EVE2_OWNS(player_id, container_id, location_id, inside_OWNS_id) VALUES (?,?,?,?);

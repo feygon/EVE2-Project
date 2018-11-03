@@ -7,10 +7,11 @@
 <h3>Ships and Containers:</h3>
 <table>
     <thead> 
-        <th>ID</th> 
+        <th><a href="/eve2/out_in_space">ID</a></th>  
         <th>Pilotable</th> 
-        <th>Capacity</th>  
-        <th>Type</th> 
+        <th><a href="/eve2/out_in_space">Capacity</a></th>   
+        <th><a href="/eve2/out_in_space">Type</a></th> 
+        <th><a href="/eve2/out_in_space">Name</a></th> 
         <th>Move Item</th>
         <th>Give Item</th>
         <th>Delete Item</th>
@@ -64,6 +65,25 @@
     </select>
 </form>
     <button onclick="changeContainer({{id}})">Change</button><br>
+
+
+<form id="sort-item" action="/item" method="get">
+   Get items of type: <select name="id"> 
+        {{#each item}}
+        <option value="id">type</option>
+        {{/each}}
+    </select>
+</form>
+    <button onclick="selectType({{id}})">Select</button><br>
+
+    <form id="sort-container" action="/container" method="get">
+   Get containers of type: <select name="id"> 
+        {{#each item}}
+        <option value="id">type</option>
+        {{/each}}
+    </select>
+</form>
+    <button onclick="selectType({{id}})">Select</button><br>
 
 </html>
 
