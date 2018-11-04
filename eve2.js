@@ -3,8 +3,8 @@ module.exports = (function() {
     
     var express = require('express');
     var router = express.Router();
-    var callbacks = req.app.get('callbacks');
-    var queries = req.app.get('queries');
+    var callbacks = require('./scripts/callbacks');
+    var queries = require('./scripts/queries');
 
     /******************************************
      *
@@ -71,7 +71,7 @@ module.exports = (function() {
 
     router.post('/wormhole/', function(req,res){
 	    console.log(req.body);
-	    var mysql = req.app.get('mysql');
+        var mysql = req.app.get('mysql');
 	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
 	    + '	 (?, ?)';
 	    var inserts = [req.body.name,

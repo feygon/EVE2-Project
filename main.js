@@ -4,8 +4,8 @@ var bodyParser = require('body-parser');
 
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
-var callbacks = require('./helpers/callbacks.js');
-var queries = require('./helpers/queries.js');
+var callbacks = require('./scripts/callbacks.js');  // callback functions
+var queries = require('./scripts/queries.js'); // big object full of sql strings
  
 app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));

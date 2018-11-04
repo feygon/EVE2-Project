@@ -214,4 +214,4 @@ queries.view.indy_containers = "CREATE VIEW indyCTs_? AS "
 
 queries.view.items_in_OCTnum = "CREATE VIEW items_in_OCT_? AS "; // concat with selection of items in OCT
 
-module.exports.queries = queries;
+module.exports = queries;
