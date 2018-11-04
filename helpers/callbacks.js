@@ -1,10 +1,9 @@
-module.exports = function() {
+function callbacks() {
 
 	var queries = req.app.get('queries');
-	var callbacks;
 
 	// select queries to get a list of ids and names from items.
-	callbacks.cb_item_list = 
+	this.item_list = 
 	function cb_item_list(res, mysql, context, complete){
 		var sql = "";
 		sql += queries.select.item_list;
@@ -19,7 +18,7 @@ module.exports = function() {
 		})
 	}
 
-	callbacks.cb_non_OCT_items = 
+	this.non_OCT_items = 
 	function cb_non_OCT_items(res, mysql, context, complete) {
 		var sql = "";
 		sql += queries.select.non_container_items;
@@ -33,7 +32,5 @@ module.exports = function() {
 			complete();
 		})
 	}
-
-	return callbacks;
-
-}();
+}
+module.exports.callbacks = callbacks;

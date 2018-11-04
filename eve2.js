@@ -1,8 +1,10 @@
-module.exports = function() {
-
+// default method export, overloading the get function with string cases.
+module.exports = (function() {
+    
     var express = require('express');
     var router = express.Router();
     var callbacks = req.app.get('callbacks');
+    var queries = req.app.get('queries');
 
     /******************************************
      *
@@ -38,18 +40,18 @@ module.exports = function() {
         res.render('out_in_space', context);
         });
 
-        /******************************************
+        /********************************************
          * 
-         *      Get routes w/ callbacks
+         *      Get routes w/ callbacks             *
          * 
-         ******************************************/
+         *******************************************/
 
     router.get('/industry/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
 
-        context = callbacks.cb_indy_getItems(res, mysql, context, complete);
+        context = callbacks.item_list(res, mysql, context, complete);
         context.jsscripts = []; // none yet
 
         function complete(){
@@ -67,7 +69,7 @@ module.exports = function() {
 	});
 	
 
-    router.post('/wormhole/',function(req,res)){
+    router.post('/wormhole/', function(req,res){
 	    console.log(req.body);
 	    var mysql = req.app.get('mysql');
 	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
@@ -87,7 +89,7 @@ module.exports = function() {
 
 
 
-   router.post('/inventitem/',function(req,res)){
+   router.post('/inventitem/', function(req,res){
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
@@ -107,7 +109,7 @@ module.exports = function() {
    });
   
   
-   router.post('/inventcontainer/',function(req,res)){
+   router.post('/inventcontainer/', function(req,res){
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
@@ -125,7 +127,7 @@ module.exports = function() {
 	   });
    });
 
-   router.post('/newplayer/',function(req,res)){
+   router.post('/newplayer/', function(req,res){
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Players(name) VALUES'
@@ -142,7 +144,7 @@ module.exports = function() {
    });
 
     return router;
-}();
+})();
 
 // an example of a fully fleshed out route w/ express-handlebars functionality
 /*    router.get('/factory/', function(req,res){
