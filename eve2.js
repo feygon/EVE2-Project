@@ -4,7 +4,6 @@ module.exports = function() {
     var router = express.Router();
     var callbacks = req.app.get('callbacks');
 
-
     router.get('/', function(req, res){
         var callbackCount = 0;
         var context = {};

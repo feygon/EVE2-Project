@@ -1,6 +1,6 @@
 module.exports = function() {
 
-	var queries = require('queries.js');
+	var queries = req.app.get('queries');
 
 	function cb_indy_getItems(res, mysql, context, complete){
 		var sql = "";

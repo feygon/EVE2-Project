@@ -5,7 +5,8 @@ var bodyParser = require('body-parser');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 var callbacks = require('/helpers/callbacks.js');
-
+var queries = require('/helpers/queries.js');
+ 
 app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use('/static', express.static('public'));
@@ -17,13 +18,11 @@ app.set('hbs',handlebars);
 
 app.use('/eve2', require('./eve2.js'));
 
-
-
 app.use(function(req,res){
     res.status(404);
     res.render('404');
 });
-
+ 
 app.use(function(err, req, res, next){
     console.error(err.stack);
     res.status(500);
