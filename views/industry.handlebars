@@ -14,13 +14,15 @@
 
 
 <form id="inventcontainer" action="/container" method="get">
-    Invent Container: <input type="text" name="name" value="name"><br>
+    Invent Container: <br>
+    <selection name="fromitemname">
+    {{#each item}}
+    <option value="{{name}}">Item Name</option>
+    {{/each}}
+    </select><brI>
 <input type="text" name="capacity" value="Capacity"><br>
-    Is This a Ship?<select name="isitship"> 
-
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-    </select><br>
+    <input type="text" name = "type" value="type">
+    <br>
 
     <input type="submit" value="Invent">
 </form>

@@ -54,6 +54,81 @@ module.exports = function() {
 	   var context = {};
 	   res.render('readme', context);
 	});
+	
+
+    router.post('/wormhole/',function(req,res)){
+	    console.log(req.body);
+	    var mysql = req.app.get('mysql');
+	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
+	    + '	VALUES (?, ?)';
+	    var inserts = [req.body.name,
+		    	req.body.Security];
+
+	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+		    if(error){
+			    res.write(JSON.stringify(error));
+			    res.end();
+		    }else{
+			    res.redirect('eve2');
+		    }
+	    });
+    });
+
+
+
+   router.post('/inventitem/',function(req,res)){
+	   console.log(req.body);
+	   var mysql = req.app.get('mysql');
+	   var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
+	   +	' VALUES(?,?,?,?)';
+	   var inserts = [req.body.name,
+		   req.body.packed,
+		   req.body.unpacked,
+		   req.body.type];
+	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+		   if(error){
+			   res.write(JSON.stringify(error));
+			   res.end();
+		   }else{
+			   res.redirect('eve2');
+		   }
+	   });
+   });
+  
+  
+   router.post('/inventcontainer/',function(req,res)){
+	   console.log(req.body);
+	   var mysql = req.app.get('mysql');
+	   var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
+	   +	' VALUES(?,?,?,?)';
+	   var inserts = [req.body.fromitemname,
+		   req.body.capacity,
+		   req.body.type];
+	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+		   if(error){
+			   res.write(JSON.stringify(error));
+			   res.end();
+		   }else{
+			   res.redirect('eve2');
+		   }
+	   });
+   });
+
+   router.post('/newplayer/',function(req,res)){
+	   console.log(req.body);
+	   var mysql = req.app.get('mysql');
+	   var sql = 'INSERT INTO EVE2_Players(name) VALUES'
+	   +	' VALUES(?)';
+	   var inserts = [req.body.name];
+	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+		   if(error){
+			   res.write(JSON.stringify(error));
+			   res.end();
+		   }else{
+			   res.redirect('eve2');
+		   }
+	   });
+   });
 
     return router;
 }();
