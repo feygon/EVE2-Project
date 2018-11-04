@@ -15,6 +15,8 @@ if (process.argv[2]===undefined){process.argv[2]="3001";}
 app.set('port', process.argv[2]);
 app.set('mysql', mysql);
 app.set('hbs',handlebars);
+app.set('callbacks', callbacks);
+app.set('queries', queries);
 
 app.use('/eve2', require('./eve2.js'));
 

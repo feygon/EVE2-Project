@@ -6,7 +6,7 @@
     <input type="text" name="unpackaged" value="unpackaged volume"><br>
     <select name="type"> 
         {{#each item}}
-        <option value="{{id}}">Type</option>
+            <option value="{{id}}">Type</option>
         {{/each}}
     </select><br>
     <input type="submit" value="Invent">
@@ -16,10 +16,12 @@
 <form id="inventcontainer" action="/container" method="get">
     Invent Container: <br>
     <selection name="fromitemname">
-    {{#each item}}
-    <option value="{{name}}">Item Name</option>
+
+    {{#each non_OCT_item}}
+        <option value="{{id}}">{{name}}</option>
     {{/each}}
-    </select><brI>
+
+    </select><br>
 <input type="text" name="capacity" value="Capacity"><br>
     <input type="text" name = "type" value="type">
     <br>
@@ -30,7 +32,7 @@
 <form id="choose-item" action="/item" method="get">
     Item: <select name="id"> 
         {{#each item}}
-        <option value="{{id}}">Item</option>
+            <option value="{{id}}">Item</option>
         {{/each}}
     </select><br>
 </form>
