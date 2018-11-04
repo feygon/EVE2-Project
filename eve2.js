@@ -4,6 +4,12 @@ module.exports = function() {
     var router = express.Router();
     var callbacks = req.app.get('callbacks');
 
+    /******************************************
+     *
+     *  Basic Get routes without callbacks
+     * 
+     ******************************************/
+
     router.get('/', function(req, res){
         var callbackCount = 0;
         var context = {};
@@ -31,6 +37,12 @@ module.exports = function() {
         var mysql = req.app.get('mysql');
         res.render('out_in_space', context);
         });
+
+        /******************************************
+         * 
+         *      Get routes w/ callbacks
+         * 
+         ******************************************/
 
     router.get('/industry/', function(req, res){
         var callbackCount = 0;
