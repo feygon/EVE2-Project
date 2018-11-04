@@ -60,7 +60,7 @@ module.exports = function() {
 	    console.log(req.body);
 	    var mysql = req.app.get('mysql');
 	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
-	    + '	VALUES (?, ?)';
+	    + '	 (?, ?)';
 	    var inserts = [req.body.name,
 		    	req.body.Security];
 
@@ -80,7 +80,7 @@ module.exports = function() {
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
-	   +	' VALUES(?,?,?,?)';
+	   +	'	(?,?,?,?)';
 	   var inserts = [req.body.name,
 		   req.body.packed,
 		   req.body.unpacked,
@@ -100,7 +100,7 @@ module.exports = function() {
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
-	   +	' VALUES(?,?,?,?)';
+	   +	' (?,?,?,?)';
 	   var inserts = [req.body.fromitemname,
 		   req.body.capacity,
 		   req.body.type];
@@ -118,7 +118,7 @@ module.exports = function() {
 	   console.log(req.body);
 	   var mysql = req.app.get('mysql');
 	   var sql = 'INSERT INTO EVE2_Players(name) VALUES'
-	   +	' VALUES(?)';
+	   +	' (?)';
 	   var inserts = [req.body.name];
 	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
 		   if(error){
