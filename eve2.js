@@ -76,7 +76,7 @@ module.exports = (function() {
         //    console.log("Callback " + callbackCount + " complete.");
             if (callbackCount >= 3){
 
-                console.log(`Context is ${JSON.stringify(context)}.`);
+                //console.log(`Context is ${JSON.stringify(context)}.`);
 
                 res.render('industry', context);
             }
