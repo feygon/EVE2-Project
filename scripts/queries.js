@@ -142,7 +142,7 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
     + "SELECT CTid, CTitemName FROM indyCTs_ ? "
     + "ORDER BY itemName";
 
-queries.select.item_types = "SELECT items.type FROM EVE2_Items AS items ORDER BY type";
+queries.select.item_types = "SELECT items.type FROM EVE2_Items AS items GROUP BY type ORDER BY type";
 queries.select.item_list = "SELECT items.id, items.name FROM EVE2_Items as items ORDER BY name";
 queries.select.container_types = "SELECT CT.type FROM EVE2_Containers as CT ORDER BY type";
 queries.select.OCTs_in_OCT_deep = ""; // recursive call required. depth unknown, potentially limitless.

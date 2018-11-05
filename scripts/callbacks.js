@@ -25,9 +25,24 @@ function item_list(res, mysql, context, complete){
 	});
 };
 
+callbacks.item_types = 
+function item_types(res, mysql, context, complete){
+	var sql = "";
+	sql += queries.select.item_types;
+
+	mysql.pool.query(sql, function(error, results, fields){
+		if(error){
+			res.write("cb_non_OCT_items returns: " + JSON.stringify(error));
+			res.end();
+		}
+		context.item_types = results;
+		complete();
+	});
+}
+
 callbacks.non_OCT_items = 
 function non_OCT_items(res, mysql, context, complete) {
-	console.log("calling back non container items");
+//	console.log("calling back non container items");
 	var sql = "";
 	sql += queries.select.non_container_items;
 

@@ -63,6 +63,7 @@ module.exports = (function() {
         //console.log("mysql3: " + mysql);
 
         callbacks.item_list(res, mysql, context, complete);
+        callbacks.item_types(res, mysql, context, complete);
         //console.log("printing context:");
         //console.log(context);
         //console.log("Done printing context.");
@@ -73,7 +74,10 @@ module.exports = (function() {
         function complete(){
             callbackCount++;
         //    console.log("Callback " + callbackCount + " complete.");
-            if (callbackCount >= 2){
+            if (callbackCount >= 3){
+
+                console.log(`Context is ${JSON.stringify(context)}.`);
+
                 res.render('industry', context);
             }
         //    console.log("Done with complete function.");

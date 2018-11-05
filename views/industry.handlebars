@@ -1,12 +1,15 @@
 <html>
 <h1>Industry Page</h1><br>
 <form id="inventitem" action="/item" method="get">
-    <label>Invent Item </label><input type="text" name="name" value="name"><br>
-    <label>Packaged Volume </label><input type="number" step="0.01" min="0" name="packaged"><br>
-    <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged"><br>
+    
+    <h2>Invent Item </h2>
+    <label>Item Name </label><input type="text" name="name" value="Name"><br>
+    <label>Packaged Volume </label><input type="number" step="0.01" min="0" name="packaged" value="0"><br>
+    <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged" value="0"><br>
     <label>Item Type </label><select name="type"> 
+        <option>None</option>
         {{#each item_list}}
-            <option value="{{id}}">{{name}}</option>
+            <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
     <label> </label><input type="submit" value="Invent">
@@ -15,7 +18,7 @@
 
 
 <form id="inventcontainer" action="/container" method="get">
-    <label>Invent Container</label> <br>
+    <h2>Invent Container</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
     {{#each non_OCT_item}}
@@ -23,14 +26,16 @@
     {{/each}}
 
     </select><br>
-    <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity"><br>
-    <label>Container Type </label><input type="text" name = "type" value="type">
+    <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity" value="0"><br>
+    <label>Container Type </label><input type="text" name = "type" value="Type">
     <br>
 
     <label> </label><input type="submit" value="Invent">
 </form><br>
 
+
 <form id="choose-item" action="/item" method="get">
+<h2>Get an inventory item</h2>
     <label>Item </label><select name="id"> 
         <option>None</option>
         {{#each item_list}}
