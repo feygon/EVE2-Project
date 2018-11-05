@@ -116,8 +116,8 @@ module.exports = (function() {
 	    var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
 	    +	'	(?,?,?,?)';
  	    var inserts = [req.body.name,
- 		    req.body.packed,
- 		    req.body.unpacked,
+ 		    req.body.packaged,
+ 		    req.body.unpackaged,
  		    req.body.type];
  	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
 		    if(error){
