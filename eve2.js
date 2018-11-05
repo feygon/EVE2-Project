@@ -104,7 +104,7 @@ module.exports = (function() {
 			    res.write("wormhole post router says: " + JSON.stringify(error));
 			    res.end();
 		    }else{
-			    res.redirect('/eve2/');
+			    res.redirect('/eve2/out_in_space');
 		    }
 	    });
     });
@@ -124,7 +124,7 @@ module.exports = (function() {
 		 	    res.write("invent item post router says: " + JSON.stringify(error));
 			    res.end();
 		    }else{
-			    res.redirect('/eve2/');
+			    res.redirect('/eve2/industry');
 		    }
 	    });
     });
@@ -143,7 +143,7 @@ module.exports = (function() {
                 res.write("invent container post router says: " + JSON.stringify(error));
                 res.end();
             }else{
-                res.redirect('/eve2/');
+                res.redirect('/eve2/industry');
             }
         });
     });
@@ -160,7 +160,7 @@ module.exports = (function() {
                 res.write("new player post router says: " + JSON.stringify(error));
                 res.end();
             }else{
-                res.redirect('/eve2/');
+                res.redirect('/eve2/player');
             }
         });
     });
