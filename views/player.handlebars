@@ -2,7 +2,7 @@
 
 <h1>Player Page</h1><br>
 <h3>Add new player:</h3>
-<form id="newplayer" action="/player" method="post">
+<form id="newplayer" action="/newplayer/" method="post">
     <label>Name:</label> <input type="text" name="name"><br>
     <label></label><input type="submit" value="Submit">
  </form>
@@ -27,7 +27,7 @@
     </tbody> 
 </table> 
 <br/>
-<form id="choose-player" action="/player" method="get">
+<form id="choose-player" action="/player/" method="get">
     <label>Player:</label> <select name="id"> 
         {{#each player}}
         <option value="{{id}}">{{name}}</option>

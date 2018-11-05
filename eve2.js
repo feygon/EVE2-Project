@@ -19,7 +19,7 @@ module.exports = (function() {
         res.render('homepage', context);
         });
 
-    router.get('/player', function(req, res){
+    router.get('/player/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
