@@ -1,45 +1,45 @@
 <html>
-<h3>Out In Space</h3>
+<h1>Out In Space</h1>
 <br>
 
 <form id="choose-station" action="/container" method="get">
-    Station: <select name="id"> 
+ <label>Station:</label> <select name="id"> 
         {{#each station}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
 </form>
-<button onclick="selectContainer({{id}})">Dock</button><br>
+<label></label><button onclick="selectContainer({{id}})">Dock</button><br>
 <br/>
 
 
 <form id="choose-location" action="/location" method="get">
-    Location: <select name="id"> 
+    <label>Location:</label> <select name="id"> 
         {{#each location}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
 </form>
-<button onclick="selectLocation({{id}})">Move</button><br>
+<label></label><button onclick="selectLocation({{id}})">Move</button><br>
 
 <br/>
 
 <form id="choose-item" action="/item" method="get">
-    Item: <select name="id"> 
+    <label>Item:</label> <select name="id"> 
         {{#each item}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
 </form>
 
-<button onclick="deleteItem({{id}})">Jettison</button><br>
+<label></label><button onclick="deleteItem({{id}})">Jettison</button><br>
  
 
 <h3>Chart A Wormhole</h3>
 <form id="wormhole" action="/location" method="get">
-Wormhole Name: <input type="text" name="name" value="name"><br>
-Wormhole Security Status: <input type="text" name="Security" value="-10.0 - 10.0"><br>
+<label>Wormhole Name:</label> <input type="text" name="name" value="name"><br>
+<label>Wormhole Security Status:</label> <input type="text" name="Security" value="-10.0 - 10.0"><br>
 
-    <input type="submit" value="Invent">
+    <label></label><input type="submit" value="Invent">
 </form>
 </html>
