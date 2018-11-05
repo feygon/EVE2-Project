@@ -1,6 +1,6 @@
 <html>
 <h1>Industry Page</h1><br>
-<form id="inventitem" action="/item" method="post">
+<form id="inventitem" action="/inventitem/" method="post">
     
     <h2>Invent Item </h2>
     <label>Item Name </label><input type="text" name="name" value="Name"><br>
@@ -17,7 +17,7 @@
 <br>
 
 
-<form id="inventcontainer" action="/container" method="post">
+<form id="inventcontainer" action="/inventcontainer/" method="post">
     <h2>Invent Container</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
@@ -34,7 +34,7 @@
 </form><br>
 
 
-<form id="choose-item" action="/item" method="get">
+<form id="choose-item" action="/item/" method="get">
 <h2>Get an inventory item</h2>
     <label>Item </label><select name="id"> 
         <option>None</option>
