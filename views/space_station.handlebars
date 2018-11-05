@@ -62,9 +62,10 @@
         {{#each item}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
-    </select>
-</form>
+</select>
+
     <label></label><button onclick="changeContainer({{id}})">Change</button><br>
+</form>
 
 
 <form id="sort-item" action="/item" method="get">
@@ -73,17 +74,20 @@
         <option value="id">type</option>
         {{/each}}
     </select>
-</form>
+
     <label></label><button onclick="selectType({{id}})">Select</button><br>
+</form>
 
     <form id="sort-container" action="/container" method="get">
    <label>Get containers of type:</label> <select name="id"> 
         {{#each item}}
         <option value="id">type</option>
         {{/each}}
-    </select>
-</form>
+
+</select>
+
     <label></label><button onclick="selectType({{id}})">Select</button><br>
+</form>
 
 </html>
 
