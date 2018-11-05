@@ -8,7 +8,7 @@
     <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged" value="0"><br>
     <label>Item Type </label><select name="type"> 
         <option>None</option>
-        {{#each item_list}}
+        {{#each item_types}}
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
