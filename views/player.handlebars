@@ -29,6 +29,7 @@
 <br/>
 <form id="choose-player" action="/player/" method="get">
     <label>Player:</label> <select name="id"> 
+        <option>None</option>
         {{#each player}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}

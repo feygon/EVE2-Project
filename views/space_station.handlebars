@@ -59,6 +59,7 @@
 
 <form id="choose-ship" action="/container" method="get">
     <label>Change Piloting ship:</label> <select name="id"> 
+        <option>None</option>
         {{#each item}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
@@ -70,6 +71,7 @@
 
 <form id="sort-item" action="/item" method="get">
    <label>Get items of type:</label> <select name="id"> 
+       <option>None</option>
         {{#each item}}
         <option value="id">type</option>
         {{/each}}
@@ -80,6 +82,7 @@
 
     <form id="sort-container" action="/container" method="get">
    <label>Get containers of type:</label> <select name="id"> 
+       <option>None</option>
         {{#each item}}
         <option value="id">type</option>
         {{/each}}
