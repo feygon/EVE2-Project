@@ -1,41 +1,44 @@
 <html>
-<h1>Industry Page</h1>
+<h1>Industry Page</h1><br>
 <form id="inventitem" action="/item" method="get">
-    Invent Item: <input type="text" name="name" value="name"><br>
-    <input type="text" name="packaged" value="packaged volume"><br>
-    <input type="text" name="unpackaged" value="unpackaged volume"><br>
-    <select name="type"> 
-        {{#each item}}
-            <option value="{{id}}">Type</option>
+    <label>Invent Item </label><input type="text" name="name" value="name"><br>
+    <label>Packaged Volume </label><input type="number" step="0.01" min="0" name="packaged"><br>
+    <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged"><br>
+    <label>Item Type </label><select name="type"> 
+        {{#each item_list}}
+            <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-    <input type="submit" value="Invent">
+    <label> </label><input type="submit" value="Invent">
 </form>
+<br>
 
 
 <form id="inventcontainer" action="/container" method="get">
-    Invent Container: <br>
-    <selection name="fromitemname">
-
+    <label>Invent Container</label> <br>
+    <label>Based on item </label><select name="fromitemname">
+        <option>None</option>
     {{#each non_OCT_item}}
         <option value="{{id}}">{{name}}</option>
     {{/each}}
 
     </select><br>
-<input type="text" name="capacity" value="Capacity"><br>
-    <input type="text" name = "type" value="type">
+    <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity"><br>
+    <label>Container Type </label><input type="text" name = "type" value="type">
     <br>
 
-    <input type="submit" value="Invent">
-</form>
+    <label> </label><input type="submit" value="Invent">
+</form><br>
 
 <form id="choose-item" action="/item" method="get">
-    Item: <select name="id"> 
-        {{#each item}}
-            <option value="{{id}}">Item</option>
+    <label>Item </label><select name="id"> 
+        <option>None</option>
+        {{#each item_list}}
+            <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
+<label> </label><button onclick="selectitem({{id}})">Buy/Make</button><br>
 </form>
-<button onclick="selectitem({{id}})">Buy/Make</button><br>
+
 
 </html>

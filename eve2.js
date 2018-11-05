@@ -6,11 +6,11 @@ module.exports = (function() {
     var callbacks = require('./scripts/callbacks');
     var queries = require('./scripts/queries');
 
-    /******************************************
+    /********************************************
      *
-     *  Basic Get routes without callbacks
+     *  Basic Get routes without callbacks      *
      * 
-     ******************************************/
+     *******************************************/
 
     router.get('/', function(req, res){
         var callbackCount = 0;
@@ -39,36 +39,54 @@ module.exports = (function() {
         var mysql = req.app.get('mysql');
         res.render('out_in_space', context);
         });
-
+    
+    router.get('/readMe/', function(req, res){
+        var context = {};
+        res.render('readme', context);
+        });
+         
+     
         /********************************************
          * 
          *      Get routes w/ callbacks             *
          * 
          *******************************************/
 
+    // get industry page
+    //      call back to get item list
+
     router.get('/industry/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
 
-        context = callbacks.item_list(res, mysql, context, complete);
-        context.jsscripts = []; // none yet
+        //console.log("mysql3: " + mysql);
+
+        callbacks.item_list(res, mysql, context, complete);
+        //console.log("printing context:");
+        //console.log(context);
+        //console.log("Done printing context.");
+        callbacks.non_OCT_items(res, mysql, context, complete);
+
+        //context.jsscripts = []; // no client-side scripts yet
 
         function complete(){
             callbackCount++;
-            if (callbackCount >= 1){
+        //    console.log("Callback " + callbackCount + " complete.");
+            if (callbackCount >= 2){
                 res.render('industry', context);
             }
+        //    console.log("Done with complete function.");
         }
         
     });
 
-    router.get('/readMe/', function(req, res){
-	   var context = {};
-	   res.render('readme', context);
-	});
-	
-
+    /************************************************
+    *
+    *       Post Routes w/ sql                      *
+    *   
+    ************************************************/
+    
     router.post('/wormhole/', function(req,res){
 	    console.log(req.body);
         var mysql = req.app.get('mysql');
@@ -79,7 +97,7 @@ module.exports = (function() {
 
 	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
 		    if(error){
-			    res.write(JSON.stringify(error));
+			    res.write("wormhole post router says: " + JSON.stringify(error));
 			    res.end();
 		    }else{
 			    res.redirect('eve2');
@@ -88,60 +106,60 @@ module.exports = (function() {
     });
 
 
-
-   router.post('/inventitem/', function(req,res){
-	   console.log(req.body);
-	   var mysql = req.app.get('mysql');
-	   var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
-	   +	'	(?,?,?,?)';
-	   var inserts = [req.body.name,
-		   req.body.packed,
-		   req.body.unpacked,
-		   req.body.type];
-	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
-		   if(error){
-			   res.write(JSON.stringify(error));
-			   res.end();
-		   }else{
-			   res.redirect('eve2');
-		   }
-	   });
-   });
+    router.post('/inventitem/', function(req,res){
+	    console.log(req.body);
+	    var mysql = req.app.get('mysql');
+	    var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
+	    +	'	(?,?,?,?)';
+ 	    var inserts = [req.body.name,
+ 		    req.body.packed,
+ 		    req.body.unpacked,
+ 		    req.body.type];
+ 	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+		    if(error){
+		 	    res.write("invent item post router says: " + JSON.stringify(error));
+			    res.end();
+		    }else{
+			    res.redirect('eve2');
+		    }
+	    });
+    });
   
   
-   router.post('/inventcontainer/', function(req,res){
-	   console.log(req.body);
-	   var mysql = req.app.get('mysql');
-	   var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
-	   +	' (?,?,?,?)';
-	   var inserts = [req.body.fromitemname,
-		   req.body.capacity,
-		   req.body.type];
-	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
-		   if(error){
-			   res.write(JSON.stringify(error));
-			   res.end();
-		   }else{
-			   res.redirect('eve2');
-		   }
-	   });
-   });
+    router.post('/inventcontainer/', function(req,res){
+        console.log(req.body);
+        var mysql = req.app.get('mysql');
+        var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
+        +	' (?,?,?,?)';
+        var inserts = [req.body.fromitemname,
+            req.body.capacity,
+            req.body.type];
+        sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+            if(error){
+                res.write("invent container post router says: " + JSON.stringify(error));
+                res.end();
+            }else{
+                res.redirect('eve2');
+            }
+        });
+    });
 
-   router.post('/newplayer/', function(req,res){
-	   console.log(req.body);
-	   var mysql = req.app.get('mysql');
-	   var sql = 'INSERT INTO EVE2_Players(name) VALUES'
-	   +	' (?)';
-	   var inserts = [req.body.name];
-	   sql = mysql.pool.query(sql,inserts,function(error,results,fields){
-		   if(error){
-			   res.write(JSON.stringify(error));
-			   res.end();
-		   }else{
-			   res.redirect('eve2');
-		   }
-	   });
-   });
+
+    router.post('/newplayer/', function(req,res){
+        console.log(req.body);
+        var mysql = req.app.get('mysql');
+        var sql = 'INSERT INTO EVE2_Players(name) VALUES'
+        +	' (?)';
+        var inserts = [req.body.name];
+        sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+            if(error){
+                res.write("new player post router says: " + JSON.stringify(error));
+                res.end();
+            }else{
+                res.redirect('eve2');
+            }
+        });
+    });
 
     return router;
 })();

@@ -143,7 +143,7 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
     + "ORDER BY itemName";
 
 queries.select.item_types = "SELECT items.type FROM EVE2_Items AS items ORDER BY type";
-queries.select.item_list = "SELECT items.id, items.name FROM EVE2_Items ORDER BY name";
+queries.select.item_list = "SELECT items.id, items.name FROM EVE2_Items as items ORDER BY name";
 queries.select.container_types = "SELECT CT.type FROM EVE2_Containers as CT ORDER BY type";
 queries.select.OCTs_in_OCT_deep = ""; // recursive call required. depth unknown, potentially limitless.
 queries.select.items_in_listed_OCTs = "SELECT CTinv.id FROM EVE2_CONTAINS AS CTinv WHERE CTinv.OWNS_id IS IN ";
@@ -152,7 +152,7 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
     + "SELECT CTid, CTitemName FROM indyCTs_? "
     + "ORDER BY itemName";
 
-queries.select.non_container_items = "SELECT item.id, item.name FROM EVE2_items AS item "
+queries.select.non_container_items = "SELECT item.id, item.name FROM EVE2_Items AS item "
     + "WHERE item.id NOT IN (" 
         + "SELECT item.id FROM EVE2_Containers as CT "
             + "INNER JOIN EVE2_Items as item ON item.id = CT.item_id"
@@ -196,9 +196,9 @@ queries.view.OCTs_in_OCTnum = "CREATE VIEW OCTs_in_OCT_? AS "; // concat w/ sele
 
 queries.view.non_OCT_items_in_OCTnum = "CREATE VIEW non_CT_items_in_OCT_? AS "
     + "SELECT "
-    + "itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
-    + "FROM items_in_OCT_? "
-    + "WHERE itemID NOT IN ("; // concat with selection
+        + "itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
+        + "FROM items_in_OCT_? "
+        + "WHERE itemID NOT IN ("; // concat with selection
 
 queries.view.indy_items = "SELECT "
     + "items.id AS itemID, "
@@ -214,4 +214,5 @@ queries.view.indy_containers = "CREATE VIEW indyCTs_? AS "
 
 queries.view.items_in_OCTnum = "CREATE VIEW items_in_OCT_? AS "; // concat with selection of items in OCT
 
+// requiring this file will automatically make the var into this object, with the above sub-objects.
 module.exports = queries;
