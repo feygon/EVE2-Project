@@ -1,9 +1,10 @@
 <html>
 
+<h1>Player Page</h1><br>
 <h3>Add new player:</h3>
 <form id="newplayer" action="/player" method="get">
-    Name: <input type="text" name="name"><br>
-    <input type="submit" value="Submit">
+    <label>Name:</label> <input type="text" name="name"><br>
+    <label></label><input type="submit" value="Submit">
  </form>
 <br/>
 <h3>Existing player:</h3>
@@ -27,12 +28,12 @@
 </table> 
 <br/>
 <form id="choose-player" action="/player" method="get">
-    Player: <select name="id"> 
+    <label>Player:</label> <select name="id"> 
         {{#each player}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
 </form>
-    <button onclick="selectPlayer({{id}})">Use</button><br>
-    <button onclick="deletePlayer({{id}})">Delete</button>
+    <label></label><button onclick="selectPlayer({{id}})">Use</button><br>
+    <label></label><button onclick="deletePlayer({{id}})">Delete</button>
 </html>
