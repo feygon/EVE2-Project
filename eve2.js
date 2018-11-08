@@ -64,17 +64,15 @@ module.exports = (function() {
 
         callbacks.item_list(res, mysql, context, complete);
         callbacks.item_types(res, mysql, context, complete);
-        //console.log("printing context:");
-        //console.log(context);
-        //console.log("Done printing context.");
-        callbacks.non_OCT_items(res, mysql, context, complete);
+        callbacks.container_types(res, mysql, context, complete);
+        callbacks.unassigned_containers(res, mysql, context, complete);
 
         //context.jsscripts = []; // no client-side scripts yet
 
         function complete(){
             callbackCount++;
         //    console.log("Callback " + callbackCount + " complete.");
-            if (callbackCount >= 3){
+            if (callbackCount >= 4){
 
                 //console.log(`Context is ${JSON.stringify(context)}.`);
 
@@ -91,8 +89,8 @@ module.exports = (function() {
     *   
     ************************************************/
     
+    // remember later to hook this up with 2 inserts to EVE2_CONNECTS.
     router.post('/wormhole/', function(req,res){
-	    console.log(req.body);
         var mysql = req.app.get('mysql');
 	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
 	    + '	 (?, ?)';
@@ -111,8 +109,8 @@ module.exports = (function() {
 
 
     router.post('/inventitem/', function(req,res){
-	    console.log(req.body);
-	    var mysql = req.app.get('mysql');
+        var mysql = req.app.get('mysql');
+        
 	    var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
 	    +	'	(?,?,?,?)';
  	    var inserts = [req.body.name,
@@ -131,13 +129,17 @@ module.exports = (function() {
   
   
     router.post('/inventcontainer/', function(req,res){
-        console.log(req.body);
         var mysql = req.app.get('mysql');
+        var pilotable = false;
+        if (req.body.type == "Ship") { pilotable = true; }
+
         var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
         +	' (?,?,?,?)';
         var inserts = [req.body.fromitemname,
-            req.body.capacity,
-            req.body.type];
+                       pilotable,
+                       req.body.capacity,
+                       req.body.type];
+
         sql = mysql.pool.query(sql,inserts,function(error,results,fields){
             if(error){
                 res.write("invent container post router says: " + JSON.stringify(error));
@@ -148,9 +150,9 @@ module.exports = (function() {
         });
     });
 
-
+    // remember later to assign new players to ships.
+    // just making a character is enough for now.
     router.post('/newplayer/', function(req,res){
-        console.log(req.body);
         var mysql = req.app.get('mysql');
         var sql = 'INSERT INTO EVE2_Players(name) VALUES'
         +	' (?)';

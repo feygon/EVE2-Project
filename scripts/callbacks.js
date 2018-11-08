@@ -15,7 +15,7 @@ function item_list(res, mysql, context, complete){
 	//no inserts
 	mysql.pool.query(sql, function(error, results, fields){
 		if(error){
-			res.write("cb_item_list returns: " + JSON.stringify(error));
+			res.write("callback item_list returns: " + JSON.stringify(error));
 			res.end();
 		}
 		context.item_list = results;
@@ -32,7 +32,7 @@ function item_types(res, mysql, context, complete){
 
 	mysql.pool.query(sql, function(error, results, fields){
 		if(error){
-			res.write("cb_non_OCT_items returns: " + JSON.stringify(error));
+			res.write("callback item_types returns: " + JSON.stringify(error));
 			res.end();
 		}
 		context.item_types = results;
@@ -40,18 +40,33 @@ function item_types(res, mysql, context, complete){
 	});
 }
 
-callbacks.non_OCT_items = 
-function non_OCT_items(res, mysql, context, complete) {
-//	console.log("calling back non container items");
+callbacks.container_types = 
+function container_types(res, mysql, context, complete){
 	var sql = "";
-	sql += queries.select.non_container_items;
+	sql += queries.select.container_types;
 
 	mysql.pool.query(sql, function(error, results, fields){
 		if(error){
-			res.write("cb_non_OCT_items returns: " + JSON.stringify(error));
+			res.write("callback item_types returns: " + JSON.stringify(error));
 			res.end();
 		}
-		context.non_OCT_items = results;
+		context.container_types = results;
+		complete();
+	});
+}
+
+callbacks.unassigned_containers = 
+function unassigned_containers(res, mysql, context, complete) {
+//	console.log("calling back non container items");
+	var sql = "";
+	sql += queries.select.unassigned_containers;
+
+	mysql.pool.query(sql, function(error, results, fields){
+		if(error){
+			res.write("callback unassigned_containers returns: " + JSON.stringify(error));
+			res.end();
+		}
+		context.unassigned_containers = results;
 		complete();
 	});
 };

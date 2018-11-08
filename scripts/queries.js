@@ -16,17 +16,17 @@ var queries = {
         "items_in_listed_OCTs": "",
         "merged_items_in_OCTnum": "",
         "item_list": "",
-        "non_container_items": ""
-    }
-    ],
+        "non_container_items": "",
+        "unassigned_containers": "",
+        "connected_locations": ""
+    }],
     "update": [
     {
         "docking": "",
         "set_inside_of": "",
         "set_piloting": "",
         "set_location": ""
-    }
-    ],
+    }],
     "insert": [
     {
         "insert_items_and_OCTs_into_OCT": "",// + select + "));"
@@ -36,8 +36,7 @@ var queries = {
         "insert_OCT": "",
         "insert_new_item": "",
         "insert_container": ""
-    }
-    ],
+    }],
     "delete": [
     {
         "del_items_in_listed_OCTs": "",
@@ -45,8 +44,7 @@ var queries = {
         "del_CONTAINS": "",
         "del_OCT": "",
         "del_item": ""
-    }
-    ],
+    }],
     "view": [
     {
         "items_in_OCTnum": "",
@@ -54,8 +52,7 @@ var queries = {
         "non_OCT_items_in_OCTnum": "",
         "indy_items": "",
         "indy_containers": ""
-    }
-    ],
+    }],
     "procedure_call": [
     {
         "SP_addItemToOCT": "",
@@ -63,8 +60,7 @@ var queries = {
         "SP_getCTItemID": "",
         "SP_getPilotedShipID": "",
         "SP_moveContainerIntoContainer": ""
-    }
-    ]
+    }]
 } 
 
 queries.select.pilot_by_ship = "SELECT "
@@ -144,7 +140,7 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
 
 queries.select.item_types = "SELECT items.type FROM EVE2_Items AS items GROUP BY type ORDER BY type";
 queries.select.item_list = "SELECT items.id, items.name FROM EVE2_Items as items ORDER BY name";
-queries.select.container_types = "SELECT CT.type FROM EVE2_Containers as CT ORDER BY type";
+queries.select.container_types = "SELECT CT.type FROM EVE2_Containers as CT GROUP BY type ORDER BY type";
 queries.select.OCTs_in_OCT_deep = ""; // recursive call required. depth unknown, potentially limitless.
 queries.select.items_in_listed_OCTs = "SELECT CTinv.id FROM EVE2_CONTAINS AS CTinv WHERE CTinv.OWNS_id IS IN ";
 queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
@@ -152,11 +148,23 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
     + "SELECT CTid, CTitemName FROM indyCTs_? "
     + "ORDER BY itemName";
 
+queries.select.unassigned_containers = "SELECT item.id, item.name FROM EVE2_Items AS item "
++ "WHERE item.type = 'container' AND item.id NOT IN (" 
+    + "SELECT item.id FROM EVE2_Containers as CT "
+        + "INNER JOIN EVE2_Items as item ON item.id = CT.item_id"
+    + ")";
+
 queries.select.non_container_items = "SELECT item.id, item.name FROM EVE2_Items AS item "
     + "WHERE item.id NOT IN (" 
         + "SELECT item.id FROM EVE2_Containers as CT "
             + "INNER JOIN EVE2_Items as item ON item.id = CT.item_id"
         + ")";
+
+queries.select.connected_locations = "link.id, link.name FROM EVE2_CONNECTS as wormhole "
+    + "INNER JOIN EVE2_Locations as source ON wormhole.source_id = source.id "
+    + "AND source.id = ?"
+    + "INNER JOIN EVE2_Locations as link ON wormhole.link_id = link.id "
+    + "ORDER BY link.name";
 
 queries.insert.insert_player = "INSERT INTO EVE2_Players (name, piloting_OWNS_id) VALUES (?,?)";
 queries.insert.insert_location = "INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?)";
