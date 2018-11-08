@@ -12,17 +12,17 @@
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
-    <label> </label><input type="submit" value="Invent">
+    <label>(Reviewer - This is an insert)</label><input type="submit" value="Invent">
 </form>
 <br>
 
 
-<form id="inventcontainer" action="/eve2/inventcontainer/" method="post">
-    <h2>Invent Container</h2> <br>
+<form id="designuse" action="/eve2/designitemuse/" method="post">
+    <h2>Design a use for an item</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
     {{#each unassigned_containers}}
-        <option value="{{id}}">{{name}}</option>
+        <option value="{{id}}">{{name}}, {{type}}</option>
     {{/each}}
 
     </select><br>
@@ -34,7 +34,7 @@
         {{/each}}
     </select><br>
 
-    <label> </label><input type="submit" value="Invent">
+    <label>(Reviewer - This is an insert)</label><input type="submit" value="Design">
 </form><br>
 
 
@@ -46,8 +46,7 @@
             <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label> </label><button onclick="selectitem({{id}})">Buy/Make</button><br>
+<label>(Reviewer - This is an insert)</label><button onclick="selectitem({{id}})">Get Object</button><br>
 </form>
-
 
 </html>

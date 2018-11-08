@@ -92,8 +92,7 @@ module.exports = (function() {
     // remember later to hook this up with 2 inserts to EVE2_CONNECTS.
     router.post('/wormhole/', function(req,res){
         var mysql = req.app.get('mysql');
-	    var sql = 'INSERT INTO EVE2_Locations(name, sec_status) VALUES'
-	    + '	 (?, ?)';
+	    var sql = queries.insert.insert_location;
 	    var inserts = [req.body.name,
 		    	req.body.Security];
 
@@ -111,8 +110,7 @@ module.exports = (function() {
     router.post('/inventitem/', function(req,res){
         var mysql = req.app.get('mysql');
         
-	    var sql = 'INSERT INTO EVE2_Items(name,vol_packed,vol_unpacked,type) VALUES'
-	    +	'	(?,?,?,?)';
+	    var sql = queries.insert.insert_new_item;
  	    var inserts = [req.body.name,
  		    req.body.packaged,
  		    req.body.unpackaged,
@@ -128,13 +126,12 @@ module.exports = (function() {
     });
   
   
-    router.post('/inventcontainer/', function(req,res){
+    router.post('/eve2/designitemuse/', function(req,res){
         var mysql = req.app.get('mysql');
         var pilotable = false;
         if (req.body.type == "Ship") { pilotable = true; }
 
-        var sql = 'INSERT INTO EVE2_Containers(item_id,pilotable,capacity,type) VALUES'
-        +	' (?,?,?,?)';
+        var sql = queries.insert.insert_container;
         var inserts = [req.body.fromitemname,
                        pilotable,
                        req.body.capacity,
@@ -154,8 +151,7 @@ module.exports = (function() {
     // just making a character is enough for now.
     router.post('/newplayer/', function(req,res){
         var mysql = req.app.get('mysql');
-        var sql = 'INSERT INTO EVE2_Players(name) VALUES'
-        +	' (?)';
+        var sql = queries.insert.insert_player;
         var inserts = [req.body.name];
         sql = mysql.pool.query(sql,inserts,function(error,results,fields){
             if(error){

@@ -148,7 +148,7 @@ queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
     + "SELECT CTid, CTitemName FROM indyCTs_? "
     + "ORDER BY itemName";
 
-queries.select.unassigned_containers = "SELECT item.id, item.name FROM EVE2_Items AS item "
+queries.select.unassigned_containers = "SELECT item.id, item.name, item.type FROM EVE2_Items AS item "
 + "WHERE item.type = 'container' AND item.id NOT IN (" 
     + "SELECT item.id FROM EVE2_Containers as CT "
         + "INNER JOIN EVE2_Items as item ON item.id = CT.item_id"
