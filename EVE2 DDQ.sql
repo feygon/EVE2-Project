@@ -350,7 +350,7 @@ BEGIN
     INSERT INTO EVE2_Locations (name, sec_status) VALUES ("HV_EAP", -0.2);
 END //
 
--- SP_CreateItemUse:     stored procedure to input containers (with item assignments)
+-- SP_CreateItemUse:     stored procedure to input cargo spaces (with item structure assignments)
 CREATE PROCEDURE SP_CreateItemUse()
 BEGIN
     CALL SP_getItemStructureID("Small Standard Container");

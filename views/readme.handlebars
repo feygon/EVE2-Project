@@ -72,10 +72,10 @@ capability for all entities</p>
 player entity: Add a new player on the player page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
-player entity: Invent a new container on the industry page.</p>
+player entity: Design a new item use on the industry page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
-structures entity: Invent a new item on the industry page.</p>
+structures entity: Invent a new item structure on the industry page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
 locations entity: Chart a wormhole on the out in space page.</p>
@@ -93,50 +93,49 @@ player entity record: Switch ships in the space station page.<br>
 OR</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Update an
-item emtity record: Unpackage an item in the space station page.</p>
+item emtity record: Unpackage an object in the space station page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>3) Add to
 all relationships</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "item
-IS container" 1-to-1 relationship: design an item use in the industry view 
-when you create a container record, you must also assign it to an item with the
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "item structure
+HAS item use" 1-to-1 relationship: design an item use in the industry view. 
+When you create an item use record, you must also assign it to an item with the
 selection box.</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "player
-OWNS container" many to many relationship: Unpackaging and naming a container
-in the space station view adds an instance of that item to the OWNS table.</p>
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
+Cargo Space entity: Unpackaging and naming a cargo space
+in the space station view adds a record to the Cargo Space table.</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "owned
-container CONTAINS item" many-to-many relationship: move an item into a
-container on space station page.</p>
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "cargo space contains" 1-to-many relationship:
+move an object into a cargo space on space station page.</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "container
-NESTS IN container" many-to-one relationship: move a container into another
-container on space station page</p>
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "cargo space
+NESTS IN cargo space" many-to-one relationship: move a cargo space into another
+cargo space on space station page</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Dock at a
-station while out in space view. This simply moves the ship container into the
-space station container.</p>
+station while out in space view. This simply moves the ship cargo space into the
+space station cargo space.</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "owned
-container OCCUPIES location" one-to-many relationship: Create a new player on
-the player page. Doing so creates a new container instance in a location.</p>
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "cargo space
+OCCUPIES location" one-to-many relationship: Create a new player on
+the player page. Doing so creates a new ship in a new space station in a set location.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Unpackage a
-container on a space station page. Doing so also creates a new container
-instance in a location.</p>
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Unpackage an
+object corresponding to a cargo space on a space station page. Doing so also creates a new cargo space
+in that space station's location.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "location
 CONNECTS TO location" many-to-many relationship: Chart a wormhole on the out in
 space page. This links a new location to an old location and vice versa (two new
-records on the table).</p>
+mirror image records on the table).</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "player
 PILOTS cargo space" one-to-one relationship: change ships on space station
@@ -153,16 +152,10 @@ character on the player page. This starts them piloting a ship.</p>
 remove to at least one many-to-many relationship</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Adding to a
-many-to-many relationship is already included above.</p>
+many-to-many relationship is already included above: chart a wormhole.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Remove a
-record from a many-to-many relationship: a player gives a container to another
-player.</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>A player moves
-objects from one cargo space into other cargo spaces.</p>
+record from a many-to-many relationship: destroying a wormhole link is yet to be implemented.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
 
@@ -175,7 +168,7 @@ by name or location: Under construction. Sort players by name or location.</p>
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Sort objects
-and containers by name or type: Table headings on the space station page act as
+and cargo spaces by column: Table headings on the space station page act as
 hyperlinks to sort tables by that heading, toggling between ascending and
 descending.</p>
 
@@ -205,18 +198,17 @@ player by ID</p>
 space View</b></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
-dock: move NESTS IN location of container by session player -&gt;
+dock: move NESTS IN entry of cargo space by session player -&gt;
 container_piloting, location id in dropdown</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE* to
-travel: change cargo space location and all sub-containers recursively</p>
+travel: change cargo space location and all subcargospace recursively</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE*
-to jettison a container: recursively remove cargo space, subcontainers, and
-corresponding objects</p>
+to jettison a cargo space: recursively remove subcargospace and contained objects</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
-jettison an item: removes just an item contained in an owned ship container</p>
+jettison an object: removes just an object entity</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
 chart a wormhole: add a new location by a form and link it to your current
@@ -228,38 +220,37 @@ location</p>
 Station View</b></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
-undock: new location NULL</p>
+undock: new CS nests in set to NULL</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-view inventory of a specific container</p>
+view objects in a specific cargo space</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT* to
-generate a tree of containers recursively</p>
+generate a tree of cargo spaces recursively</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-populate item selection input: trash an item</p>
+populate object selection input: trash an object</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-populate players selection input: give an item to another player</p>
+populate players selection input: give an object to another player</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-populate container input: move an item into another
-container</p>
+populate container input: move an object into another cargo space</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-unpackage a container</p>
+unpackage a cargo space's corresponding object and create the space</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
-repackage a container</p>
+repackage a cargo space's corresponding object and delete the space</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-move objects into containers</p>
+move objects into cargo spaces</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
-move objects out of containers</p>
+move objects out of cargo spaces</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE&amp;INSERT*
-to empty container contents recursively</p>
+to empty cargo space contents recursively</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE to
 change piloting ships</p>
@@ -276,16 +267,16 @@ invent an item structure</p>
 design an item use</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-make/buy objects</p>
+produce objects</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-get item types</p>
+get item structure types</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-get Container types</p>
+get item use scales</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
-get item list</p>
+get item structure list</p>
 
 </div>
 
