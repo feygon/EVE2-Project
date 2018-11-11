@@ -129,13 +129,13 @@ module.exports = (function() {
     router.post('/eve2/designItemUse/', function(req,res){
         var mysql = req.app.get('mysql');
         var pilotable = false;
-        if (req.body.type == "Ship") { pilotable = true; }
+        if (req.body.scale == "Ship") { pilotable = true; }
 
         var sql = queries.insert.insert_item_use;
         var inserts = [req.body.fromitemname,
                        pilotable,
                        req.body.capacity,
-                       req.body.type];
+                       req.body.scale];
 
         sql = mysql.pool.query(sql,inserts,function(error,results,fields){
             if(error){
