@@ -23,7 +23,16 @@ module.exports = (function() {
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
-        res.render('player', context);
+
+	callbacks.player(res, mysql, context, complete);
+	callbacks.player(res, mysql, context, complete);
+
+	 function complete(){
+		 callbackCount++;
+		 if(callbackCount >= 2){
+    			res.render('player',context);
+		 }
+	 }
         });
 
     router.get('/space_station/', function(req, res){
