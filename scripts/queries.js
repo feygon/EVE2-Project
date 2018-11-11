@@ -51,7 +51,7 @@ var queries = {
         "cargoSpaces_in_CargoSpace": "",
         "non_CS_itemStructures_in_CS_numq": "",
         "indy_itemStructures": "",
-        "indy_item_uses": ""
+        "indy_itemUses": ""
     }],
     "procedure_call": [
     {
@@ -72,56 +72,57 @@ queries.select.pilot_by_ship = "SELECT "
     + "INNER JOIN EVE2_CargoSpace as Ship ON Ship.id = player.piloting_CS_id "
     + "ORDER BY ?, ?";
 
-queries.select.CS_count = "SELECT count(itemID) FROM cargoSpaces_in_cargoSpace_?";
+queries.select.CS_count = "SELECT count(structureID) FROM cargoSpaces_in_cargoSpace_?";
 
 queries.select.objects_in_CS = "SELECT "
-    + "structures.id AS itemID, "
-    + "structures.name AS itemName, "
-    + "structures.type AS itemType, "
+    + "structures.id AS id, "
+    + "structures.name AS name, "
+    + "structures.type AS type, "
     + "structures.vol_packed, "
     + "structures.vol_unpacked, "
-    + "OCTinv.qty, " // -- qty will always be 1 with an OCT
-    + "OCTinv.packaged " // -- will always be 1 = true with an OCT
-    + "FROM EVE2_Objects AS OCTinv "
-    + "INNER JOIN EVE2_ItemStructure AS structures ON structures.id = OCTinv.itemStructure_id "
-    + "INNER JOIN EVE2_CargoSpace AS OWNS ON OWNS.id = OCTinv.id "
-    + "AND OWNS.id = ?";
+    + "objects.qty, " // -- qty will always be 1 with an OCT
+    + "objects.packaged " // -- will always be 1 = true with an OCT
+    + "FROM EVE2_Objects AS objects "
+    + "INNER JOIN EVE2_ItemStructure AS structures ON structures.id = objects.itemStructure_id "
+    + "INNER JOIN EVE2_CargoSpace AS CS ON CS.id = objects.id "
+    + "AND CS.id = ?";
 
-queries.select.items_in_OCTnumlist = "SELECT "
-    + "structures.id AS itemID, "
-    + "structures.name AS itemName, "
-    + "structures.type AS itemType, "
+    // use this query with a concatenated subquery.
+queries.select.items_in_CSnumqlist = "SELECT "
+    + "structures.id AS id, "
+    + "structures.name AS name, "
+    + "structures.type AS type, "
     + "structures.vol_packed, "
     + "structures.vol_unpacked, "
-    + "OCTinv.qty, " // -- qty will always be 1 with an OCT
-    + "OCTinv.packaged " // -- will always be 1 = true with an OCT
-    + "FROM EVE2_Objects AS OCTinv "
-    + "INNER JOIN EVE2_ItemStructure AS structures ON structures.id = OCTinv.itemStructure_id "
-    + "INNER JOIN EVE2_CargoSpace AS OWNS ON OWNS.id = OCTinv.id "
-    + "AND OWNS.id IN "; // concat with selection of OCTs
+    + "objects.qty, " // -- qty will always be 1 with an OCT
+    + "objects.packaged " // -- will always be 1 = true with an OCT
+    + "FROM EVE2_Objects AS objects "
+    + "INNER JOIN EVE2_ItemStructure AS structures ON structures.id = objects.itemStructure_id "
+    + "INNER JOIN EVE2_CargoSpace AS CS ON CS.id = objects.id "
+    + "AND CS.id IN "; // concat with selection of CSs
 
 queries.select.cargoSpaces_in_CargoSpace = "SELECT "
-    + "structures.id AS itemID, "
+    + "structures.id AS structureID, "
     + "structures.name AS itemName, "
     + "structures.type AS itemType, "
     + "structures.vol_packed, "
     + "structures.vol_unpacked, "
-    + "OWNS.id AS OCTid, "
-    + "OWNS.name AS OCTname, "
-    + "OWNS.itemUse_id AS OCT_base_id "
-    + "FROM EVE2_CargoSpace AS OWNS "
-    + "INNER JOIN EVE2_ItemUse as CT ON CT.id = CTinv.itemUse_id "
-    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = CT.itemStructure_id "
-    + "INNER JOIN EVE2_Objects as CTinv ON CTinv.cargoSpace_id = OWNS.id "
-    + "AND OWNS.inside_cargoSpace_id = ? ";
+    + "CS.id AS CSid, "
+    + "CS.name AS CSname, "
+    + "CS.itemUse_id AS CS_itemUse_id "
+    + "FROM EVE2_CargoSpace AS CS "
+    + "INNER JOIN EVE2_ItemUse as IUse ON IUse.id = objects.itemUse_id "
+    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = IUse.itemStructure_id "
+    + "INNER JOIN EVE2_Objects as objects ON objects.cargoSpace_id = CS.id "
+    + "AND CS.inside_cargoSpace_id = ? ";
 
 queries.select.non_CS_item_structures = "SELECT "
-    + "itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
-    + "FROM items_in_OCT_? "
-    + "WHERE itemID NOT IN "; // concat with selection of OCTs in OCT
+    + "structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
+    + "FROM objects_in_CS_? "
+    + "WHERE structureID NOT IN "; // concat with selection of OCTs in OCT
 
-queries.select.total_vol_of_non_CS_item_structures = "SELECT sum(sum(vol_packed)) FROM non_CT_items_in_OCT_?";
-queries.select.total_vol_all_item_structures = "SELECT sum(vol_packed) FROM items_in_OCT_? ";
+queries.select.total_vol_of_non_CS_item_structures = "SELECT sum(sum(vol_packed)) FROM non_CS_objects_in_CS_?";
+queries.select.total_vol_all_item_structures = "SELECT sum(vol_packed) FROM objects_in_CS_? ";
 
 queries.select.all_players = "SELECT "
     + "player.id AS playerID, "
@@ -133,31 +134,31 @@ queries.select.all_players = "SELECT "
     + "INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id "
     + "ORDER BY ?, ? ";
 
-queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
+queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_? "
     + "UNION "
     + "SELECT CTid, CTitemName FROM indyCTs_ ? "
     + "ORDER BY itemName";
 
 queries.select.item_structure_types = "SELECT structures.type FROM EVE2_ItemStructure AS structures GROUP BY type ORDER BY type";
 queries.select.item_structure_list = "SELECT structures.id, structures.name, structures.type FROM EVE2_ItemStructure as structures ORDER BY name";
-queries.select.item_use_scales = "SELECT CT.type FROM EVE2_ItemUse as CT GROUP BY type ORDER BY type";
+queries.select.item_use_scales = "SELECT itemUse.scale FROM EVE2_ItemUse as CT GROUP BY type ORDER BY type";
 queries.select.CargoSpaces_in_CargoSpace_deep = ""; // recursive call required. depth unknown, potentially limitless.
 queries.select.objects_in_listed_cargoSpaces = "SELECT CTinv.id FROM EVE2_Objects AS CTinv WHERE CTinv.cargoSpace_id IS IN ";
-queries.select.indy_views_union = "SELECT itemID, itemName FROM indyItems_? "
+queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_? "
     + "UNION "
     + "SELECT CTid, CTitemName FROM indyCTs_? "
     + "ORDER BY itemName";
 
-queries.select.useless_item_structures = "SELECT item.id, item.name, item.type FROM EVE2_ItemStructure AS item "
-+ "WHERE item.type = 'container' AND item.id NOT IN (" 
-    + "SELECT item.id FROM EVE2_ItemUse as CT "
-        + "INNER JOIN EVE2_ItemStructure as item ON item.id = CT.itemStructure_id"
+queries.select.useless_item_structures = "SELECT structure.id, structure.name, structure.type FROM EVE2_ItemStructure as structure "
++ "WHERE structure.type = 'container' AND structure.id NOT IN (" 
+    + "SELECT structure.id FROM EVE2_ItemUse as CT "
+        + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = CT.itemStructure_id"
     + ")";
 
-queries.select.non_CS_structures = "SELECT item.id, item.name FROM EVE2_ItemStructure AS item "
-    + "WHERE item.id NOT IN (" 
-        + "SELECT item.id FROM EVE2_ItemUse as CT "
-            + "INNER JOIN EVE2_ItemStructure as item ON item.id = CT.itemStructure_id"
+queries.select.non_CS_structures = "SELECT structure.id, structure.name FROM EVE2_ItemStructure AS structure "
+    + "WHERE structure.id NOT IN (" 
+        + "SELECT structure.id FROM EVE2_ItemUse as CT "
+            + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = CT.itemStructure_id"
         + ")";
 
 queries.select.linked_locations = "link.id, link.name FROM EVE2_LINKS as wormhole "
@@ -191,36 +192,36 @@ queries.insert.insert_structures_and_CSs_into_CS = ""; // get selection of objec
 queries.delete.del_structures_in_listed_cargoSpaces = "DELETE CTinv.id FROM EVE2_Objects AS CTinv WHERE CTinv.cargoSpace_id IS IN ";
 
 // for displaying containers and objects together.
-queries.view.merged_objects_in_cargoSpace_numq = "CREATE VIEW merged_items_? "
-    + "SELECT itemID, itemName, itemType, vol_packed, qty, packaged, NULL, NULL, NULL "
-        + "FROM items_in_OCT_? "
+queries.view.merged_objects_in_cargoSpace_numq = "CREATE VIEW merged_objects_? "
+    + "SELECT structureID, itemName, itemType, vol_packed, qty, packaged, NULL, NULL, NULL "
+        + "FROM objects_in_CS_? "
     + "UNION "
-    + "SELECT itemID, itemName, itemType, "
-    + "vol_unpacked, NULL, NULL, OCTid, OCTname, OCT_base_id "
-        + "FROM non_CT_items_in_OCT_ ? "
+    + "SELECT structureID, itemName, itemType, "
+    + "vol_unpacked, NULL, NULL, CSid, CSname "
+        + "FROM non_CS_objects_in_CS_? "
     + "ORDER BY ?, ?";
 
 queries.view.cargoSpaces_in_CargoSpace = "CREATE VIEW cargoSpaces_in_cargoSpace_? AS "; // concat w/ selection of OCTs in OCTnum
 
-queries.view.non_CS_itemStructures_in_CS_numq = "CREATE VIEW non_CT_items_in_OCT_? AS "
+queries.view.non_CS_itemStructures_in_CS_numq = "CREATE VIEW non_CS_objects_in_CS_? AS "
     + "SELECT "
-        + "itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
-        + "FROM items_in_OCT_? "
-        + "WHERE itemID NOT IN ("; // concat with selection
+        + "structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
+        + "FROM objects_in_CS_? "
+        + "WHERE structureID NOT IN ("; // concat with selection
 
 queries.view.indy_itemStructures = "SELECT "
-    + "structures.id AS itemID, "
+    + "structures.id AS structureID, "
     + "structures.name AS itemName "
     + "FROM EVE2_ItemStructure as structures";
 
-queries.view.indy_item_uses = "CREATE VIEW indyCTs_? AS "
+queries.view.indy_itemUses = "CREATE VIEW indyCTs_? AS "
     + "SELECT "
-        + "CT.id AS CTid, "
-        + "CTitem.name AS CTitemName "
-        + "FROM EVE2_ItemUse AS CT "
-        + "INNER JOIN EVE2_ItemStructure as CTitem ON CTitem.id = CT.itemStructure_id";
+        + "itemUse.id AS id, "
+        + "object.name AS name "
+        + "FROM EVE2_ItemUse AS itemUse "
+        + "INNER JOIN EVE2_ItemStructure as object ON object.id = itemUse.itemStructure_id";
 
-queries.view.objects_in_CS = "CREATE VIEW items_in_OCT_? AS "; // concat with selection of objects in OCT
+queries.view.objects_in_CS = "CREATE VIEW objects_in_CS_? AS "; // concat with selection of objects in OCT
 
 // requiring this file will automatically make the var into this object, with the above sub-objects.
 module.exports = queries;

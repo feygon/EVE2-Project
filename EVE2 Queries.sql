@@ -18,9 +18,9 @@
 */
 
 /* C-style prototypes for stored procedures:
-    void SP_addObjectToCS(IN itemID int, IN qty INT, IN packed TINYINT(1), IN OCT int);
-    void SP_remObjectFromCS(IN OCT int, IN itemID INT, IN packed TINYINT(1), IN qty INT);
-    int SP_getItemUseItemID(IN OCTid int, OUT itemID int);
+    void SP_addObjectToCS(IN structureID int, IN qty INT, IN packed TINYINT(1), IN OCT int);
+    void SP_remObjectFromCS(IN OCT int, IN structureID INT, IN packed TINYINT(1), IN qty INT);
+    int SP_getItemUseItemID(IN OCTid int, OUT structureID int);
     int SP_getPilotedCS_id(IN playerID int, OUT shipID int);
     void SP_moveCSintoCS(IN subOCT int, IN newOCT int);
 */
@@ -38,7 +38,7 @@
 --      
 -- 3)   Add to all relationships
 --      item IS container --                industry view (design an item use)
---      player OWNS container --            space station view (unpackage a container)
+--      Cargo Space --            space station view (unpackage a container)
 --      cargo space CONTAINS item --    space station view (move an item into a container)
 --      container NESTS IN container --     space station view (move a container into another container),
 --                                          or out in space view (dock)
@@ -111,19 +111,19 @@ SELECT
 /*note to self: transform into stored procedure?*/
 --  SELECT to view inventory of a specific container (OWNS.id)
 -- objects in that container
-DROP VIEW IF EXISTS items_in_OCT_?;
-CREATE VIEW items_in_OCT_? AS
+DROP VIEW IF EXISTS objects_in_CS_?;
+CREATE VIEW objects_in_CS_? AS
 SELECT
-    structures.id AS itemID,
+    structures.id AS structureID,
     structures.name AS itemName,
     structures.type AS itemType,
     structures.vol_packed,
     structures.vol_unpacked,
-    OCTinv.qty,              -- will always be 1 with an OCT
-    OCTinv.packaged          -- will always be 1 with an OCT
-    FROM EVE2_Objects AS OCTinv
-    INNER JOIN EVE2_ItemStructure AS structures ON structures.id = OCTinv.itemStructure_id
-    INNER JOIN EVE2_CargoSpace AS OWNS ON OWNS.id = OCTinv.id
+    objects.qty,              -- will always be 1 with an OCT
+    objects.packaged          -- will always be 1 with an OCT
+    FROM EVE2_Objects AS objects
+    INNER JOIN EVE2_ItemStructure AS structures ON structures.id = objects.itemStructure_id
+    INNER JOIN EVE2_CargoSpace AS CS ON CS.id = objects.id
         AND OWNS.id = ?;
 
     -- place in stored procedure with 3 parameters for ?, ?, ?, takes 2 parameters from values
@@ -131,7 +131,7 @@ SELECT
 DROP VIEW IF EXISTS cargoSpaces_in_cargoSpace_?;
 CREATE VIEW cargoSpaces_in_cargoSpace_? AS
 SELECT
-    structures.id AS itemID,
+    structures.id AS structureID,
     structures.name AS itemName,
     structures.type AS itemType,
     structures.vol_packed,
@@ -140,32 +140,32 @@ SELECT
     OWNS.name AS OCTname,
     OWNS.itemUse_id AS OCT_base_id
     FROM EVE2_CargoSpace AS OWNS
-    INNER JOIN EVE2_ItemUse as CT ON CT.id = CTinv.itemUse_id
-    INNER JOIN EVE2_ItemStructure as structures ON structures.id = CT.itemStructure_id
+    INNER JOIN EVE2_ItemUse as itemUse ON itemUse.id = CTinv.itemUse_id
+    INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id
     INNER JOIN EVE2_Objects as CTinv ON CTinv.cargoSpace_id = OWNS.id
             AND OWNS.inside_cargoSpace_id = ?;
 -- IDs of objects that don't correspond to unpackaged containers
-DROP VIEW IF EXISTS non_CT_items_in_OCT_?;
-CREATE VIEW non_CT_items_in_OCT_? AS
+DROP VIEW IF EXISTS non_CS_objects_in_CS_?;
+CREATE VIEW non_CS_objects_in_CS_? AS
 SELECT
-    itemID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged
-    FROM items_in_OCT_?
-    WHERE itemID NOT IN (SELECT itemID FROM cargoSpaces_in_cargoSpace_?);
+    structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged
+    FROM objects_in_CS_?
+    WHERE structureID NOT IN (SELECT structureID FROM cargoSpaces_in_cargoSpace_?);
 -- Final query, merging containers with non-containers
-DROP VIEW IF EXISTS merged_items_?;
-CREATE VIEW merged_items_?
-SELECT itemID, itemName, itemType, 
+DROP VIEW IF EXISTS merged_objects_?;
+CREATE VIEW merged_objects_?
+SELECT structureID, itemName, itemType, 
     vol_packed, qty, packaged, NULL, NULL, NULL
-    FROM items_in_OCT_?
+    FROM objects_in_CS_?
 UNION
-SELECT itemID, itemName, itemType, 
+SELECT structureID, itemName, itemType, 
     vol_unpacked, NULL, NULL, OCTid, OCTname, OCT_base_id
-    FROM non_CT_items_in_OCT_?
+    FROM non_CS_objects_in_CS_?
     ORDER BY ?, ?;
     
-SET @containerCount = (SELECT count(itemID) FROM cargoSpaces_in_cargoSpace_?);
-SET @totalVol = (SELECT sum(sum(vol_packed)) FROM non_CT_items_in_OCT_?);
-SET @totalVolAll = (SELECT sum(vol_packed) FROM items_in_OCT_?);
+SET @containerCount = (SELECT count(structureID) FROM cargoSpaces_in_cargoSpace_?);
+SET @totalVol = (SELECT sum(sum(vol_packed)) FROM non_CS_objects_in_CS_?);
+SET @totalVolAll = (SELECT sum(vol_packed) FROM objects_in_CS_?);
 
 
 --  SELECT to populate item selection input:                trash an item
@@ -188,19 +188,19 @@ SELECT
 --  SELECT to get item names for industry view selection box
 CREATE VIEW indyItems_? AS
 SELECT
-    structures.id AS itemID,
+    structures.id AS structureID,
     structures.name AS itemName
     FROM EVE2_ItemStructure as structures;
 
 --  SELECT to get Container names for industry view selection box
 CREATE VIEW indyCTs_? AS
 SELECT
-    CT.id AS CTid,
-    CTitem.name AS CTitemName
-    FROM EVE2_ItemUse AS CT
-    INNER JOIN EVE2_ItemStructure as CTitem ON CTitem.id = CT.itemStructure_id;
+    itemUse.id AS CTid,
+    object.name AS CTitemName
+    FROM EVE2_ItemUse AS itemUse
+    INNER JOIN EVE2_ItemStructure as object ON object.id = CT.itemStructure_id;
     
-SELECT itemID, itemName FROM indyItems_?
+SELECT structureID, itemName FROM indyItems_?
 UNION
 SELECT CTid, CTitemName FROM indyCTs_?
     ORDER BY itemName;
@@ -211,7 +211,7 @@ DROP VIEW IF EXISTS indyCTs_?;
 --  SELECT to get item type list for item creation form selection box
 SELECT structures.type FROM EVE2_ItemStructure AS structures ORDER BY type;
 -- SELECT to get container type list for form selection box
-SELECT CT.type FROM EVE2_ItemUse as CT ORDER BY type;
+SELECT itemUse.scale FROM EVE2_ItemUse as CT ORDER BY type;
 
 
 --  SELECT* to generate a tree of containers *recursively*
@@ -255,19 +255,19 @@ UPDATE EVE2_CargoSpace
 DELIMITER //
 DROP PROCEDURE IF EXISTS SP_addObjectToCS;
 CREATE PROCEDURE SP_addObjectToCS(
-    IN itemID int,
+    IN structureID int,
     IN qty INT,
     IN packed TINYINT(1),
     IN OCT int)
 BEGIN
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
-                              (itemID,  OCT,      qty,      packed);
+                              (structureID,  OCT,      qty,      packed);
 END //
 
 DROP PROCEDURE IF EXISTS SP_remObjectFromCS;
 CREATE PROCEDURE SP_remObjectFromCS(
     IN OCT int,
-    IN itemID INT,
+    IN structureID INT,
     IN packed TINYINT(1),
     IN qty INT)
 BEGIN
@@ -280,9 +280,9 @@ END //
 DROP PROCEDURE IF EXISTS SP_getItemUseItemID;
 CREATE PROCEDURE SP_getItemUseItemID(
     IN OCTid int,
-    OUT itemID int)
+    OUT structureID int)
 BEGIN
-    itemID = (SELECT item.id FROM EVE2_ItemStructure as item
+    structureID = (SELECT structure.id FROM EVE2_ItemStructure as structure
                 INNER JOIN EVE2_ItemUse as CTs ON CTs.itemStructure_id = item
                 INNER JOIN EVE2_CargoSpace as OCT ON OCT.itemUse_id = CTs.id
                     AND OCT.id = OCTid
@@ -319,13 +319,13 @@ finally, add the child item to the new parent OCT
         SET (inside_cargoSpace_id) VALUES (subOCT)
         WHERE OWNS.id = newOCT;
     
-    DECLARE itemID int;
-    SET itemID = (SELECT itemID FROM (CALL getCorrespondintItem_xOCT(subOCT)));
+    DECLARE structureID int;
+    SET structureID = (SELECT structureID FROM (CALL getCorrespondintItem_xOCT(subOCT)));
 
     IF (oldOCT) NOT NULL THEN
-        remItemFromOCT(itemID, 1, 1, oldOCT);
+        remItemFromOCT(structureID, 1, 1, oldOCT);
     END IF;
-    addItemToOCT(itemID, 1, 1, newOCT); -- i.e. box's id of quantity 1 is unpacked.
+    addItemToOCT(structureID, 1, 1, newOCT); -- i.e. box's id of quantity 1 is unpacked.
 END //
 
 DELIMITER ;
@@ -358,7 +358,7 @@ DELETE FROM EVE2_ItemStructure WHERE id = ?;
 --  (SELECT&)DELETE(&INSERT)* to empty container contents *recursively*
 --  (SELECT&)DELETE* to jettison a container: remove cargo space and corresponding objects
 -- while out in space, ships will only be jettisoning containers that have no containers in them.
--- EVE2_Objects's foreign key has on delete cascade, so if the OCT is deleted, the OCTinventory
+-- EVE2_Objects's foreign key has on delete cascade, so if the OCT is deleted, the objects
 --  will be deleted too.
 -- Just need to delete the OCT.
 
@@ -376,4 +376,4 @@ INSERT INTO EVE2_ItemStructure(name, vol_packed, vol_unpacked, type) VALUES(?,?,
 --  INSERT to design an item use
 INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES(?,?,?,?);--  INSERT to make/buy objects
 --  INSERT to move objects into containers
-    -- PROTOTYPE: void SP_addObjectToCS(IN itemID int, IN qty INT, IN packed TINYINT(1), IN OCT int);
+    -- PROTOTYPE: void SP_addObjectToCS(IN structureID int, IN qty INT, IN packed TINYINT(1), IN OCT int);
