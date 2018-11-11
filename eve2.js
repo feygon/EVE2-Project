@@ -62,10 +62,10 @@ module.exports = (function() {
 
         //console.log("mysql3: " + mysql);
 
-        callbacks.item_list(res, mysql, context, complete);
-        callbacks.item_types(res, mysql, context, complete);
-        callbacks.container_types(res, mysql, context, complete);
-        callbacks.unassigned_containers(res, mysql, context, complete);
+        callbacks.item_structure_list(res, mysql, context, complete);
+        callbacks.item_structure_types(res, mysql, context, complete);
+        callbacks.item_use_scales(res, mysql, context, complete);
+        callbacks.useless_item_structures(res, mysql, context, complete);
 
         //context.jsscripts = []; // no client-side scripts yet
 
@@ -89,7 +89,7 @@ module.exports = (function() {
     *   
     ************************************************/
     
-    // remember later to hook this up with 2 inserts to EVE2_CONNECTS.
+    // remember later to hook this up with 2 inserts to EVE2_LINKS.
     router.post('/wormhole/', function(req,res){
         var mysql = req.app.get('mysql');
 	    var sql = queries.insert.insert_location;
@@ -107,17 +107,17 @@ module.exports = (function() {
     });
 
 
-    router.post('/inventitem/', function(req,res){
+    router.post('/inventstructure/', function(req,res){
         var mysql = req.app.get('mysql');
         
-	    var sql = queries.insert.insert_new_item;
+	    var sql = queries.insert.insert_item_structure;
  	    var inserts = [req.body.name,
  		    req.body.packaged,
  		    req.body.unpackaged,
  		    req.body.type];
  	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
 		    if(error){
-		 	    res.write("invent item post router says: " + JSON.stringify(error));
+		 	    res.write("invent item structure post router says: " + JSON.stringify(error));
 			    res.end();
 		    }else{
 			    res.redirect('/eve2/industry');
@@ -126,12 +126,12 @@ module.exports = (function() {
     });
   
   
-    router.post('/eve2/designitemuse/', function(req,res){
+    router.post('/eve2/designItemUse/', function(req,res){
         var mysql = req.app.get('mysql');
         var pilotable = false;
         if (req.body.type == "Ship") { pilotable = true; }
 
-        var sql = queries.insert.insert_container;
+        var sql = queries.insert.insert_item_use;
         var inserts = [req.body.fromitemname,
                        pilotable,
                        req.body.capacity,
@@ -139,7 +139,7 @@ module.exports = (function() {
 
         sql = mysql.pool.query(sql,inserts,function(error,results,fields){
             if(error){
-                res.write("invent container post router says: " + JSON.stringify(error));
+                res.write("design item use post router says: " + JSON.stringify(error));
                 res.end();
             }else{
                 res.redirect('/eve2/industry');

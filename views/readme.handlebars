@@ -57,7 +57,7 @@ remove to at least one many-to-many relationship</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>5) Search
 using text or filter using dynamically populated list of properties to filter
-on, present for at least one entity (either players on player screen or items
+on, present for at least one entity (either players on player screen or structures
 in industry)</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
@@ -75,7 +75,7 @@ player entity: Add a new player on the player page.</p>
 player entity: Invent a new container on the industry page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
-items entity: Invent a new item on the industry page.</p>
+structures entity: Invent a new item on the industry page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the
 locations entity: Chart a wormhole on the out in space page.</p>
@@ -101,7 +101,7 @@ item emtity record: Unpackage an item in the space station page.</p>
 all relationships</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "item
-IS container" 1-to-1 relationship: invent a container in the industry view 
+IS container" 1-to-1 relationship: design an item use in the industry view 
 when you create a container record, you must also assign it to an item with the
 selection box.</p>
 
@@ -139,7 +139,7 @@ space page. This links a new location to an old location and vice versa (two new
 records on the table).</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Add to the "player
-PILOTS owned container" one-to-one relationship: change ships on space station
+PILOTS cargo space" one-to-one relationship: change ships on space station
 page.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
@@ -162,7 +162,7 @@ player.</p>
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>A player moves
-items from one owned container into other owned containers.</p>
+objects from one cargo space into other cargo spaces.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>&nbsp;</p>
 
@@ -174,7 +174,7 @@ by name or location: Under construction. Sort players by name or location.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>OR</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Sort items
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>Sort objects
 and containers by name or type: Table headings on the space station page act as
 hyperlinks to sort tables by that heading, toggling between ascending and
 descending.</p>
@@ -209,11 +209,11 @@ dock: move NESTS IN location of container by session player -&gt;
 container_piloting, location id in dropdown</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>UPDATE* to
-travel: change owned container location and all sub-containers recursively</p>
+travel: change cargo space location and all sub-containers recursively</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE*
-to jettison a container: recursively remove owned container, subcontainers, and
-corresponding items</p>
+to jettison a container: recursively remove cargo space, subcontainers, and
+corresponding objects</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
 jettison an item: removes just an item contained in an owned ship container</p>
@@ -253,10 +253,10 @@ unpackage a container</p>
 repackage a container</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-move items into containers</p>
+move objects into containers</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>DELETE to
-move items out of containers</p>
+move objects out of containers</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT&amp;DELETE&amp;INSERT*
 to empty container contents recursively</p>
@@ -270,13 +270,13 @@ change piloting ships</p>
 Industry View</b></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-invent an item</p>
+invent an item structure</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-invent a container</p>
+design an item use</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>INSERT to
-make/buy items</p>
+make/buy objects</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt'>SELECT to
 get item types</p>

@@ -1,6 +1,6 @@
 <html>
 <h1>Industry Page</h1><br>
-<form id="inventitem" action="/eve2/inventitem/" method="post">
+<form id="inventstructure" action="/eve2/inventstructure/" method="post">
     
     <h2>Invent Item </h2>
     <label>Item Name </label><input type="text" name="name" value="Name"><br>
@@ -8,11 +8,11 @@
     <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged" value="0"><br>
     <label>Item Type </label><select name="type"> 
         <option>None</option>
-        {{#each item_types}}
+        {{#each item_structure_types}}
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
-    <label>(Reviewer - This is an insert)</label><input type="submit" value="Invent">
+    <label style = "color:red">(Reviewer - This is an insert)</label><input type="submit" value="Invent">
 </form>
 <br>
 
@@ -21,7 +21,7 @@
     <h2>Design a use for an item</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
-    {{#each unassigned_containers}}
+    {{#each useless_item_structures}}
         <option value="{{id}}">{{name}}, {{type}}</option>
     {{/each}}
 
@@ -29,12 +29,12 @@
     <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity" value="0"><br>
     <label>Container Type </label><select name="type"> 
         <option>None</option>
-        {{#each container_types}}
+        {{#each item_use_scales}}
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
 
-    <label>(Reviewer - This is an insert)</label><input type="submit" value="Design">
+    <label style = "color:red">(Reviewer - This is an insert)</label><input type="submit" value="Design">
 </form><br>
 
 
@@ -42,11 +42,11 @@
 <h2>Get an inventory item</h2>
     <label>Item </label><select name="id"> 
         <option>None</option>
-        {{#each item_list}}
+        {{#each item_structure_list}}
             <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label>(Reviewer - This is an insert)</label><button onclick="selectitem({{id}})">Get Object</button><br>
+<label style = "color:red">(Reviewer - This is an insert)</label><button onclick="selectitem({{id}})">Get Object</button><br>
 </form>
 
 </html>
