@@ -21,8 +21,8 @@
     <tbody> 
         {{#each container}}
         <tr> 
-            <td>{{id}}</td> 
-            <td>{{Pilotable}}</td> 
+            <td>{{id}}</td>
+            <td>{{Pilotable}}</td>
             <td>{{capacity}}</td>
             <td>{{type}}</td>
             <td>
@@ -34,20 +34,19 @@
     </select><br>
     </form>
             </td>
-
             <td><button onclick="deleteItem({{id}})">Give</button></td>
             <td><button onclick="deleteItem({{id}})">Delete</button></td>
             <td><button onclick="deleteItem({{id}})">Repackage</button></td>
 
     <table>
     <thead> 
-        <th>Inside Item</th> 
-    </thead> 
-    <tbody> 
-        <tr> 
-            <td>{{Item.name}}</td> 
+        <th>Inside Item</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{Item.name}}</td>
         </tr>
-    </tbody>    
+    </tbody>   
     </table>
 
         </tr> 
@@ -57,7 +56,8 @@
 <br/>
 <br/>
 
-<form id="choose-ship" action="/container" method="get">
+
+<form id="choose-ship" action="/eve2/space_station/container" method="get">
     <label>Change Piloting ship:</label> <select name="id"> 
         <option>None</option>
         {{#each item}}
@@ -69,7 +69,7 @@
 </form>
 
 
-<form id="sort-item" action="/item" method="get">
+<form id="sort-item" action="/eve2/space_station/item" method="get">
    <label>Get structures of type:</label> <select name="id"> 
        <option>None</option>
         {{#each item}}
@@ -80,7 +80,7 @@
     <label></label><button onclick="selectType({{id}})">Select</button><br>
 </form>
 
-    <form id="sort-container" action="/container" method="get">
+    <form id="sort-container" action="/eve2/space_station/container" method="get">
    <label>Get containers of type:</label> <select name="id"> 
        <option>None</option>
         {{#each item}}
@@ -93,4 +93,3 @@
 </form>
 
 </html>
-

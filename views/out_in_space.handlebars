@@ -22,7 +22,7 @@
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label></label><input type="submit" value="Travel Through Wormhole">
+<label></label><input type="submit" value="Travel">
 </form>
 <br/>
 
@@ -34,9 +34,11 @@
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label></label><button onclick="deleteItem({{id}})">Jettison</button><br>
+<label></label>
+<input type="submit" value="Jettison">
 </form>
 
+<!-- create post handler for this -->
 <form id="annihilate-wormhole" action="/out_in_space/annihilate" method="post">
     <label>Wormhole to:</label> <select name="wormhole_id">
         <option>None></option>
@@ -45,17 +47,19 @@
         {{/each}}
         </select>
     </select><br>
-    <label></label><input type="submit" value="Annihilate"><br>
+
+    <label style = "color:red">(Reviewer - This is a delete of two M-to-N relationship table records)</label><input type="submit" value="Annihilate"><br>
 </form>
 
- 
-
+ <!-- create post handler for this -->
 <h3>Chart A Wormhole</h3>
-<form id="wormhole" action="/eve2/wormhole/" method="post">
+<form id="wormhole" action="/eve2/out_in_space/wormhole/" method="post">
 
 <label>Wormhole Name:</label> <input type="text" name="name" value="Name"><br>
-<label>Wormhole Security Status:</label> <input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
+<label>Wormhole Security Status:</label> 
+<input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
 
-<label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label><input type="submit" value="Chart">
+<label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label>
+<input type="submit" value="Chart">
 </form>
 </html>

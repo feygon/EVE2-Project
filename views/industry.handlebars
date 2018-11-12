@@ -1,6 +1,6 @@
 <html>
 <h1>Industry Page</h1><br>
-<form id="inventstructure" action="/eve2/inventstructure/" method="post">
+<form id="inventstructure" action="/eve2/industry/inventstructure/" method="post">
     
     <h2>Invent Item </h2>
     <label>Item Name </label><input type="text" name="name" value="Name"><br>
@@ -12,12 +12,13 @@
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
-    <label style = "color:red">(Reviewer - This is an insert)</label><input type="submit" value="Invent">
+    <label style = "color:red">(Reviewer - This is an insert to the item structures entity.)</label>
+    <input type="submit" value="Invent">
 </form>
 <br>
 
 
-<form id="designuse" action="/eve2/designitemuse/" method="post">
+<form id="designuse" action="/eve2/industry/designitemuse/" method="post">
     <h2>Design a use for an item</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
@@ -34,11 +35,12 @@
         {{/each}}
     </select><br>
 
-    <label style = "color:red">(Reviewer - This is an insert)</label><input type="submit" value="Design">
+    <label style = "color:red">(Reviewer - This is an insert to the item uses entity.)</label>
+    <input type="submit" value="Design">
 </form><br>
 
 
-<form id="choose-item" action="/item/" method="get">
+<form id="choose-item" action="/eve2/industry/produce/" method="get">
 <h2>Get an inventory item</h2>
     <label>Item </label><select name="id"> 
         <option>None</option>
@@ -46,7 +48,8 @@
             <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label style = "color:red">(Reviewer - This is an insert)</label><button onclick="selectitem({{id}})">Get Object</button><br>
+<label style = "color:red">(Reviewer - This is an insert to the Objects entity.)</label>
+<input type="submit" value="Produce">
 </form>
 
 </html>

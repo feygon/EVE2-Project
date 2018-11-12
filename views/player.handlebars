@@ -2,9 +2,10 @@
 
 <h1>Player Page</h1><br>
 <h3>Add new player:</h3>
-<form id="newplayer" action="/eve2/newplayer/" method="post">
+<form id="newplayer" action="/eve2/player/newplayer/" method="post">
     <label>Name:</label> <input type="text" name="name"><br>
-    <label style = "color:red">(Reviewer - This is an insert)</label><input type="submit" value="Submit">
+    <label style = "color:red">(Reviewer - This is an insert)</label>
+    <input type="submit" value="Submit">
  </form>
 <br/>
 <h3>Existing player:</h3>
@@ -27,8 +28,10 @@
     </tbody> 
 </table> 
 <br/>
-<form id="choose-player" action="/player/" method="get">
-    <label>Player:</label> <select name="id"> 
+
+<!-- at least make sessions functional for step 5 draft -->
+<form id="choose-player" action="/player/choose/" method="get">
+    <label>Player:</label> <select name="id">
         <option>None</option>
         {{#each player}}
         <option value="{{id}}">{{name}}</option>
