@@ -48,10 +48,10 @@
 
     </select><br>
     <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity" value="0"><br>
-    <label>Container Type </label><select name="type"> 
+    <label>Scale of use </label><select name="scale"> 
         <option>None</option>
         {{#each item_use_scales}}
-            <option value="{{type}}">{{type}}</option>
+            <option value="{{scale}}">{{scale}}</option>
         {{/each}}
     </select><br>
 

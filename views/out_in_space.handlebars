@@ -3,7 +3,7 @@
 <br>
 
 <!-- create post handler for this -->
-<form id="choose-station" action="/out_in_space/dock" method="post">
+<form id="choose-station" action="/eve2/out_in_space/dock" method="post">
  <label>Station:</label> <select name="id"> 
         <option>None</option>
         {{#each station}}
@@ -15,7 +15,7 @@
 <br/>
 
 <!-- create post handler for this -->
-<form id="choose-location" action="/out_in_space/moveLocation" method="post">
+<form id="choose-location" action="/eve2/out_in_space/moveLocation" method="post">
     <label>Location:</label> <select name="id"> 
         <option>None</option>
         {{#each location}}
@@ -27,7 +27,7 @@
 <br/>
 
 <!-- create post handler for this -->
-<form id="choose-item" action="/out_in_space/jettison" method="post">
+<form id="choose-item" action="/eve2/out_in_space/jettison" method="post">
     <label>Item:</label> <select name="id"> 
         <option>None</option>
         {{#each item}}
@@ -39,7 +39,7 @@
 </form>
 
 <!-- create post handler for this -->
-<form id="annihilate-wormhole" action="/out_in_space/annihilate" method="post">
+<form id="annihilate-wormhole" action="/eve2/out_in_space/annihilate/" method="post">
     <label>Wormhole to:</label> <select name="wormhole_id">
         <option>None></option>
         {{#each wormhole}}
@@ -47,7 +47,6 @@
         {{/each}}
         </select>
     </select><br>
-
     <label style = "color:red">(Reviewer - This is a delete of two M-to-N relationship table records)</label><input type="submit" value="Annihilate"><br>
 </form>
 

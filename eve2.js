@@ -100,7 +100,7 @@ module.exports = (function() {
     ************************************************/
     
     // remember later to hook this up with 2 inserts to EVE2_LINKS.
-    router.post('/wormhole/', function(req,res){
+    router.post('/out_in_space/wormhole/', function(req,res){
         var mysql = req.app.get('mysql');
 	    var sql = queries.insert.insert_location;
 	    var inserts = [req.body.name,
@@ -117,7 +117,7 @@ module.exports = (function() {
     });
 
 
-    router.post('/eve2/industry/inventstructure/', function(req,res){
+    router.post('/industry/inventstructure/', function(req,res){
         var mysql = req.app.get('mysql');
         
 	    var sql = queries.insert.insert_item_structure;
@@ -136,7 +136,7 @@ module.exports = (function() {
     });
   
   
-    router.post('/eve2/industry/designitemuse/', function(req,res){
+    router.post('/industry/designitemuse/', function(req,res){
         var mysql = req.app.get('mysql');
         var pilotable = false;
         if (req.body.scale == "Ship") { pilotable = true; }
