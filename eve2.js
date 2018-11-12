@@ -46,7 +46,18 @@ module.exports = (function() {
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
-        res.render('out_in_space', context);
+
+	callbacks.station(res, mysql, context, complete);
+	callbacks.location(res, mysql, context, complete);
+	callbacks.item(res, mysql, context, complete);
+	callbacks.wormhole(res, mysql, context, complete);
+
+	function complete(){
+		callbackCount++;
+		if(callbackCount >=4){
+        		res.render('out_in_space', context);
+		}
+	}
         });
     
     router.get('/readMe/', function(req, res){
