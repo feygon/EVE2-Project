@@ -1,17 +1,20 @@
 var callbacks = {};
+callbacks.select.item_structure_list = {}; 		// id, name, type
+callbacks.select.item_structure_types = {}; 	// type
+callbacks.select.item_use_scales = {}; 			// scale
+callbacks.select.itemUse_list_orderbyq = {};	// name, id, pilotable, capacity, scale
+callbacks.select.useless_item_structures = {}; 	// id, name, type
 
 //console.log("parsing callbacks.js");
 var queries = require('./queries');
 
-// select queries to get a list of ids and names from structures.
-callbacks.item_structure_list = 
+// column names: id, name, type
+callbacks.select.item_structure_list = 
 function item_structure_list(res, mysql, context, complete){
 //	console.log("calling back item list");
 	var sql = "";
 	sql += queries.select.item_structure_list;
 	
-
-//	console.log("mysql2: " + mysql);
 	//no inserts
 	mysql.pool.query(sql, function(error, results, fields){
 		if(error){
@@ -19,13 +22,12 @@ function item_structure_list(res, mysql, context, complete){
 			res.end();
 		}
 		context.item_structure_list = results;
-//		console.log("Results:\n" + JSON.stringify(results) + "\nResults end.");
-//		console.log("Done printing results.");
 		complete();
 	});
 };
 
-callbacks.item_structure_types = 
+// column names: type
+callbacks.select.item_structure_types = 
 function item_structure_types(res, mysql, context, complete){
 	var sql = "";
 	sql += queries.select.item_structure_types;
@@ -40,14 +42,15 @@ function item_structure_types(res, mysql, context, complete){
 	});
 }
 
-callbacks.item_use_scales = 
+// column names: scale
+callbacks.select.item_use_scales = 
 function item_use_scales(res, mysql, context, complete){
 	var sql = "";
 	sql += queries.select.item_use_scales;
 
 	mysql.pool.query(sql, function(error, results, fields){
 		if(error){
-			res.write("callback item_structure_types returns: " + JSON.stringify(error));
+			res.write("callback item_use_scales returns: " + JSON.stringify(error));
 			res.end();
 		}
 		context.item_use_scales = results;
@@ -55,7 +58,24 @@ function item_use_scales(res, mysql, context, complete){
 	});
 }
 
-callbacks.useless_item_structures = 
+// column names: name, id, pilotable, capacity, scale
+callbacks.select.itemUse_list_orderbyq = 
+function itemUse_list_orderbyq(res, mysql, context, complete){
+	var sql = "";
+	sql += queries.select.itemUse_list_orderbyq;
+	
+	var inserts = ["name"];
+	sql = mysql.pool.query(sql, inserts, function(error, results, fields){
+		if(error){
+			res.write("callback itemUse_list_orderbyq returns: " + JSON.stringify(error));
+			res.end();
+		}
+		context.itemUse_list_orderbyq = results;
+	});
+}
+
+// column names: id, name, type
+callbacks.select.useless_item_structures = 
 function useless_item_structures(res, mysql, context, complete) {
 //	console.log("calling back non container objects");
 	var sql = "";
@@ -70,5 +90,8 @@ function useless_item_structures(res, mysql, context, complete) {
 		complete();
 	});
 };
+
+
+
 
 module.exports = callbacks;

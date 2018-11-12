@@ -71,10 +71,10 @@ module.exports = (function() {
 
         //console.log("mysql3: " + mysql);
 
-        callbacks.item_structure_list(res, mysql, context, complete);
-        callbacks.item_structure_types(res, mysql, context, complete);
-        callbacks.item_use_scales(res, mysql, context, complete);
-        callbacks.useless_item_structures(res, mysql, context, complete);
+        callbacks.select.item_structure_list(res, mysql, context, complete);
+        callbacks.select.item_structure_types(res, mysql, context, complete);
+        callbacks.select.item_use_scales(res, mysql, context, complete);
+        callbacks.select.useless_item_structures(res, mysql, context, complete);
 
         //context.jsscripts = []; // no client-side scripts yet
 

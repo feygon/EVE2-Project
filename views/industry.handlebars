@@ -1,12 +1,31 @@
 <html>
 <h1>Industry Page</h1><br>
+
+<div>
+<label>Current Items</label>
+<select name="CurrentItems"></select>
+{{#each item_structure_list}}
+<option>{{name}}, type: {{type}}, vol: {{vol_packed}}</option>
+{{/each}}
+</div>
+<div>
+    <label>Current Item Uses</label>
+    <select name="CurrentUses"></select>
+    {{#each itemUse_list_orderbyq}}
+    <option>{{name}}, capacity: {{capacity}}m3, scale: {{scale}}</option>
+    {{/each}}
+</div>
+<div>
+    <label>Objects under construction.</label>
+</div>
+
 <form id="inventstructure" action="/eve2/industry/inventstructure/" method="post">
     
     <h2>Invent Item </h2>
     <label>Item Name </label><input type="text" name="name" value="Name"><br>
     <label>Packaged Volume </label><input type="number" step="0.01" min="0" name="packaged" value="0"><br>
     <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged" value="0"><br>
-    <label>Item Type </label><select name="type"> 
+    <label>Item Structure Type </label><select name="type"> 
         <option>None</option>
         {{#each item_structure_types}}
             <option value="{{type}}">{{type}}</option>

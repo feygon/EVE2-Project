@@ -11,14 +11,15 @@ var queries = {
         "total_vol_all_item_structures": "",
         "all_players": "",
         "indy_views_union": "",
-        "item_structure_types": "",
-        "item_use_scales": "",
+        "item_structure_types": "", // type
+        "item_use_scales": "", // scale
         "objects_in_listed_cargoSpaces": "",
         "merged_objects_in_cargoSpace_numq": "",
-        "item_structure_list": "",
+        "item_structure_list": "", // id, name, type, vol_packed, vol_unpacked
         "non_CS_structures": "",
         "useless_item_structures": "",
-        "linked_locations": ""
+        "linked_locations": "",
+        "itemUse_list_orderbyq":"" // name, id, pilotable, capacity, scale
     }],
     "update": [
     {
@@ -114,7 +115,7 @@ queries.select.cargoSpaces_in_CargoSpace = "SELECT "
     + "INNER JOIN EVE2_ItemUse as IUse ON IUse.id = objects.itemUse_id "
     + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = IUse.itemStructure_id "
     + "INNER JOIN EVE2_Objects as objects ON objects.cargoSpace_id = CS.id "
-    + "AND CS.inside_cargoSpace_id = ? ";
+    + "AND CS.inside_CS_id = ? ";
 
 queries.select.non_CS_item_structures = "SELECT "
     + "structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
@@ -129,7 +130,7 @@ queries.select.all_players = "SELECT "
     + "player.name AS playerName, "
     + "ship.name AS playerShip, "
     + "ship.location AS playerLocation, "
-    + "ship.inside_cargoSpace_id AS playerPosition "
+    + "ship.inside_CS_id AS playerPosition "
     + "FROM EVE2_Players as player "
     + "INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id "
     + "ORDER BY ?, ? ";
@@ -140,10 +141,10 @@ queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_?
     + "ORDER BY itemName";
 
 queries.select.item_structure_types = "SELECT structures.type FROM EVE2_ItemStructure AS structures GROUP BY type ORDER BY type";
-queries.select.item_structure_list = "SELECT structures.id, structures.name, structures.type FROM EVE2_ItemStructure as structures ORDER BY name";
-queries.select.item_use_scales = "SELECT itemUse.scale FROM EVE2_ItemUse as CT GROUP BY type ORDER BY type";
+queries.select.item_structure_list = "SELECT structures.id, structures.name, structures.type, structures.vol_packed, structures.vol_unpacked FROM EVE2_ItemStructure as structures ORDER BY name";
+queries.select.item_use_scales = "SELECT itemUse.scale FROM EVE2_ItemUse as itemUse GROUP BY scale ORDER BY scale";
 queries.select.CargoSpaces_in_CargoSpace_deep = ""; // recursive call required. depth unknown, potentially limitless.
-queries.select.objects_in_listed_cargoSpaces = "SELECT CTinv.id FROM EVE2_Objects AS CTinv WHERE CTinv.cargoSpace_id IS IN ";
+queries.select.objects_in_listed_cargoSpaces = "SELECT Object.id FROM EVE2_Objects AS Object WHERE Object.cargoSpace_id IS IN ";
 queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_? "
     + "UNION "
     + "SELECT CTid, CTitemName FROM indyCTs_? "
@@ -151,14 +152,14 @@ queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_?
 
 queries.select.useless_item_structures = "SELECT structure.id, structure.name, structure.type FROM EVE2_ItemStructure as structure "
 + "WHERE structure.type = 'container' AND structure.id NOT IN (" 
-    + "SELECT structure.id FROM EVE2_ItemUse as CT "
-        + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = CT.itemStructure_id"
+    + "SELECT structure.id FROM EVE2_ItemUse as itemUse "
+        + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = itemUse.itemStructure_id"
     + ")";
 
 queries.select.non_CS_structures = "SELECT structure.id, structure.name FROM EVE2_ItemStructure AS structure "
     + "WHERE structure.id NOT IN (" 
-        + "SELECT structure.id FROM EVE2_ItemUse as CT "
-            + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = CT.itemStructure_id"
+        + "SELECT structure.id FROM EVE2_ItemUse as itemUse "
+            + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = itemUse.itemStructure_id"
         + ")";
 
 queries.select.linked_locations = "link.id, link.name FROM EVE2_LINKS as wormhole "
@@ -167,16 +168,21 @@ queries.select.linked_locations = "link.id, link.name FROM EVE2_LINKS as wormhol
     + "INNER JOIN EVE2_Locations as link ON wormhole.link_id = link.id "
     + "ORDER BY link.name";
 
+queries.select.itemUse_list_orderbyq = "structures.name, itemUse.id, itemUse.pilotable, itemUse.capacity, itemUse.scale"
+    + "FROM EVE2_ItemUse as itemUse"
+    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id"
+    + "ORDER BY ?"
+
 queries.insert.insert_player = "INSERT INTO EVE2_Players (name, piloting_CS_id) VALUES (?,?)";
 queries.insert.insert_location = "INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?)";
 queries.insert.insert_link = "INSERT INTO EVE2_LINKS (source_id, link_id) VALUES (?,?)";
-queries.insert.insert_CS = "INSERT INTO EVE2_CargoSpace(player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (?,?,?,?)";
+queries.insert.insert_CS = "INSERT INTO EVE2_CargoSpace(player_id, itemUse_id, location_id, inside_CS_id) VALUES (?,?,?,?)";
 queries.insert.insert_item_structure = "INSERT INTO EVE2_ItemStructure(name, vol_packed, vol_unpacked, type) VALUES(?,?,?,?)";
 queries.insert.insert_item_use = "INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES(?,?,?,?)";
 
-queries.update.docking = "UPDATE EVE2_CargoSpace SET inside_cargoSpace_id = ? WHERE id = ?";
-queries.update.set_inside_of = "UPDATE EVE2_CargoSpace SET inside_cargoSpace_id = ? WHERE id = ?";
-queries.update.set_inside_of_selection = "UPDATE EVE2_CargoSpace SET inside_cargoSpace_id = ? WHERE id IN "; // concat w/ selection: 
+queries.update.docking = "UPDATE EVE2_CargoSpace SET inside_CS_id = ? WHERE id = ?";
+queries.update.set_inside_of = "UPDATE EVE2_CargoSpace SET inside_CS_id = ? WHERE id = ?";
+queries.update.set_inside_of_selection = "UPDATE EVE2_CargoSpace SET inside_CS_id = ? WHERE id IN "; // concat w/ selection: 
 queries.update.set_piloting = "UPDATE EVE2_Players SET piloting_CS_id = ? WHERE id = ?";
 queries.update.set_location = "UPDATE EVE2_CargoSpace SET EVE2_CargoSpace.location = ? WHERE id = ?";
 queries.update.set_location_selection = "UPDATE EVE2_CargoSpace SET EVE2_CargoSpace.location = ? WHERE id IN "; // concat with selection
@@ -189,7 +195,7 @@ queries.delete.del_item_structure = "DELETE FROM EVE2_ItemStructure WHERE id = ?
 
 
 queries.insert.insert_structures_and_CSs_into_CS = ""; // get selection of objects and OCTs into a view, and select it. Insert the objects for those into the specified container. for reference, also call 'set_inside_of' for containers.
-queries.delete.del_structures_in_listed_cargoSpaces = "DELETE CTinv.id FROM EVE2_Objects AS CTinv WHERE CTinv.cargoSpace_id IS IN ";
+queries.delete.del_structures_in_listed_cargoSpaces = "DELETE Object.id FROM EVE2_Objects AS Object WHERE Object.cargoSpace_id IS IN ";
 
 // for displaying containers and objects together.
 queries.view.merged_objects_in_cargoSpace_numq = "CREATE VIEW merged_objects_? "

@@ -127,7 +127,7 @@ SELECT
         AND OWNS.id = ?;
 
     -- place in stored procedure with 3 parameters for ?, ?, ?, takes 2 parameters from values
--- unpackaged containers in that container (inside_cargoSpace_id = OWNS.id)
+-- unpackaged containers in that container (inside_CS_id = OWNS.id)
 DROP VIEW IF EXISTS cargoSpaces_in_cargoSpace_?;
 CREATE VIEW cargoSpaces_in_cargoSpace_? AS
 SELECT
@@ -140,10 +140,10 @@ SELECT
     OWNS.name AS OCTname,
     OWNS.itemUse_id AS OCT_base_id
     FROM EVE2_CargoSpace AS OWNS
-    INNER JOIN EVE2_ItemUse as itemUse ON itemUse.id = CTinv.itemUse_id
+    INNER JOIN EVE2_ItemUse as itemUse ON itemUse.id = Object.itemUse_id
     INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id
-    INNER JOIN EVE2_Objects as CTinv ON CTinv.cargoSpace_id = OWNS.id
-            AND OWNS.inside_cargoSpace_id = ?;
+    INNER JOIN EVE2_Objects as Object ON Object.cargoSpace_id = OWNS.id
+            AND OWNS.inside_CS_id = ?;
 -- IDs of objects that don't correspond to unpackaged containers
 DROP VIEW IF EXISTS non_CS_objects_in_CS_?;
 CREATE VIEW non_CS_objects_in_CS_? AS
@@ -177,7 +177,7 @@ SELECT
     player.name AS playerName,
     ship.name AS playerShip,
     ship.location AS playerLocation,
-    ship.inside_cargoSpace_id AS playerPosition
+    ship.inside_CS_id AS playerPosition
     FROM EVE2_Players as player
     INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id
     ORDER BY ?, ?;
@@ -198,7 +198,7 @@ SELECT
     itemUse.id AS CTid,
     object.name AS CTitemName
     FROM EVE2_ItemUse AS itemUse
-    INNER JOIN EVE2_ItemStructure as object ON object.id = CT.itemStructure_id;
+    INNER JOIN EVE2_ItemStructure as object ON object.id = itemUse.itemStructure_id;
     
 SELECT structureID, itemName FROM indyItems_?
 UNION
@@ -211,7 +211,7 @@ DROP VIEW IF EXISTS indyCTs_?;
 --  SELECT to get item type list for item creation form selection box
 SELECT structures.type FROM EVE2_ItemStructure AS structures ORDER BY type;
 -- SELECT to get container type list for form selection box
-SELECT itemUse.scale FROM EVE2_ItemUse as CT ORDER BY type;
+SELECT itemUse.scale FROM EVE2_ItemUse as itemUse ORDER BY type;
 
 
 --  SELECT* to generate a tree of containers *recursively*
@@ -229,15 +229,15 @@ DROP VIEW IF EXISTS cargoSpaces_in_cargoSpace_?_twoDeep;
 -- Use concat or ?unionall? to union all sub-container, and call it 
 --  cargoSpaces_in_cargoSpace_?_twoDeep. Then:
 
-SELECT CTinv.id FROM EVE2_Objects AS CTinv
-    WHERE CTinv.cargoSpace_id IS IN (cargoSpaces_in_cargoSpace_?_twoDeep); -- (above)
-DELETE CTinv.id FROM EVE2_Objects AS CTinv
-    WHERE CTinv.cargoSpace_id IS IN (cargoSpaces_in_cargoSpace_?_twoDeep); -- (use above to confirm)
+SELECT Object.id FROM EVE2_Objects AS Object
+    WHERE Object.cargoSpace_id IS IN (cargoSpaces_in_cargoSpace_?_twoDeep); -- (above)
+DELETE Object.id FROM EVE2_Objects AS Object
+    WHERE Object.cargoSpace_id IS IN (cargoSpaces_in_cargoSpace_?_twoDeep); -- (use above to confirm)
 
 --  SELECT(&DELETE&INSERT)* to empty container contents recursively
 -- re-use code from jettisoning, but before the delete while doing so,
 --  insert the objects into another container.
-INSERT INTO CTinv (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (( SELECT /* Some other stuff */));
+INSERT INTO Object (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (( SELECT /* Some other stuff */));
     -- ****unionize the select of what containers are in the top box and the objects in just the top box****
     -- ****delete them from the top container****
     -- ****insert them into the target container****
@@ -246,7 +246,7 @@ INSERT INTO CTinv (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (
 --  UPDATE to dock: move NESTS IN location of container 
 --          by session player -> container_piloting, location id in dropdown
 UPDATE EVE2_CargoSpace
-    SET EVE2_CargoSpace.inside_cargoSpace_id = ? -- ? is id of station if docking or null if undocking.
+    SET EVE2_CargoSpace.inside_CS_id = ? -- ? is id of station if docking or null if undocking.
     WHERE EVE2_CargoSpace.id = ( -- the id of the player's piloted ship, by player.
         CALL SP_getPilotedCS_id(?); -- ? is player id
     )
@@ -313,10 +313,10 @@ then, remove the child item from the old parent OCT
 finally, add the child item to the new parent OCT
 */
     DECLARE oldOCT int;
-    oldOCT = (SELECT inside_cargoSpace_id FROM EVE2_CargoSpace WHERE id = subOCT);
+    oldOCT = (SELECT inside_CS_id FROM EVE2_CargoSpace WHERE id = subOCT);
     
     UPDATE EVE2_CargoSpace AS OWNS 
-        SET (inside_cargoSpace_id) VALUES (subOCT)
+        SET (inside_CS_id) VALUES (subOCT)
         WHERE OWNS.id = newOCT;
     
     DECLARE structureID int;
@@ -331,7 +331,7 @@ END //
 DELIMITER ;
 
 --  UPDATE to undock: new outer OCT NULL
-UPDATE EVE2_CargoSpace SET inside_cargoSpace_id = NULL WHERE id = ?;
+UPDATE EVE2_CargoSpace SET inside_CS_id = NULL WHERE id = ?;
 
 --  UPDATE to change piloting ships
 UPDATE EVE2_Players SET piloting_CS_id = ? WHERE id = ?;
@@ -370,7 +370,7 @@ INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?);
 --  INSERT to put a container into another container
 INSERT INTO EVE2_LINKS (source_id, link_id) VALUES (?,?);
 --  INSERT to unpackage a container
-INSERT INTO EVE2_CargoSpace(player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (?,?,?,?);
+INSERT INTO EVE2_CargoSpace(player_id, itemUse_id, location_id, inside_CS_id) VALUES (?,?,?,?);
 --  INSERT to invent an item structure
 INSERT INTO EVE2_ItemStructure(name, vol_packed, vol_unpacked, type) VALUES(?,?,?,?);
 --  INSERT to design an item use

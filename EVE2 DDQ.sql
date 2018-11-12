@@ -1,14 +1,15 @@
 -- Table Data Definition Queries begin at line 1667. Before that, there are stored procedures.
 
--- use cs340_nickersr;
+use cs340_nickersr;
 
 DROP PROCEDURE IF EXISTS SP_getItemStructureID;
 DROP PROCEDURE IF EXISTS SP_getLocs;
 DROP PROCEDURE IF EXISTS SP_getCSid;
 DROP PROCEDURE IF EXISTS SP_getParams4CreateCS;
-DROP PROCEDURE IF EXISTS SO_getSpaceStationCSid;
+DROP PROCEDURE IF EXISTS SP_getSpaceStationCSid;
 DROP PROCEDURE IF EXISTS SP_putPlayerInPod;
 DROP PROCEDURE IF EXISTS SP_startingPlayersInPods;
+DROP PROCEDURE IF EXISTS SP_Log;
 
 
 
@@ -26,47 +27,57 @@ DELIMITER //
 
 CREATE PROCEDURE SP_getItemStructureID(IN itemname varchar(255))
 BEGIN
-    SET @itemStructureID = (SELECT id FROM EVE2_ItemStructure
+    SET @itemStructureID = (SELECT EVE2_ItemStructure.id FROM EVE2_ItemStructure
         WHERE name = itemname);
 END //
 
 CREATE PROCEDURE SP_getLocs(IN sourceLoc varchar(255),
                             IN linkLoc varchar(255))
 BEGIN
-    SET @loc1 = (SELECT id FROM EVE2_Locations
+    SET @loc1 = (SELECT EVE2_Locations.id FROM EVE2_Locations
         WHERE name = sourceLoc);
-    SET @loc2 = (SELECT id from EVE2_Locations
+    SET @loc2 = (SELECT EVE2_Locations.id from EVE2_Locations
         WHERE name = linkLoc);
 END //
 
 CREATE PROCEDURE SP_getCSid(IN playerName varchar(255),
-                              IN containerItemName varchar(255))
+                              IN itemUseName varchar(255))
 BEGIN
-    SET @playerID = (SELECT id FROM EVE2_Players
+    SET @playerID = (SELECT EVE2_Players.id FROM EVE2_Players
         WHERE name = playerName);
     SET @ItemUseID = (SELECT EVE2_CargoSpace.id FROM EVE2_CargoSpace
     	INNER JOIN EVE2_Players ON EVE2_CargoSpace.player_id = EVE2_Players.id
         INNER JOIN EVE2_ItemUse ON EVE2_CargoSpace.itemUse_id = EVE2_ItemUse.id
         INNER JOIN EVE2_ItemStructure ON EVE2_ItemUse. itemStructure_id = EVE2_ItemStructure.id
-        WHERE EVE2_ItemStructure.name = containerItemName AND EVE2_Players.name = playerName
+        WHERE EVE2_ItemStructure.name = itemUseName AND EVE2_Players.name = playerName
         LIMIT 1);
 END //
 
 CREATE PROCEDURE SP_getParams4CreateCS(IN playerName varchar(255),
-                                  IN containerName varchar(255),
-                                  IN locationName varchar(255))
+                                  IN itemUseName varchar(255),
+                                  IN locationName varchar(255),
+                                  IN integerVal int(11))
 BEGIN
-    SET @playerID = (SELECT id FROM EVE2_Players
+    SET @playerID = (SELECT EVE2_Players.id FROM EVE2_Players
         WHERE name = playerName);
     SET @ItemUseID = (SELECT EVE2_ItemUse.id FROM EVE2_ItemUse
         INNER JOIN EVE2_ItemStructure ON EVE2_ItemStructure.id = EVE2_ItemUse.itemStructure_id
-        WHERE name = containerName);
-    SET @loc1 = (SELECT id FROM EVE2_Locations
+        WHERE name = itemUseName);
+    SET @loc1 = (SELECT EVE2_Locations.id FROM EVE2_Locations
         WHERE name = locationName);
+
+    SET @CSname = (SELECT CONCAT(
+        (SELECT name FROM EVE2_Players where id = @playerID),
+            "'s ",
+            @itemUseID,
+            integerVal)
+        AS concatString);
 END //
 
-CREATE PROCEDURE SO_getSpaceStationCSid(IN playerName varchar(255),
-                                          containerName varchar(255),
+
+
+CREATE PROCEDURE SP_getSpaceStationCSid(IN playerName varchar(255),
+                                          itemUseName varchar(255),
                                           locationName varchar(255))
 BEGIN
     SET @stationCSid = (SELECT EVE2_CargoSpace.id FROM EVE2_CargoSpace
@@ -74,7 +85,7 @@ BEGIN
     	INNER JOIN EVE2_ItemStructure on EVE2_ItemStructure.id = EVE2_ItemUse.itemStructure_id
     	INNER JOIN EVE2_Players on EVE2_Players.id = EVE2_CargoSpace.player_id
     	INNER JOIN EVE2_Locations on EVE2_Locations.id = EVE2_CargoSpace.location_id
-    	WHERE EVE2_ItemStructure.name = containerName AND
+    	WHERE EVE2_ItemStructure.name = itemUseName AND
           	  EVE2_Players.name = playerName AND
           	  EVE2_Locations.name = locationName
     	LIMIT 1);
@@ -353,102 +364,54 @@ END //
 -- SP_CreateItemUse:     stored procedure to input cargo spaces (with item structure assignments)
 CREATE PROCEDURE SP_CreateItemUse()
 BEGIN
-    CALL SP_getItemStructureID("Small Standard Container");
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 120, "Box");
-    CALL SP_getItemStructureID("Medium Standard Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 390, "Box");
-    CALL SP_getItemStructureID("Large Standard Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 780, "Box");
-    CALL SP_getItemStructureID("Small Secure Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 120, "Box");
-    CALL SP_getItemStructureID("Medium Secure Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 390, "Box");
-    CALL SP_getItemStructureID("Large Secure Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 780, "Box");
-    CALL SP_getItemStructureID("Giant Secure Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 3900, "Box");
-    CALL SP_getItemStructureID("Large Freight Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 10000, "Box");
-    CALL SP_getItemStructureID("Giant Freight Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 120000, "Box");
-    CALL SP_getItemStructureID("Enormous Freight Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 250000, "Box");
-    CALL SP_getItemStructureID("Station Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 1000000, "Box");
-    CALL SP_getItemStructureID("Station Vault Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 10000000, "Box");
-    CALL SP_getItemStructureID("Station Warehouse Container"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, 100000000, "Box");
-    CALL SP_getItemStructureID("Astrahus"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Fortizar"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Keepstar"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Athanor"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Tatara"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Raitaru"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Azbel"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Sotiyo"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Space Station");
-    CALL SP_getItemStructureID("Ibis"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 125, "Ship");
-    CALL SP_getItemStructureID("Bantam"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 270, "Ship");
-    CALL SP_getItemStructureID("Condor"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 130, "Ship");
-    CALL SP_getItemStructureID("Griffin"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 260, "Ship");
-    CALL SP_getItemStructureID("Heron"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 400, "Ship");
-    CALL SP_getItemStructureID("Kestrel"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 160, "Ship");
-    CALL SP_getItemStructureID("Merlin"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 150, "Ship");
-    CALL SP_getItemStructureID("Blackbird"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 305, "Ship");
-    CALL SP_getItemStructureID("Caracal"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 450, "Ship");
-    CALL SP_getItemStructureID("Osprey"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 485, "Ship");
-    CALL SP_getItemStructureID("Raven"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 830, "Ship");
-    CALL SP_getItemStructureID("Rokh"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 820, "Ship");
-    CALL SP_getItemStructureID("Scorpion"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 690, "Ship");
-    CALL SP_getItemStructureID("Wyvern"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 2500000, "Ship");
-    CALL SP_getItemStructureID("Phoenix"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 1000000, "Ship");
-    CALL SP_getItemStructureID("Leviathan"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 5000000, "Ship");
-    CALL SP_getItemStructureID("Epithal"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 45000, "Ship");
-    CALL SP_getItemStructureID("Kryos"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 43000, "Ship");
-    CALL SP_getItemStructureID("Miasmos"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 42000, "Ship");
-    CALL SP_getItemStructureID("Nereus"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 2700, "Ship");
-    CALL SP_getItemStructureID("Iteron Mark V"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 5800, "Ship");
-    CALL SP_getItemStructureID("Ship Maintenance Bay"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Bay");
-    CALL SP_getItemStructureID("Ore Hold"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Bay");
-    CALL SP_getItemStructureID("Mineral Hold"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Bay");
-    CALL SP_getItemStructureID("Fleet Hangar"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Bay");
-    CALL SP_getItemStructureID("Fuel Bay"); 
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 0, NULL, "Bay");
-    CALL SP_getItemStructureID("Pod");
-    INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES (@itemStructureID, 1, 0, "Ship");
+    CALL SP_getItemStructureID("Small Standard Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 120, "Box");
+    CALL SP_getItemStructureID("Medium Standard Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 390, "Box");
+    CALL SP_getItemStructureID("Large Standard Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 780, "Box");
+    CALL SP_getItemStructureID("Small Secure Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 120, "Box");
+    CALL SP_getItemStructureID("Medium Secure Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 390, "Box");
+    CALL SP_getItemStructureID("Large Secure Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 780, "Box");
+    CALL SP_getItemStructureID("Giant Secure Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 3900, "Box");
+    CALL SP_getItemStructureID("Large Freight Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 10000, "Box");
+    CALL SP_getItemStructureID("Giant Freight Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 120000, "Box");
+    CALL SP_getItemStructureID("Enormous Freight Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 250000, "Box");
+    CALL SP_getItemStructureID("Station Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 1000000, "Box");
+    CALL SP_getItemStructureID("Station Vault Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 10000000, "Box");
+    CALL SP_getItemStructureID("Station Warehouse Container"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, 100000000, "Box");
+    CALL SP_getItemStructureID("Astrahus"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Fortizar"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Keepstar"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Athanor"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Tatara"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Raitaru"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Azbel"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Sotiyo"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Space Station");
+    CALL SP_getItemStructureID("Ibis"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 125, "Ship");
+    CALL SP_getItemStructureID("Bantam"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 270, "Ship");
+    CALL SP_getItemStructureID("Condor"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 130, "Ship");
+    CALL SP_getItemStructureID("Griffin"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 260, "Ship");
+    CALL SP_getItemStructureID("Heron"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 400, "Ship");
+    CALL SP_getItemStructureID("Kestrel"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 160, "Ship");
+    CALL SP_getItemStructureID("Merlin"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 150, "Ship");
+    CALL SP_getItemStructureID("Blackbird"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 305, "Ship");
+    CALL SP_getItemStructureID("Caracal"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 450, "Ship");
+    CALL SP_getItemStructureID("Osprey"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 485, "Ship");
+    CALL SP_getItemStructureID("Raven"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 830, "Ship");
+    CALL SP_getItemStructureID("Rokh"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 820, "Ship");
+    CALL SP_getItemStructureID("Scorpion"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 690, "Ship");
+    CALL SP_getItemStructureID("Wyvern"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 2500000, "Ship");
+    CALL SP_getItemStructureID("Phoenix"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 1000000, "Ship");
+    CALL SP_getItemStructureID("Leviathan"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 5000000, "Ship");
+    CALL SP_getItemStructureID("Epithal"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 45000, "Ship");
+    CALL SP_getItemStructureID("Kryos"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 43000, "Ship");
+    CALL SP_getItemStructureID("Miasmos"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 42000, "Ship");
+    CALL SP_getItemStructureID("Nereus"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 2700, "Ship");
+    CALL SP_getItemStructureID("Iteron Mark V"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 5800, "Ship");
+    CALL SP_getItemStructureID("Pod"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 1, 0, "Ship");
+    CALL SP_getItemStructureID("Ship Maintenance Bay"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Bay");
+    CALL SP_getItemStructureID("Ore Hold"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Bay");
+    CALL SP_getItemStructureID("Mineral Hold"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Bay");
+    CALL SP_getItemStructureID("Fleet Hangar"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Bay");
+    CALL SP_getItemStructureID("Fuel Bay"); INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, scale) VALUES (@itemStructureID, 0, NULL, "Bay");
 END //
 
 -- SP_CreateLink: stored procedure to input location links
@@ -677,966 +640,180 @@ BEGIN
     INSERT INTO EVE2_Players (name, piloting_CS_id) VALUES ("General_Hooligan", NULL);
 END //
 
+CREATE PROCEDURE SP_Log()
+BEGIN
+    INSERT INTO EVE2_SP_debug (report) VALUES (
+        (SELECT
+            CONCAT("playerID: ", @playerID,
+                " itemUseID: " , @ItemUseID,
+                " loc1: " , @loc1,
+                " CSname: " , @CSname)
+            AS ConcatenatedString
+        )
+    );
+END //
+
 -- SP_CreateCargoSpace:     stored procedure to input cargo spaces
 CREATE PROCEDURE SP_CreateCargoSpace()
 BEGIN
-    CALL SP_getParams4CreateCS("Johnny", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Pod", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Jita");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "New Caldari");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Maurasi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Perimeter");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Niyabainen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Kisogo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Urlen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Muvolailen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Sobaseki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Malkalen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Alikara");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Josameto");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Otela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Poinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Obanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Liekuri");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Ikuchi");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Sakenta");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Tunttaras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Itamo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Olo");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Osmon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Korsiki");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Airaken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Ikami");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Reisen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Purjola");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Hampinen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Hurtoken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Abagawa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Saisio");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Jakanerva");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Nomaa");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Geras");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Tuuriainas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Shihuken");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Senda");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Unpas");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Uitra");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Sirppala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Inaro");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Sirseshin");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Oijanen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Akora");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Maila");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Messoya");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Tasti");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Otosela");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Uemon");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Paala");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Fuskunen");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Johnny", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("William_Shatner", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Doctor_Tennant", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Dentarthurdent", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Zaphod", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Trillian", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("RealDrumpf", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("KurtRussell", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("CaptainRon", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("MajorMacGuyver", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Major_Hooligan", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("Private_Hooligan", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
-    CALL SP_getParams4CreateCS("General_Hooligan", "Fortizar", "Ofage");  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, inside_cargoSpace_id) VALUES (@playerID, @ItemUseID, @loc1, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Pod", "Jita", 0);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Pod", "Jita", 1);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Pod", "Jita", 2);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Pod", "Jita", 3);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Pod", "Jita", 4);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Pod", "Jita", 5);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Pod", "Jita", 6);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Pod", "Jita", 7);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Pod", "Jita", 8);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Pod", "Jita", 9);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Pod", "Jita", 10);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Pod", "Jita", 11);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Pod", "Jita", 12);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Pod", "Jita", 13);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Pod", "Jita", 14);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Pod", "Jita", 15);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Pod", "Jita", 16);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Jita", 17);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Jita", 18);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Jita", 19);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Jita", 20);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Jita", 21);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Jita", 22);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Jita", 23);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Jita", 24);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Jita", 25);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Jita", 26);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Jita", 27);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Jita", 28);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Jita", 29);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Jita", 30);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Jita", 31);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Jita", 32);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Jita", 33);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "New Caldari", 34);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "New Caldari", 35);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "New Caldari", 36);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "New Caldari", 37);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "New Caldari", 38);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "New Caldari", 39);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "New Caldari", 40);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "New Caldari", 41);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "New Caldari", 42);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "New Caldari", 43);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "New Caldari", 44);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "New Caldari", 45);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "New Caldari", 46);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "New Caldari", 47);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "New Caldari", 48);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "New Caldari", 49);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "New Caldari", 50);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Maurasi", 51);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Maurasi", 52);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Maurasi", 53);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Maurasi", 54);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Maurasi", 55);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Maurasi", 56);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Maurasi", 57);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Maurasi", 58);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Maurasi", 59);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Maurasi", 60);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Maurasi", 61);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Maurasi", 62);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Maurasi", 63);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Maurasi", 64);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Maurasi", 65);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Maurasi", 66);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Maurasi", 67);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Perimeter", 68);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Perimeter", 69);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Perimeter", 70);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Perimeter", 71);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Perimeter", 72);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Perimeter", 73);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Perimeter", 74);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Perimeter", 75);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Perimeter", 76);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Perimeter", 77);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Perimeter", 78);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Perimeter", 79);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Perimeter", 80);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Perimeter", 81);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Perimeter", 82);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Perimeter", 83);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Perimeter", 84);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Johnny", "Keepstar", "Niyabainen", 85);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("William_Shatner", "Keepstar", "Niyabainen", 86);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Doctor_Tennant", "Keepstar", "Niyabainen", 87);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Sarah_Jane_Smith", "Keepstar", "Niyabainen", 88);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Dentarthurdent", "Keepstar", "Niyabainen", 89);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Zaphod", "Keepstar", "Niyabainen", 90);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Trillian", "Keepstar", "Niyabainen", 91);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Ronald_McSpaceweevilburger", "Keepstar", "Niyabainen", 92);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("RealDrumpf", "Keepstar", "Niyabainen", 93);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MatzoManRandallSausage", "Keepstar", "Niyabainen", 94);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Daily_Multivitamin_Man", "Keepstar", "Niyabainen", 95);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("KurtRussell", "Keepstar", "Niyabainen", 96);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("CaptainRon", "Keepstar", "Niyabainen", 97);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("MajorMacGuyver", "Keepstar", "Niyabainen", 98);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Major_Hooligan", "Keepstar", "Niyabainen", 99);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("Private_Hooligan", "Keepstar", "Niyabainen", 100);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
+    CALL SP_getParams4CreateCS("General_Hooligan", "Keepstar", "Niyabainen", 101);  INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, name, inside_CS_id) VALUES (@playerID, @ItemUseID, @loc1, @CSname, NULL);
 END //
 
 -- SP_CONTAINS: stored procedure to input contained items
 CREATE PROCEDURE SP_CreateObject()
 BEGIN
-    CALL SO_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
-    CALL SO_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Oxygen");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Precious Metals");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Johnny", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("William_Shatner", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Doctor_Tennant", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Sarah_Jane_Smith", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Dentarthurdent", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Zaphod", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Trillian", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Ronald_McSpaceweevilburger", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("RealDrumpf", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MatzoManRandallSausage", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Daily_Multivitamin_Man", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("KurtRussell", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("CaptainRon", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("MajorMacGuyver", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Major_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("Private_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
+    CALL SP_getSpaceStationCSid("General_Hooligan", "Keepstar", "Jita"); CALL SP_getItemStructureID("Water");  INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES (@itemStructureID, @stationCSid, 100, 1);
 END //
 
 CREATE PROCEDURE SP_startingPlayersInPods()
@@ -1665,7 +842,7 @@ DELIMITER ;
 -- use cs340_nickersr;
 
 CREATE TABLE IF NOT EXISTS EVE2_Players(id int primary key not null auto_increment);
-ALTER TABLE EVE2_Players DROP FOREIGN KEY IF EXISTS FK_PILOT_OWNS_id;
+ALTER TABLE EVE2_Players DROP FOREIGN KEY IF EXISTS FK_Player_CS_id;
 DROP TABLE IF EXISTS EVE2_Objects;
 DROP TABLE IF EXISTS EVE2_CargoSpace;
 DROP TABLE IF EXISTS EVE2_ItemUse;
@@ -1673,6 +850,13 @@ DROP TABLE IF EXISTS EVE2_ItemStructure;
 DROP TABLE IF EXISTS EVE2_Players;
 DROP TABLE IF EXISTS EVE2_LINKS;
 DROP TABLE IF EXISTS EVE2_Locations;
+DROP TABLE IF EXISTS EVE2_SP_debug;
+
+CREATE TABLE EVE2_SP_debug(
+    id int(11)not null auto_increment,
+    primary key (id),
+    report varchar(255)
+) ENGINE=InnoDB;
 
 CREATE TABLE EVE2_ItemStructure(
     id int(20) not null auto_increment,
@@ -1690,7 +874,7 @@ CREATE TABLE EVE2_ItemUse(
     constraint FK_containers_item_id foreign key (itemStructure_id) references EVE2_ItemStructure(id),
     pilotable tinyint(1) default 0 not null,
     capacity float(20,2) default 100.0,
-    type varchar(255) not null
+    scale varchar(255) not null
 ) ENGINE=InnoDB;
 
 CREATE TABLE EVE2_Locations(
@@ -1724,37 +908,38 @@ CREATE TABLE EVE2_CargoSpace(
     primary key (id),
     name varchar(255) unique NOT NULL,
     player_id int(20) not null,
-    constraint FK_OWNS_player_id foreign key (player_id) 
+    constraint FK_CS_player_id foreign key (player_id) 
     	references EVE2_Players(id)
     	ON DELETE CASCADE
     	ON UPDATE CASCADE,
     itemUse_id int(20) not null,
-    constraint FK_OWNS_container_id foreign key (itemUse_id)
+    constraint FK_CS_itemUse_id foreign key (itemUse_id)
     	references EVE2_ItemUse(id)
         ON DELETE CASCADE
     	ON UPDATE CASCADE,
     location_id int(20) not null,
-    constraint FK_OWNS_location_id foreign key (location_id)
+    constraint FK_CS_location_id foreign key (location_id)
     	references EVE2_Locations(id)
     	ON DELETE CASCADE
     	ON UPDATE CASCADE,
-    inside_cargoSpace_id int(20),
-    constraint FK_OWNS_inside_OWNS_id foreign key (inside_cargoSpace_id)
+    inside_CS_id int(20),
+    constraint FK_CS_inside_CS_id foreign key (inside_CS_id)
         references EVE2_CargoSpace(id)
 ) ENGINE=InnoDB;
 
 ALTER TABLE EVE2_Players ADD COLUMN piloting_CS_id int;
-ALTER TABLE EVE2_Players ADD CONSTRAINT FK_PILOT_OWNS_id
+ALTER TABLE EVE2_Players ADD CONSTRAINT FK_Player_CS_id
 	foreign key (piloting_CS_id) references EVE2_CargoSpace(id)
     ON DELETE CASCADE;
     
 CREATE TABLE EVE2_Objects(
     itemStructure_id int(20) not null,
-    constraint FK_CONTAINS_item_id foreign key (itemStructure_id) references EVE2_ItemStructure(id)
+    constraint FK_Objects_itemStructure_id foreign key (itemStructure_id) 
+        references EVE2_ItemStructure(id)
     	ON DELETE CASCADE
     	ON UPDATE CASCADE,
     cargoSpace_id int(20) not null,
-    constraint FK_CONTAINS_OWNS_id foreign key (cargoSpace_id) references EVE2_CargoSpace(id)
+    constraint FK_Object_CS_id foreign key (cargoSpace_id) references EVE2_CargoSpace(id)
     	ON DELETE CASCADE
     	ON UPDATE CASCADE,
     primary key (itemStructure_id, cargoSpace_id),
