@@ -60,18 +60,19 @@ function item_use_scales(res, mysql, context, complete){
 }
 
 // column names: name, id, pilotable, capacity, scale
-callbacks.select.itemUse_list_orderbyq = 
-function itemUse_list_orderbyq(res, mysql, context, complete){
+callbacks.select.itemUse_list_orderbyqq = 
+function itemUse_list_orderbyqq(res, mysql, context, complete){
 	var sql = "";
-	sql += queries.select.itemUse_list_orderbyq;
+	sql += queries.select.itemUse_list_orderbyqq;
+	var inserts = ['name'];
 	
-	var inserts = ["name"];
 	sql = mysql.pool.query(sql, inserts, function(error, results, fields){
 		if(error){
-			res.write("callback itemUse_list_orderbyq returns: " + JSON.stringify(error));
+			res.write("callback itemUse_list_orderbyqq returns: " + JSON.stringify(error));
 			res.end();
 		}
-		context.itemUse_list_orderbyq = results;
+		context.itemUse_list_orderbyqq = results;
+		complete();
 	});
 }
 
@@ -91,8 +92,6 @@ function useless_item_structures(res, mysql, context, complete) {
 		complete();
 	});
 };
-
-
 
 
 module.exports = callbacks;

@@ -2,18 +2,20 @@
 <h1>Industry Page</h1><br>
 
 <div>
-<label>Current Items</label>
-<select name="CurrentItems"></select>
-{{#each item_structure_list}}
-<option>{{name}}, type: {{type}}, vol: {{vol_packed}}</option>
-{{/each}}
+    <label>Current Items</label>
+    <select name="CurrentItems">
+    {{#each item_structure_list}}
+    <option>{{name}}, type: {{type}}, vol: {{vol_packed}}</option>
+    {{/each}}
+    </select>
 </div>
 <div>
     <label>Current Item Uses</label>
-    <select name="CurrentUses"></select>
-    {{#each itemUse_list_orderbyq}}
+    <select name="CurrentUses">
+    {{#each itemUse_list_orderbyqq}}
     <option>{{name}}, capacity: {{capacity}}m3, scale: {{scale}}</option>
     {{/each}}
+    </select>
 </div>
 <div>
     <label>Objects under construction.</label>
@@ -36,7 +38,6 @@
 </form>
 <br>
 
-
 <form id="designuse" action="/eve2/industry/designitemuse/" method="post">
     <h2>Design a use for an item</h2> <br>
     <label>Based on item </label><select name="fromitemname">
@@ -57,7 +58,6 @@
     <label style = "color:red">(Reviewer - This is an insert to the item uses entity.)</label>
     <input type="submit" value="Design">
 </form><br>
-
 
 <form id="choose-item" action="/eve2/industry/produce/" method="get">
 <h2>Get an inventory item</h2>

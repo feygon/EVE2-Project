@@ -162,16 +162,21 @@ queries.select.non_CS_structures = "SELECT structure.id, structure.name FROM EVE
             + "INNER JOIN EVE2_ItemStructure as structure ON structure.id = itemUse.itemStructure_id"
         + ")";
 
-queries.select.linked_locations = "link.id, link.name FROM EVE2_LINKS as wormhole "
+queries.select.linked_locations = "SELECT link.id, link.name FROM EVE2_LINKS as wormhole "
     + "INNER JOIN EVE2_Locations as source ON wormhole.source_id = source.id "
     + "AND source.id = ?"
     + "INNER JOIN EVE2_Locations as link ON wormhole.link_id = link.id "
     + "ORDER BY link.name";
 
-queries.select.itemUse_list_orderbyq = "structures.name, itemUse.id, itemUse.pilotable, itemUse.capacity, itemUse.scale"
-    + "FROM EVE2_ItemUse as itemUse"
-    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id"
-    + "ORDER BY ?"
+queries.select.itemUse_list_orderbyqq = "SELECT structures.name, itemUse.id, itemUse.pilotable, itemUse.capacity, itemUse.scale "
+    + "FROM EVE2_ItemUse as itemUse "
+    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id "
+    + "ORDER BY ??";
+
+    queries.select.itemUse_list_orderbyq = "SELECT structures.name, itemUse.id, itemUse.pilotable, itemUse.capacity, itemUse.scale "
+    + "FROM EVE2_ItemUse as itemUse "
+    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id "
+    + "ORDER BY ?";
 
 queries.insert.insert_player = "INSERT INTO EVE2_Players (name, piloting_CS_id) VALUES (?,?)";
 queries.insert.insert_location = "INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?)";

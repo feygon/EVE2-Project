@@ -46,18 +46,7 @@ module.exports = (function() {
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
-
-	callbacks.station(res, mysql, context, complete);
-	callbacks.location(res, mysql, context, complete);
-	callbacks.item(res, mysql, context, complete);
-	callbacks.wormhole(res, mysql, context, complete);
-
-	function complete(){
-		callbackCount++;
-		if(callbackCount >=4){
-        		res.render('out_in_space', context);
-		}
-	}
+        res.render('out_in_space', context);
         });
     
     router.get('/readMe/', function(req, res){
@@ -81,18 +70,19 @@ module.exports = (function() {
         var mysql = req.app.get('mysql');
 
         //console.log("mysql3: " + mysql);
-
+        
         callbacks.select.item_structure_list(res, mysql, context, complete);
+        callbacks.select.itemUse_list_orderbyqq(res, mysql, context, complete);
         callbacks.select.item_structure_types(res, mysql, context, complete);
         callbacks.select.item_use_scales(res, mysql, context, complete);
         callbacks.select.useless_item_structures(res, mysql, context, complete);
-
+        console.log(context);
         //context.jsscripts = []; // no client-side scripts yet
 
         function complete(){
             callbackCount++;
         //    console.log("Callback " + callbackCount + " complete.");
-            if (callbackCount >= 4){
+            if (callbackCount >= 5){
 
                 //console.log(`Context is ${JSON.stringify(context)}.`);
 
