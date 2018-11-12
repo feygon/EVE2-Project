@@ -1,4 +1,5 @@
 var callbacks = {};
+callbacks.select = {};
 callbacks.select.item_structure_list = {}; 		// id, name, type
 callbacks.select.item_structure_types = {}; 	// type
 callbacks.select.item_use_scales = {}; 			// scale
