@@ -117,7 +117,7 @@ module.exports = (function() {
     });
 
 
-    router.post('/inventstructure/', function(req,res){
+    router.post('/eve2/industry/inventstructure/', function(req,res){
         var mysql = req.app.get('mysql');
         
 	    var sql = queries.insert.insert_item_structure;
@@ -136,7 +136,7 @@ module.exports = (function() {
     });
   
   
-    router.post('/eve2/designItemUse/', function(req,res){
+    router.post('/eve2/industry/designitemuse/', function(req,res){
         var mysql = req.app.get('mysql');
         var pilotable = false;
         if (req.body.scale == "Ship") { pilotable = true; }
