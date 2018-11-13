@@ -29,16 +29,16 @@
 
 <label style = "color:red">(Reviewer - There is not actually any security implemented here. Anyone can access your player after it's made.)</label>
 <!-- at least make sessions functional for step 5 draft -->
-<form id="choose-player" action="/player/choose/" method="get">
+<form id="choose-player" action="/eve2/player/" method="post">
     <label>Player:</label> <select name="playerID">
         <option>None</option>
         {{#each all_players}}
         <option value="{{playerID}}">{{playerName}}</option>
         {{/each}}
-    </select><br>
-</form>
-    <label></label>
-    <input type="submit" value="Use player" name="UsePlayer">
-    <label></label>
+    </select>
+    <input type="submit" value="Use player" name="UsePlayer"><br>
+    <label></label><label></label>
     <input type="submit" value="Delete player" name="DeletePlayer">
+</form>
+
 </html>

@@ -1,22 +1,24 @@
 var callbacks = {};
+callbacks.select = {};
+callbacks.post = {};
 callbacks.session = {};
 callbacks.session.setSession = {};
 callbacks.session.checkSession = {};
-callbacks.select = {};
-callbacks.getPostValues = {};
+callbacks.session.clearSessionData = {};
 callbacks.select.item_structure_list = {}; 		// id, name, type
 callbacks.select.item_structure_types = {}; 	// type
 callbacks.select.item_use_scales = {}; 			// scale
 callbacks.select.itemUse_list_orderbyq = {};	// name, id, pilotable, capacity, scale
 callbacks.select.useless_item_structures = {}; 	// id, name, type
-callbacks.getPostValues.out_in_space = {};
-callbacks.getPostValues.player = {};
+callbacks.post.out_in_space = {};
+callbacks.post.player = {};
 
 //console.log("parsing callbacks.js");
 var queries = require('./queries');
 
 callbacks.session.setSession = 
 function setSession(req, res, mysql, context, done){
+	console.log(context);
 	var sql = "";
 	var finishedCount = 0;
 	var inserts = [];
@@ -37,7 +39,7 @@ function setSession(req, res, mysql, context, done){
 };
 
 callbacks.session.checkSession = 
-function checkSession(req, res, complete){
+function checkSession(req, res, context, complete){
 	var doneCounter = 0;
 	if (!req.session.playerID){
 		callbacks.session.clearSessionData(req, done);
@@ -48,10 +50,13 @@ function checkSession(req, res, complete){
 				res.render('player', context);
 			}
 		}
+	} else {
+		context.session = req.session;	// continuity based on player id.
 		complete();
 	}
 };
 
+// GP CB encapsulation.
 callbacks.session.clearSessionData = 
 function clearSessionData(req, complete){
 	req.session = {};
@@ -159,7 +164,7 @@ function useless_item_structures(res, mysql, context, complete) {
 	});
 };
 
-callbacks.getPostValues.out_in_space = 
+callbacks.post.out_in_space = 
 function out_in_space(req, tag, sql, inserts, complete){
 	if (req.body['annihilate']) {
         // query not yet written. Plan for body to get location extrapolated from session player tho.
@@ -196,7 +201,7 @@ function out_in_space(req, tag, sql, inserts, complete){
 	complete();
 };
 
-callbacks.getPostValues.player = 
+callbacks.post.player = 
 function player(req, res, tag, sql, inserts, mysql, context, complete){
 
 	console.log(req.body);
@@ -205,8 +210,14 @@ function player(req, res, tag, sql, inserts, mysql, context, complete){
 		console.log("UsePlayer post invoked.");
 		var doneCount = 0;
 		// set up session data.
+		console.log(req.body.playerID);
+		context.session = {};
+		context.session.playerID = {};
 		context.session.playerID = req.body.playerID;
-		callbacks.session.setSession(req, mysql, context, done);
+
+		console.log("playerIDb is " + context.session.playerID);
+		
+		callbacks.session.setSession(req, res, mysql, context, done);
 
 		function done(){
 			doneCount++;

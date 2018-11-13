@@ -23,7 +23,6 @@ DROP PROCEDURE IF EXISTS SP_CreateCargoSpace;
 DROP PROCEDURE IF EXISTS SP_CreateObject;
 DROP PROCEDURE IF EXISTS SP_startingPlayersInPods;
 
-
 DELIMITER //
 
 CREATE PROCEDURE SP_getItemStructureID(IN itemname varchar(255))

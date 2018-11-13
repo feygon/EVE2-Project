@@ -32,17 +32,16 @@ var queries = {
     }],
     "insert": [
     {
-        "insert_structures_and_CSs_into_CS": "",// + select + "));"
-        "insert_player": "",
-        "insert_location": "",
-        "insert_link": "",
+        "insert_objects_and_CSs_into_CS": "",// + select + "));"
+        "insert_player": "",    // calls stored procedure. adds station, ship, and contents.
+        "insert_location": "",  // need SP for wormhole exploration.
         "insert_CS": "",
         "insert_item_structure": "",
         "insert_item_use": ""
     }],
     "delete": [
     {
-        "del_structures_in_listed_cargoSpaces": "",
+        "del_objects_in_listed_cargoSpaces": "",
         "del_player": "",
         "del_object": "",
         "del_CS": "",
@@ -203,8 +202,7 @@ queries.select.session_player = "SELECT player.id as playerID, "
     + "WHERE player.id = ?";
 
 queries.insert.insert_player = "CALL SP_newPlayerGetsPodInJita(?)";
-queries.insert.insert_location = "INSERT INTO EVE2_Locations (name, sec_status) VALUES (?,?)";
-queries.insert.insert_link = "INSERT INTO EVE2_LINKS (source_id, link_id) VALUES (?,?)";
+queries.insert.insert_location = "CALL SP_linkNewWormhole(?, ?)";
 queries.insert.insert_CS = "INSERT INTO EVE2_CargoSpace(player_id, itemUse_id, location_id, inside_CS_id) VALUES (?,?,?,?)";
 queries.insert.insert_item_structure = "INSERT INTO EVE2_ItemStructure(name, vol_packed, vol_unpacked, type) VALUES(?,?,?,?)";
 queries.insert.insert_item_use = "INSERT INTO EVE2_ItemUse (itemStructure_id, pilotable, capacity, type) VALUES(?,?,?,?)";
@@ -224,8 +222,13 @@ queries.delete.del_item_structure = "DELETE FROM EVE2_ItemStructure WHERE id = ?
 queries.delete.del_link = "";   // delete link to here from there, and to there from here. Don't delete location.
 
 
-queries.insert.insert_structures_and_CSs_into_CS = ""; // get selection of objects and OCTs into a view, and select it. Insert the objects for those into the specified container. for reference, also call 'set_inside_of' for containers.
-queries.delete.del_structures_in_listed_cargoSpaces = "DELETE Object.id FROM EVE2_Objects AS Object WHERE Object.cargoSpace_id IS IN ";
+queries.insert.insert_objects_and_CSs_into_CS = ""; 
+// get selection of objects and CSs into a view, and select it.
+// Insert the objects for those into the specified container. for reference, also call 'set_inside_of' for containers.
+
+// deprecated.
+queries.delete.del_objects_in_listed_cargoSpaces = "DELETE Object.id FROM EVE2_Objects AS Object WHERE Object.cargoSpace_id IS IN ";
+// on delete cascade took care of this.
 
 // for displaying containers and objects together.
 queries.view.merged_objects_in_cargoSpace_numq = "CREATE VIEW merged_objects_? "
