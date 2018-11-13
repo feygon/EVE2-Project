@@ -2,6 +2,7 @@
 
 use cs340_nickersr;
 
+DROP PROCEDURE IF EXISTS SP_newPlayerGetsPodInJita;
 DROP PROCEDURE IF EXISTS SP_getItemStructureID;
 DROP PROCEDURE IF EXISTS SP_getLocs;
 DROP PROCEDURE IF EXISTS SP_getCSid;
@@ -89,6 +90,44 @@ BEGIN
           	  EVE2_Players.name = playerName AND
           	  EVE2_Locations.name = locationName
     	LIMIT 1);
+END //
+
+
+CREATE PROCEDURE SP_newPlayerGetsPodInJita(IN playerName varchar(255))
+BEGIN
+    INSERT INTO EVE2_Players (name, piloting_CS_id) VALUES (playerName, NULL);
+    SET @newestPlayerID = (SELECT id FROM EVE2_Players WHERE name = playerName);
+    SET @newestPlayerName = (SELECT name FROM EVE2_Players where id=@newestPlayerID);
+    CALL SP_getItemStructureID("Keepstar");
+    SET @stationISid = @itemStructureID;
+    SET @stationIUID = (SELECT id from EVE2_ItemUse WHERE itemStructure_id = @stationISid);
+    CALL SP_getItemStructureID("Pod");
+    SET @podISid = @itemStructureID;
+    SET @podIUID = (SELECT id FROM EVE2_ItemUse WHERE itemStructure_id = @podISid);
+    CALL SP_getItemStructureID("Precious Metals");
+    SET @preciousMetalsID = @itemStructureID;
+    CALL SP_getItemStructureID("Water");
+    SET @waterID = @itemStructureID;
+    CALL SP_getItemStructureID("Oxygen");
+    SET @oxygenID = @itemStructureID;
+
+    SET @jitaID = (SELECT loc.id FROM EVE2_Locations as loc WHERE loc.name="Jita");
+    INSERT INTO EVE2_CargoSpace (name, player_id, itemUse_id, location_id, inside_CS_id) VALUES
+        (CONCAT(playerName, "'s Keepstar"), @newestPlayerID, @stationIUID, @jitaID, NULL);
+
+    SET @stationCSid = (SELECT id FROM EVE2_CargoSpace WHERE 
+        id in (SELECT MAX(id) FROM EVE2_CargoSpace));
+    INSERT INTO EVE2_CargoSpace (name, player_id, itemUse_id, location_id, inside_CS_id) VALUES
+        (CONCAT(playerName, "'s Pod"), @newestPlayerID, @podIUID, @jitaID, @stationCSid);
+    SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE
+        id in (SELECT MAX(id) FROM EVE2_CargoSpace));
+    INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
+        (@preciousMetalsID, @stationCSid, 100, 1);
+    INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
+        (@waterID, @stationCSid, 100, 1);
+    INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
+        (@oxygenID, @stationCSid, 100, 1);
+    UPDATE EVE2_Players SET piloting_CS_id = @shipCSid WHERE id = @newestPlayerID;
 END //
 
 CREATE PROCEDURE SP_putPlayerInPod(IN playerName varchar(255))

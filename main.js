@@ -1,11 +1,18 @@
 var express=require('express');
 var mysql = require('./dbcon.js');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 var queries = require('./scripts/queries.js'); // big object full of sql strings
- 
+
+app.use(session({
+    secret:'SuperSecretPasswordReallyItsLikeTheBestPa55word',
+    resave: false,
+    saveUninitialized: false
+}));
+
 app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use('/static', express.static('public'));

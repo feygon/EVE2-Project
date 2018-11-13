@@ -2,42 +2,43 @@
 
 <h1>Player Page</h1><br>
 <h3>Add new player:</h3>
-<form id="newplayer" action="/eve2/player/newplayer/" method="post">
+<form id="newplayer" action="/eve2/player/" method="post">
     <label>Name:</label> <input type="text" name="name"><br>
     <label style = "color:red">(Reviewer - This is an insert)</label>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" name="AddPlayer">
  </form>
 <br/>
 <h3>Existing player:</h3>
 <table>
     <thead> 
-        <th>ID</th> 
-        <th>Name</th> 
-        <th>Piloting Container</th>  
-        <th>Location of Pilot</th> 
+        <th>Name</th>
+        <th>Piloting</th> 
+        <th>Location</th>
     </thead> 
     <tbody> 
-        {{#each player}}
+        {{#each all_players}}
         <tr> 
-            <td>{{id}}</td> 
-            <td>{{name}}</td> 
-            <td>{{piloting_CS_id}}</td>
-            <td>{{location}}</td>
+            <td>{{playerName}}</td> 
+            <td>{{playerShip}}</td>
+            <td>{{locationName}}</td>
         </tr> 
         {{/each}}
     </tbody> 
 </table> 
 <br/>
 
+<label style = "color:red">(Reviewer - There is not actually any security implemented here. Anyone can access your player after it's made.)</label>
 <!-- at least make sessions functional for step 5 draft -->
 <form id="choose-player" action="/player/choose/" method="get">
-    <label>Player:</label> <select name="id">
+    <label>Player:</label> <select name="playerID">
         <option>None</option>
-        {{#each player}}
-        <option value="{{id}}">{{name}}</option>
+        {{#each all_players}}
+        <option value="{{playerID}}">{{playerName}}</option>
         {{/each}}
     </select><br>
 </form>
-    <label></label><button onclick="selectPlayer({{id}})">Use</button><br>
-    <label></label><button onclick="deletePlayer({{id}})">Delete</button>
+    <label></label>
+    <input type="submit" value="Use player" name="UsePlayer">
+    <label></label>
+    <input type="submit" value="Delete player" name="DeletePlayer">
 </html>

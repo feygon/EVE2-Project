@@ -4,38 +4,38 @@
 
 <!-- create post handler for this -->
 <form id="choose-station" action="/eve2/out_in_space/dock" method="post">
- <label>Station:</label> <select name="id"> 
+ <label>Station:</label> <select name="stationCSid"> 
         <option>None</option>
         {{#each station}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label></label><input type="submit" value="Dock"><br>
+<label></label><input type="submit" value="Dock" name="dock"><br>
 </form>
 <br/>
 
 <!-- create post handler for this -->
 <form id="choose-location" action="/eve2/out_in_space/moveLocation" method="post">
-    <label>Location:</label> <select name="id"> 
+    <label>Location:</label> <select name="locationID"> 
         <option>None</option>
         {{#each location}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
-<label></label><input type="submit" value="Travel">
+<label></label><input type="submit" value="Travel" name="moveLocation">
 </form>
 <br/>
 
 <!-- create post handler for this -->
 <form id="choose-item" action="/eve2/out_in_space/jettison" method="post">
-    <label>Item:</label> <select name="id"> 
+    <label>Item:</label> <select name="objectID"> 
         <option>None</option>
         {{#each item}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
     </select><br>
 <label></label>
-<input type="submit" value="Jettison">
+<input type="submit" value="Jettison" name="jettison">
 </form>
 
 <!-- create post handler for this -->
@@ -47,18 +47,18 @@
         {{/each}}
         </select>
     </select><br>
-    <label style = "color:red">(Reviewer - This is a delete of two M-to-N relationship table records)</label><input type="submit" value="Annihilate"><br>
+    <label style = "color:red">(Reviewer - This is a delete of two M-to-N relationship table records)</label>
+    <input type="submit" value="Annihilate" name="annihilate"><br>
 </form>
 
  <!-- create post handler for this -->
 <h3>Chart A Wormhole</h3>
 <form id="wormhole" action="/eve2/out_in_space/wormhole/" method="post">
+    <label>Wormhole Name:</label> <input type="text" name="name" value="Name"><br>
+    <label>Wormhole Security Status:</label> 
+    <input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
 
-<label>Wormhole Name:</label> <input type="text" name="name" value="Name"><br>
-<label>Wormhole Security Status:</label> 
-<input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
-
-<label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label>
-<input type="submit" value="Chart">
+    <label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label>
+    <input type="submit" value="Chart" name="wormhole">
 </form>
 </html>

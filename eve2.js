@@ -5,6 +5,8 @@ module.exports = (function() {
     var router = express.Router();
     var callbacks = require('./scripts/callbacks');
     var queries = require('./scripts/queries');
+    var runtimeScripts = require('./scripts/runtimeScripts');
+    
 
     /********************************************
      *
@@ -12,47 +14,61 @@ module.exports = (function() {
      * 
      *******************************************/
 
+    function getComplete(res, count, renderString, callbackCount, context) {
+        return function() {
+            callbackCount++;
+            if (callbackCount >= count){
+                res.render(renderString, context);
+            }
+        }
+    }
+
+    /********************************
+     *                              *
+     *      DEFAULT ROUTER          *
+     *                              *
+     *******************************/
     router.get('/', function(req, res){
+        /** example call to getSessionValues:
+         * getSessionValues(req, res, mysql, context, complete);
+         * Should be after mysql is instantiated, context is set,
+         *  and should have access to a complete() function callback.
+         */
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
         res.render('homepage', context);
-        });
+    });
 
     router.get('/player/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
+        var complete = getComplete(res, 1, 'player', callbackCount, context);
 
-	callbacks.player(res, mysql, context, complete);
-	callbacks.player(res, mysql, context, complete);
-
-	 function complete(){
-		 callbackCount++;
-		 if(callbackCount >= 2){
-    			res.render('player',context);
-		 }
-	 }
-        });
+        // columns in all_players: playerID, playerName, playerShip,
+        //  playerLocation, locationName, playerShipCSid
+        callbacks.select.all_players(res, mysql, context, complete); // id, name, piloting_CS_id, locationID
+     });
 
     router.get('/space_station/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
         res.render('space_station', context);
-        });
+    });
 
     router.get('/out_in_space/', function(req, res){
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
         res.render('out_in_space', context);
-        });
+    });
     
     router.get('/readMe/', function(req, res){
         var context = {};
         res.render('readme', context);
-        });
+    });
          
      
         /********************************************
@@ -100,20 +116,55 @@ module.exports = (function() {
     ************************************************/
     
     // remember later to hook this up with 2 inserts to EVE2_LINKS.
-    router.post('/out_in_space/wormhole/', function(req,res){
+    router.post('/out_in_space/', function(req,res){
         var mysql = req.app.get('mysql');
-	    var sql = queries.insert.insert_location;
-	    var inserts = [req.body.name,
-		    	req.body.Security];
+        var callbackCount = 0;
+        var tag = "";
+        var sql = "";
+        var inserts = [];
+        callbacks.getPostValues.out_in_space(req, res, tag, sql, inserts, complete);
+        
+        function complete(){
+            callbackCount++;
+            if (callbackCount >= 1){
+                sql = mysql.pool.query(sql, inserts, function(error, results, fields){
+                    if(error){
+                        res.write("out_in_space(" + tag + ") post router tag says: " 
+                            + JSON.stringify(error));
+                        res.end();
+                    }else{
+                        res.redirect('/eve2/out_in_space');
+                    }
+                }); // end sql query anonymous error logging function
+            } // end callbackCount check
+        } // end complete
+    });
 
-	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
-		    if(error){
-			    res.write("wormhole post router says: " + JSON.stringify(error));
-			    res.end();
-		    }else{
-			    res.redirect('/eve2/out_in_space');
-		    }
-	    });
+    router.post('/player/', function(req, res){
+        var mysql = req.app.get('mysql');
+        var callbackCount = 0;
+        var tag = {};
+        var sql = {};
+        var inserts = {};
+        var context = {};
+        callbacks.getPostValues.player(req, res, tag, sql, inserts, mysql, context, complete);
+
+        function complete(){
+            callbackCount++;
+            if (callbackCount >= 1){
+            console.log("1 player post callback completed. SQL = " + sql);
+
+                sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields){
+                    if(error){
+                        res.write("player(" + tag.post + ") post router tag says: " 
+                            + JSON.stringify(error));
+                        res.end();
+                    }else{
+                        res.redirect('/eve2/player');
+                    }
+                }); // end sql query anonymous error logging function
+            } // end callbackCount check
+        } // end complete
     });
 
 
