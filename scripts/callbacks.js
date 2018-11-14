@@ -35,7 +35,6 @@ function setSession(req, res, playerID, mysql, done){
 	var subcompleteCount = 0;
 	var sql = "";
 	var inserts = [];
-	if (!req.session) { req.session = {}; };
 	var subcontext = {};
 	subcontext.playerID = playerID;
 	console.log("subcontext playerID: " + subcontext.playerID);
@@ -46,18 +45,12 @@ function setSession(req, res, playerID, mysql, done){
 		if (subcompleteCount >= 1){
 			console.log("-------------SetSession says: \n" + 
 				"external subcontext: " + JSON.stringify(subcontext.session_player));
-			req.session.playerID = {};
-			req.session.playerID = subcontext.session_player.playerID;
-			req.session.playerName = {};
-			req.session.playerName = subcontext.session_player.playerName;
-			req.session.CSid = {};
-			req.session.CSid = subcontext.session_player.CSid;
-			req.session.CSnext = {};
-			req.session.CSnext = subcontext.session_player.CSnest;
-			req.session.locationID = {};
-			req.session.locationID = subcontext.session_player.locationID;
-			req.session.locationname = {};
-			req.session.locationname = subcontext.session_player.locationName;
+			req.session.playerID = subcontext.session_player[0].playerID;
+			req.session.playerName = subcontext.session_player[0].playerName;
+			req.session.CSid = subcontext.session_player[0].CSid;
+			req.session.CSnext = subcontext.session_player[0].CSnest;
+			req.session.locationID = subcontext.session_player[0].locationID;
+			req.session.locationname = subcontext.session_player[0].locationName;
 			console.log("SetSession says: \n" +
 				"req.session in setsession is " + JSON.stringify(req.session)
 				+ "\n-----------------------------------------------");
@@ -67,7 +60,7 @@ function setSession(req, res, playerID, mysql, done){
 };
 
 callbacks.session.checkSession = 
-function checkSession(req, res, context, complete){
+function checkSession(req, res, complete){
 	var doneCounter = 0;
 	console.log("Checking req.session in checkSession:\n req.session.playerID = " 
 		+ req.session.playerID);
