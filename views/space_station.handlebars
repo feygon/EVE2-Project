@@ -1,27 +1,29 @@
 <html>
 
 <h1>Space Station Page</h1><br>
-<a href="/eve2/out_in_space">undock</a>
+<a href="/eve2/industry">Industry</a><br>
+<a href="/eve2/out_in_space">undock</a><br>
 <br/>
 
 <h3>Ships and Containers:</h3>
 <table>
     <thead> 
-        <th><a href="/eve2/out_in_space">ID</a></th>  
+        <th><a href="/eve2/out_in_space/Name">Name</a></th> 
+        <th><a href="/eve2/out_in_space/Type">Type</a></th> 
+        <th><a href="/eve2/out_in_space/Quantity">Quantity</a></th>   
+        <th><a href="/eve2/out_in_space/Volume">Volume</a></th>   
+        <th><a href="/eve2/out_in_space/Capacity">Capacity</a></th>   
         <th>Pilotable</th> 
-        <th><a href="/eve2/out_in_space">Capacity</a></th>   
-        <th><a href="/eve2/out_in_space">Type</a></th> 
-        <th><a href="/eve2/out_in_space">Name</a></th> 
+        <th>Packaged?</th>
         <th>Move Item</th>
         <th>Give Item</th>
         <th>Delete Item</th>
-        <th>Repackage Item</th>
 
     </thead> 
     <tbody> 
-        {{#each container}}
+        {{#each CS}}
         <tr> 
-            <td>{{id}}</td>
+            <td>{{Name}}</td>
             <td>{{Pilotable}}</td>
             <td>{{capacity}}</td>
             <td>{{type}}</td>

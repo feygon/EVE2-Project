@@ -22,6 +22,8 @@ module.exports = (function() {
         }
     }
 
+    
+
     /********************************
      *                              *
      *      DEFAULT ROUTER          *
@@ -33,13 +35,22 @@ module.exports = (function() {
          * Should be after mysql is instantiated, context is set,
          *  and should have access to a complete() function callback.
          */
+        if (!req.session.count){
+            req.session.count = 0;
+        }
+        req.session.count += 1;
+
+
         var callbackCount = 0;
         var context = {};
+        context.counter = req.session.count;
         var mysql = req.app.get('mysql');
         res.render('homepage', context);
     });
 
     router.get('/player/', function(req, res){
+        console.log("Req.session before any of this crap:\n"
+            + JSON.stringify(req.session) + "\n-----------------------------");
         var callbackCount = 0;
         var context = {};
         var mysql = req.app.get('mysql');
@@ -65,9 +76,11 @@ module.exports = (function() {
         var context = {};
         var mysql = req.app.get('mysql');
         var complete = renderComplete(
-            res, 1, 'out_in_space', callbackCount, context); // increment if adding callbacks.
+            res, 1, 'out_in_space', callbackCount, context); 
+            // increment if adding callbacks.
 
         callbacks.session.checkSession(req, res, complete);
+        
     });
     
     router.get('/readMe/', function(req, res){
@@ -145,15 +158,13 @@ module.exports = (function() {
         var sql = {};
         var inserts = {};
         var context = {};
-        context.session = req.session;
+        context = callbacks.session.copySessionObjToContext(context, req.session);
         callbacks.post.player(req, res, tag, sql, inserts, mysql, context, complete);
+        //post.player includes setSession
 
         function complete(){
             callbackCount++;
-            if (callbackCount == 1){
-                callbacks.session.setSession(req, res, mysql, complete);
-            }
-            if (callbackCount >= 2){
+            if (callbackCount >= 1){
                 console.log("1 player post callback completed. SQL = " + sql);
 
                 sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields){

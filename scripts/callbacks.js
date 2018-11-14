@@ -16,57 +16,68 @@ callbacks.post.player = {};
 //console.log("parsing callbacks.js");
 var queries = require('./queries');
 
+// don't use w/ req as context.
+callbacks.session.copySessionObjToContext = 
+function copySessionToContext(context, obj){
+	context.session = {};
+	context.session.playerID = obj.playerID;
+	context.session.playerName = obj.playerName;
+	context.session.CSid = obj.CSid;
+	context.session.CSnest = obj.CSnest;
+	context.session.locationID = obj.locationID;
+	context.session.locationname = obj.locationName;
+	return context;
+};
+
 callbacks.session.setSession = 
-function setSession(req, res, mysql, done){
+function setSession(req, res, playerID, mysql, done){
+	console.log("------Setting session------");
+	var subcompleteCount = 0;
 	var sql = "";
 	var inserts = [];
-	var playerID = req.session.playerID;
+	if (!req.session) { req.session = {}; };
+	var subcontext = {};
+	subcontext.playerID = playerID;
+	console.log("subcontext playerID: " + subcontext.playerID);
+	callbacks.select.session_player(res, mysql, subcontext, subcomplete);
 
-	sql = queries.select.session_player;
-	inserts = [playerID];
-
-	mysql.pool.query(sql, inserts, function(error, results, fields){
-		if (error){
-			res.write("session.setSession returns: " + JSON.stringify(error));
-			res.end();
+	function subcomplete(){
+		subcompleteCount++;
+		if (subcompleteCount >= 1){
+			console.log("-------------SetSession says: \n" + 
+				"external subcontext: " + JSON.stringify(subcontext.session_player));
+			req.session.playerID = {};
+			req.session.playerID = subcontext.session_player.playerID;
+			req.session.playerName = {};
+			req.session.playerName = subcontext.session_player.playerName;
+			req.session.CSid = {};
+			req.session.CSid = subcontext.session_player.CSid;
+			req.session.CSnext = {};
+			req.session.CSnext = subcontext.session_player.CSnest;
+			req.session.locationID = {};
+			req.session.locationID = subcontext.session_player.locationID;
+			req.session.locationname = {};
+			req.session.locationname = subcontext.session_player.locationName;
+			console.log("SetSession says: \n" +
+				"req.session in setsession is " + JSON.stringify(req.session)
+				+ "\n-----------------------------------------------");
+			done();
 		}
-		req.session.playerID = results.playerID;
-		req.session.playerName = results.playerName;
-		req.session.CSid = results.CDis;
-		req.session.CSnext = results.CSnest;
-		req.session.locationID = results.locationID;
-		req.session.locationname = results.locationName;
-		done();
-	});
+	}
 };
 
 callbacks.session.checkSession = 
 function checkSession(req, res, context, complete){
 	var doneCounter = 0;
+	console.log("Checking req.session in checkSession:\n req.session.playerID = " 
+		+ req.session.playerID);
 	if (!req.session.playerID){
-		callbacks.session.clearSessionData(req, done);
-
-		function done(){
-			doneCounter++;
-			if (doneCounter >= 1){
-				res.render('player', context);
-			}
-		}
+		req.session.destroy();
+		console.log("Session not set. Redirecting to login page.");
+		res.redirect('/eve2/player');
 	} else {
 		complete();
 	}
-};
-
-// GP CB encapsulation.
-callbacks.session.clearSessionData = 
-function clearSessionData(req, complete){
-	req.session.playerID = null;
-	req.session.playerName = null;
-	req.session.CSid = null;
-	req.session.CSnest = null;
-	req.session.locationID = null;
-	req.session.locationName = null;
-	complete();
 };
 
 callbacks.select.all_players =
@@ -170,6 +181,30 @@ function useless_item_structures(res, mysql, context, complete) {
 	});
 };
 
+callbacks.select.session_player = 
+function session_player(res, mysql, subcontext, subcomplete){
+	console.log("------session_player sql callback------- ")
+	var sql = "";
+	sql += queries.select.session_player;
+	var inserts = [subcontext.playerID];
+
+	console.log("mysql.pool.query receiving query: \n" 
+		+ sql + "\n"
+		+ "and inserts from subcontext: " + JSON.stringify(subcontext));
+
+	mysql.pool.query(sql, inserts, function(error, results, fields){
+		if(error){
+			res.write("callbacks.select.session_player returns: "
+				+ JSON.stringify(error) + "\n----------------------------");
+			res.end;
+		}
+		subcontext.session_player = results;
+		console.log("subcontext.session_player ought to be returning: \n"
+		+ JSON.stringify(subcontext.session_player));
+		subcomplete();
+	});
+};
+
 callbacks.post.out_in_space = 
 function out_in_space(req, tag, sql, inserts, complete){
 	if (req.body['annihilate']) {
@@ -207,32 +242,35 @@ function out_in_space(req, tag, sql, inserts, complete){
 	complete();
 };
 
+
 callbacks.post.player = 
 function player(req, res, tag, sql, inserts, mysql, context, complete){
 
 	console.log(req.body);
 
 	if (req.body['UsePlayer']){
-		console.log("UsePlayer post invoked.");
+		console.log("UsePlayer post invoked.------");
 		var doneCount = 0;
 		// set up session data.
-		console.log(req.body.playerID);
-		console.log(req.session.playerID);
-		context.session = {};
-		context.session.playerID = {};
 		context.session.playerID = req.body.playerID;
-
-		console.log("playerIDb is " + context.session.playerID);
+		var playerID = req.body.playerID;
+		console.log("callbacks.post.player says: \n" +
+			"context.session.playerID is " + context.session.playerID);
 		
-		callbacks.session.setSession(req, res, mysql, done);
-
+		callbacks.session.setSession(req, res, playerID, mysql, done);
+		
 		function done(){
 			doneCount++;
 			if (doneCount >= 1){
 				if (context.session.CSnest == "NULL"){
-					res.redirect('/eve2/out_in_space');
+					console.log("callbacks.post.player says: \n" +
+						"Session set. Redirecting to /eve2/out_in_space/");
+					res.redirect('/eve2/out_in_space/');
 				} else {
-					res.redirect('/eve2/space_station');
+					console.log("callbacks.post.player says: \n" +
+						"Session set. Redirecting to /eve2/space_station/\n"
+					+ "Req.session is: " + JSON.stringify(req.session));
+					res.redirect('/eve2/space_station/');
 				}
 			}
 		}

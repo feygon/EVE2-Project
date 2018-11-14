@@ -9,8 +9,12 @@ var queries = require('./scripts/queries.js'); // big object full of sql strings
 
 app.use(session({
     secret:'SuperSecretPasswordReallyItsLikeTheBestPa55word',
-    resave: false,
-    saveUninitialized: false
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+        // 7 day cookie
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 
 app.engine('handlebars', handlebars.engine);
@@ -32,7 +36,7 @@ app.use(function(req,res){
     res.status(404);
     res.render('404');
 });
- 
+
 app.use(function(err, req, res, next){
     console.error(err.stack);
     res.status(500);
