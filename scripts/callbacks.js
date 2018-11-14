@@ -17,23 +17,25 @@ callbacks.post.player = {};
 var queries = require('./queries');
 
 callbacks.session.setSession = 
-function setSession(req, res, mysql, context, done){
-	console.log(context);
+function setSession(req, res, mysql, done){
 	var sql = "";
-	var finishedCount = 0;
 	var inserts = [];
-	var playerID = context.session.playerID;
-	context.session = {};
+	var playerID = req.session.playerID;
 
 	sql = queries.select.session_player;
 	inserts = [playerID];
 
-	mysql.pool.query(sql, function(error, results, fields){
+	mysql.pool.query(sql, inserts, function(error, results, fields){
 		if (error){
 			res.write("session.setSession returns: " + JSON.stringify(error));
 			res.end();
 		}
-		context.session = results;
+		req.session.playerID = results.playerID;
+		req.session.playerName = results.playerName;
+		req.session.CSid = results.CDis;
+		req.session.CSnext = results.CSnest;
+		req.session.locationID = results.locationID;
+		req.session.locationname = results.locationName;
 		done();
 	});
 };
@@ -51,7 +53,6 @@ function checkSession(req, res, context, complete){
 			}
 		}
 	} else {
-		context.session = req.session;	// continuity based on player id.
 		complete();
 	}
 };
@@ -59,7 +60,12 @@ function checkSession(req, res, context, complete){
 // GP CB encapsulation.
 callbacks.session.clearSessionData = 
 function clearSessionData(req, complete){
-	req.session = {};
+	req.session.playerID = null;
+	req.session.playerName = null;
+	req.session.CSid = null;
+	req.session.CSnest = null;
+	req.session.locationID = null;
+	req.session.locationName = null;
 	complete();
 };
 
@@ -211,23 +217,22 @@ function player(req, res, tag, sql, inserts, mysql, context, complete){
 		var doneCount = 0;
 		// set up session data.
 		console.log(req.body.playerID);
+		console.log(req.session.playerID);
 		context.session = {};
 		context.session.playerID = {};
 		context.session.playerID = req.body.playerID;
 
 		console.log("playerIDb is " + context.session.playerID);
 		
-		callbacks.session.setSession(req, res, mysql, context, done);
+		callbacks.session.setSession(req, res, mysql, done);
 
 		function done(){
 			doneCount++;
 			if (doneCount >= 1){
 				if (context.session.CSnest == "NULL"){
-					nevermind();
-					res.render('out_in_space');
+					res.redirect('/eve2/out_in_space');
 				} else {
-					nevermind();
-					res.render('space_station');
+					res.redirect('/eve2/space_station');
 				}
 			}
 		}

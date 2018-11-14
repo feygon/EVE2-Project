@@ -114,11 +114,17 @@ module.exports = (function() {
         var tag = "";
         var sql = "";
         var inserts = [];
+        var context = {};
+        context.session = req.session;
         callbacks.post.out_in_space(req, res, tag, sql, inserts, complete);
         
         function complete(){
             callbackCount++;
-            if (callbackCount >= 1){
+            if (callbackCount == 1){
+                callbacks.session.setSession(req, res, mysql, context, complete);
+            }
+
+            if (callbackCount >= 2){
                 sql = mysql.pool.query(sql, inserts, function(error, results, fields){
                     if(error){
                         res.write("out_in_space(" + tag + ") post router tag says: " 
@@ -139,12 +145,16 @@ module.exports = (function() {
         var sql = {};
         var inserts = {};
         var context = {};
+        context.session = req.session;
         callbacks.post.player(req, res, tag, sql, inserts, mysql, context, complete);
 
         function complete(){
             callbackCount++;
-            if (callbackCount >= 1){
-            console.log("1 player post callback completed. SQL = " + sql);
+            if (callbackCount == 1){
+                callbacks.session.setSession(req, res, mysql, complete);
+            }
+            if (callbackCount >= 2){
+                console.log("1 player post callback completed. SQL = " + sql);
 
                 sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields){
                     if(error){
@@ -158,7 +168,6 @@ module.exports = (function() {
             } // end callbackCount check
         } // end complete
     });
-
 
     router.post('/industry/inventstructure/', function(req,res){
         var mysql = req.app.get('mysql');

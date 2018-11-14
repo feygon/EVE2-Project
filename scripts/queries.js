@@ -190,7 +190,8 @@ queries.select.itemUse_list_orderbyq = "SELECT structures.name, itemUse.id, item
     + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id "
     + "ORDER BY ?";
 
-queries.select.session_player = "SELECT player.id as playerID, "
+queries.select.session_player = "SELECT "
+        + "player.id as playerID, "
         + "player.name as playerName, "
         + "CS.id as CSid, "
         + "CS.inside_CS_id as CSnest, "
