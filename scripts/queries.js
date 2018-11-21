@@ -71,27 +71,8 @@ var queries = {
         "SP_getShipAndBoxes":"",
         "SP_getStationShipAndBoxes":"",
         "SP_getObjectsInCSView":"" // meant to be used with views from getShipAndBoxes or getStationShipAndBoxes
-    }],
-    "monolithic": [
-    {
-        "ship_queries": [
-        {
-            "create_view_CS_aggregate":"",
-            "create_view_obj_aggregate":"",      // union with CSid to create
-            "insert_1deep_CSs":"",  // union this manually with above
-            "insert_1deep_objs":""
-        }
-        ],
-        "get_ship_contents":"",
-        "get_station_contents":""
-    }
-    ]
+    }]
 } 
-
-queries.monolothic.ship_queries.create_view_CS_aggregate = ""
-    + " DROP VIEW IF EXISTS view_CS_aggregate;"
-    + " CREATE VIEW view_CS_aggregate AS "
-        + " SELECT ? "; // CSid
 
 queries.select.pilot_by_ship = "SELECT "
         + "player.id AS playerID, "
@@ -131,21 +112,6 @@ queries.select.objects_in_CSnumqlist = "SELECT "
     + "INNER JOIN EVE2_CargoSpace AS CS ON CS.id = objects.id "
     + "AND CS.id IN "; // concat with selection of CSs
 
-    // maybe obsolete b/c of SP?
-// queries.select.cargoSpaces_in_CargoSpace = "SELECT "
-//     + "structures.id AS structureID, "
-//     + "structures.name AS itemName, "
-//     + "structures.type AS itemType, "
-//     + "structures.vol_packed, "
-//     + "structures.vol_unpacked, "
-//     + "CS.id AS CSid, "
-//     + "CS.name AS CSname, "
-//     + "CS.itemUse_id AS CS_itemUse_id "
-//     + "FROM EVE2_CargoSpace AS CS "
-//     + "INNER JOIN EVE2_ItemUse as IUse ON IUse.id = objects.itemUse_id "
-//     + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = IUse.itemStructure_id "
-//     + "INNER JOIN EVE2_Objects as objects ON objects.cargoSpace_id = CS.id "
-//     + "AND objects.cargoSpace_id = ? ";
 
 // could union this on its own products as inserts to get full depth selection tree.
 queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
@@ -154,15 +120,6 @@ queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
     + "INNER JOIN EVE2_CargoSpace as innerCS ON obj.id = innerCS.object_id "
     + "INNER JOIN EVE2_Objects as obj ON obj.cargoSpace_id = outerCS.id "
         + "AND outerCS.id = ? ";
-
-// queries.select.non_CS_item_structures = "SELECT "
-//     + "structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
-//     + "FROM objects_in_CS_? "
-//     + "WHERE structureID NOT IN "; // concat with selection of OCTs in OCT
-
-// likely broken code. refers to a view that is likely broken.
-// queries.select.total_vol_of_non_CS_objects = "SELECT sum(sum(vol_packed)) FROM non_CS_objects_in_CS_?";
-// queries.select.total_vol_all_objects = "SELECT sum(vol_packed) FROM objects_in_CS_? ";
 
 queries.select.all_players = "SELECT "
         + "player.id AS playerID, "
