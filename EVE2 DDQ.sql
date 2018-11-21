@@ -113,14 +113,14 @@ END //
 DROP PROCEDURE IF EXISTS SP_view_ObjectsInCS //
 CREATE PROCEDURE SP_view_ObjectsInCS(IN CSid int(20))
 BEGIN
-    SET @str = '
+    DROP VIEW IF EXISTS view_ObjectsInCS;
+    SET @str = CONCAT('
     CREATE VIEW view_ObjectsInCS AS
         (SELECT Obj.id FROM EVE2_Objects as Obj
             INNER JOIN EVE2_CargoSpace as CS ON CS.Object_id = Obj.id
-            AND CS.id = ?)';
+            AND CS.id = ', CSid ,')');
     PREPARE stmt FROM @str;
-    SET @in1 = CSid;
-    EXECUTE stmt using @in1;
+    EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
 END //
 
@@ -136,9 +136,10 @@ END //
 DROP PROCEDURE IF EXISTS SP_view_CSpacesInObjectView //
 CREATE PROCEDURE SP_view_CSpacesInObjectView(IN viewname varchar(255))
 BEGIN
+    DROP VIEW IF EXISTS view_CSpacesInObjectView;
     SET @str = CONCAT('CREATE VIEW view_CSpacesInObjectView AS
-        (SELECT CS.ID FROM EVE2_CargoSpace AS CS
-            WHERE CS.ID IN (SELECT * from ', viewname , ')');
+        SELECT CS.ID FROM EVE2_CargoSpace AS CS
+            WHERE CS.ID IN (SELECT * from ', viewname, ');');
     PREPARE stmt FROM @str;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
@@ -151,10 +152,9 @@ CREATE PROCEDURE SP_unionViews(IN viewname varchar(255),
                                IN viewname2 varchar(255),
                                IN viewUnion varchar(255))
 BEGIN
-    DROP VIEW IF EXISTS viewUnion;
-    SET @str = CONCAT('
+    SET @str = SELECT CONCAT('
     CREATE VIEW ', viewUnion, ' AS SELECT * FROM ', viewname, 
-        ' UNION SELECT * FROM ', viewname2);
+        ' UNION SELECT * FROM ', viewname2) as ConcatenatedString;
     PREPARE stmt FROM @str;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
@@ -164,6 +164,7 @@ END //
 DROP PROCEDURE IF EXISTS SP_view_ObjectsInCSView //
 CREATE PROCEDURE SP_view_ObjectsInCSView(IN viewname varchar(255))
 BEGIN
+    DROP VIEW IF EXISTS ObjectsInCSView;
     SET @str1 = CONCAT('
     CREATE VIEW ObjectsInCSView AS 
         SELECT Obj.id FROM EVE2_Objects as Obj
@@ -183,8 +184,9 @@ DROP PROCEDURE IF EXISTS SP_view_ShipUnionNestedCSs //
 CREATE PROCEDURE SP_view_ShipUnionNestedCSs(IN CSid int(20))
 BEGIN
     CALL SP_view_ObjectsInCS(CSid);
-    call SP_view_CSpacesInObjectView("view_ObjectsInCS");
+    CALL SP_view_CSpacesInObjectView("view_ObjectsInCS");
 
+    DROP VIEW IF EXISTS view_justCDID;
     SET @str1 = CONCAT('
         CREATE VIEW view_justCDID AS
             SELECT ', CSid);
@@ -207,7 +209,7 @@ BEGIN
 
     CALL SP_view_ObjectsInCS(CSid);
     CALL SP_view_CSpacesInObjectView("view_ObjectsInCS");
-
+    DROP VIEW IF EXISTS view_justCSid;
     SET @str1 = CONCAT('
         CREATE VIEW view_justCSid AS
             SELECT ', CSid);
@@ -215,9 +217,11 @@ BEGIN
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
 
+    DROP VIEW IF EXISTS view_StationUnionNestedCSs;
     CALL SP_unionViews("view_justCSid", "view_CSpacesInObjectView", "view_StationUnionNestedCSs");
     CALL SP_view_ObjectsInCSView("view_ShipUnionNestedCSs");
     CALL SP_view_CSpacesInObjectView("view_ObjectsInCSView");
+    DROP VIEW IF EXISTS view_StationUnionNextedCSs_Deep;
     CALL SP_unionViews("view_StationUnionNestedCSs", "view_CSpacesInObjectView",
         "view_StationUnionNextedCSs_Deep");
 END //
@@ -275,7 +279,6 @@ BEGIN
 END //
 
 
-
 DROP PROCEDURE IF EXISTS SP_view_ShipObjects_Deep //
 CREATE PROCEDURE SP_view_ShipObjects_Deep(IN CSid int(20),
         IN orderBy1 varchar(255), IN ascending1 varchar(255),
@@ -307,7 +310,7 @@ BEGIN
         WHERE name = linkLoc);
 END //
 
-DROP PROCEDURE IF EXISTS SP_getCSid
+DROP PROCEDURE IF EXISTS SP_getCSid //
 CREATE PROCEDURE SP_getCSid(IN playerName varchar(255),
                               IN itemUseName varchar(255))
 BEGIN
@@ -346,7 +349,7 @@ BEGIN
         AS concatString);
 END //
 
-
+DROP PROCEDURE IF EXISTS SP_getSpaceStationCSid //
 CREATE PROCEDURE SP_getSpaceStationCSid(IN playerName varchar(255),
                                           itemUseName varchar(255),
                                           locationName varchar(255))
@@ -407,6 +410,7 @@ BEGIN
     DROP VIEW IF EXISTS temp1;
 END //
 
+DROP PROCEDURE IF EXISTS SP_putPlayerInPod //
 CREATE PROCEDURE SP_putPlayerInPod(IN playerName varchar(255))
 BEGIN
 	CALL SP_getCSid(playerName, "pod");
