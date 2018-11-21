@@ -71,8 +71,27 @@ var queries = {
         "SP_getShipAndBoxes":"",
         "SP_getStationShipAndBoxes":"",
         "SP_getObjectsInCSView":"" // meant to be used with views from getShipAndBoxes or getStationShipAndBoxes
-    }]
+    }],
+    "monolithic": [
+    {
+        "ship_queries": [
+        {
+            "create_view_CS_aggregate":"",
+            "create_view_obj_aggregate":"",      // union with CSid to create
+            "insert_1deep_CSs":"",  // union this manually with above
+            "insert_1deep_objs":""
+        }
+        ],
+        "get_ship_contents":"",
+        "get_station_contents":""
+    }
+    ]
 } 
+
+queries.monolothic.ship_queries.create_view_CS_aggregate = ""
+    + " DROP VIEW IF EXISTS view_CS_aggregate;"
+    + " CREATE VIEW view_CS_aggregate AS "
+        + " SELECT ? "; // CSid
 
 queries.select.pilot_by_ship = "SELECT "
         + "player.id AS playerID, "
@@ -132,10 +151,8 @@ queries.select.objects_in_CSnumqlist = "SELECT "
 queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
        + "innerCS.id AS CSid "
     + "FROM EVE2_CargoSpace as outerCS "
-    + "FROM EVE2_CargoSpace as innerCS "
-        + "ON obj.id = innerCS.object_id"
-    + "INNER JOIN EVE2_Objects as obj "
-        + "ON obj.cargoSpace_id = outerCS.id "
+    + "INNER JOIN EVE2_CargoSpace as innerCS ON obj.id = innerCS.object_id "
+    + "INNER JOIN EVE2_Objects as obj ON obj.cargoSpace_id = outerCS.id "
         + "AND outerCS.id = ? ";
 
 // queries.select.non_CS_item_structures = "SELECT "

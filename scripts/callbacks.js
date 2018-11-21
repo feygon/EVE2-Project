@@ -62,6 +62,7 @@ callbacks.post.player = {};
 
 //console.log("parsing callbacks.js");
 var queries = require('./queries');
+var monoCBs = require('./monoCBs.js');
 
 // don't use w/ req as context.
 callbacks.pre.session.copySessionObjToContext = 

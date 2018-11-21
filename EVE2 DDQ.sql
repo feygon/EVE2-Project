@@ -152,9 +152,9 @@ CREATE PROCEDURE SP_unionViews(IN viewname varchar(255),
                                IN viewname2 varchar(255),
                                IN viewUnion varchar(255))
 BEGIN
-    SET @str = SELECT CONCAT('
+    SET @str = (SELECT CONCAT('
     CREATE VIEW ', viewUnion, ' AS SELECT * FROM ', viewname, 
-        ' UNION SELECT * FROM ', viewname2) as ConcatenatedString;
+        ' UNION SELECT * FROM ', viewname2) as ConcatenatedString);
     PREPARE stmt FROM @str;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
