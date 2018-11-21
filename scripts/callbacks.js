@@ -1,38 +1,3 @@
-// class HandlerProgress_Get {
-// 	constructor(renderString, callbackTotalCount, behavior, 
-// 			preCallbackTotalCount, preBehavior){
-// 		this.renderString = renderString;
-// 		this.callbackTotalCount = callbackTotalCount;
-// 		this.preCallbackTotalCount = preCallbackTotalCount;
-// 		this.count = 0;
-// 		this.precount = 0;
-// 		this.behavior = behavior;
-// 		this.prebehavior = preBehavior;
-
-// 		this.incomplete = function(cbName){
-// 			this.precount++;
-// 			console.log(this.renderString + "'s pre-loading callback " + cbName + " complete.\n"
-// 				+ "PrecallbackCount = " + this.precount + " / " + this.preCallbackTotalCount);
-// 			if (this.precount >= this.preCallbackTotalCount){
-// 				prebehavior();
-// 			}
-// 		};
-// 		this.complete = function(cbName){
-// 			this.count++;
-// 			console.log(renderString + "'s callback " + cbName + " complete.\n"
-// 				+ " CallbackCount = " + this.count + " / " + this.callbackTotalCount
-// 				+ "\n---------------HandlerProgress_Get----------------");
-// 			if (this.count >= this.callbackTotalCount) {
-// 				behavior();
-// 			}
-// 		};
-// 		this.render = function(res, context){
-// 			res.render(this.renderString, context);
-// 		};
-// 	}
-// }
-
-
 var callbacks = {};
 callbacks.select = {};
 callbacks.post = {};

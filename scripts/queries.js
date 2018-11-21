@@ -280,45 +280,5 @@ queries.procedure_call.SP_getShipAndBoxes = "CALL SP_getShipAndBoxes(?)";
 queries.procedure_call.SP_getStationShipAndBoxes = "CALL SP_getStationShipAndBoxes(?)";
 queries.procedure_call.SP_getObjectsInCSView = "CALL SP_getObjectsInCSView(??)";
 
-/*
-*   Views below won't work w/ current deployment of '?' operator.
-*   Better to custom-make views from a procedure call anyway,
-*       provided the support department comes through.
-*/
-
-// for displaying containers and objects together.
-// queries.view.merged_objects_in_cargoSpace_numq = "CREATE VIEW merged_objects_? "
-//     + "SELECT structureID, itemName, itemType, vol_packed, qty, packaged, NULL, NULL, NULL "
-//         + "FROM objects_in_CS_? "
-//     + "UNION "
-//     + "SELECT structureID, itemName, itemType, "
-//     + "vol_unpacked, NULL, NULL, CSid, CSname "
-//         + "FROM non_CS_objects_in_CS_? "
-//     + "ORDER BY ?, ?";
-
-// queries.view.cargoSpaces_in_CargoSpace = "CREATE VIEW cargoSpaces_in_cargoSpace_? AS "; // concat w/ selection of OCTs in OCTnum
-
-// queries.view.non_CS_itemStructures_in_CS_numq = "CREATE VIEW non_CS_objects_in_CS_? AS "
-//     + "SELECT "
-//         + "structureID, itemName, itemType, vol_packed, vol_unpacked, qty, packaged "
-//         + "FROM objects_in_CS_? "
-//         + "WHERE structureID NOT IN ("; // concat with selection
-
-// queries.view.indy_itemStructures = "SELECT "
-//     + "structures.id AS structureID, "
-//     + "structures.name AS itemName "
-//     + "FROM EVE2_ItemStructure as structures";
-
-// queries.view.indy_itemUses = "CREATE VIEW indyCTs_? AS "
-//     + "SELECT "
-//         + "itemUse.id AS id, "
-//         + "object.name AS name "
-//         + "FROM EVE2_ItemUse AS itemUse "
-//         + "INNER JOIN EVE2_ItemStructure as object ON object.id = itemUse.itemStructure_id";
-
-//queries.view.objects_in_CS = "CREATE VIEW objects_in_CS_? AS "; // concat with selection of objects in OCT
-
-// call after docking insert with new object.
-
 // requiring this file will automatically make the var into this object, with the above sub-objects.
 module.exports = queries;
