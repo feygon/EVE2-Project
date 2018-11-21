@@ -148,25 +148,16 @@ END //
 -- union the selected contents of 2 views into the first.
 DROP PROCEDURE IF EXISTS SP_unionViews //
 CREATE PROCEDURE SP_unionViews(IN viewname varchar(255), 
-                               IN viewname2 varchar(255))
+                               IN viewname2 varchar(255),
+                               IN viewUnion varchar(255))
 BEGIN
-    DROP VIEW IF EXISTS tempView;
+    DROP VIEW IF EXISTS viewUnion;
     SET @str = CONCAT('
-    CREATE VIEW tempView AS 
-        SELECT * FROM ', viewname, ' UNION SELECT * FROM ', viewname2);
+    CREATE VIEW ', viewUnion, ' AS SELECT * FROM ', viewname, 
+        ' UNION SELECT * FROM ', viewname2);
     PREPARE stmt FROM @str;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-
-    SET @str2 = CONCAT('DROP VIEW ', viewname, ';');
-    PREPARE stmt2 FROM @str2;
-    EXECUTE stmt2;
-    DEALLOCATE PREPARE stmt2;
-
-    SET @str3 = CONCAT('CREATE VIEW ', viewname , ' AS SELECT * FROM tempView');
-    PREPARE stmt3 FROM @str3;
-    EXECUTE stmt3;
-    DEALLOCATE PREPARE stmt3;
 END //
 
 -- get a view of objects from a view of cargo spaces
@@ -195,13 +186,13 @@ BEGIN
     call SP_view_CSpacesInObjectView("view_ObjectsInCS");
 
     SET @str1 = CONCAT('
-        CREATE VIEW view_ShipUnionNestedCSs AS
+        CREATE VIEW view_justCDID AS
             SELECT ', CSid);
     PREPARE stmt FROM @str1;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
 
-    CALL SP_unionViews("view_ShipUnionNestedCSs", "view_CSpacesInObjectView");
+    CALL SP_unionViews("view_justCDID", "view_CSpacesInObjectView", "view_ShipUnionNestedCSs");
 END //
 
 -- as above, with more:
@@ -218,16 +209,17 @@ BEGIN
     CALL SP_view_CSpacesInObjectView("view_ObjectsInCS");
 
     SET @str1 = CONCAT('
-        CREATE VIEW view_StationUnionNestedCSs AS
+        CREATE VIEW view_justCSid AS
             SELECT ', CSid);
     PREPARE stmt FROM @str1;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
 
-    CALL SP_unionViews("view_StationUnionNestedCSs", "view_CSpacesInObjectView");
+    CALL SP_unionViews("view_justCSid", "view_CSpacesInObjectView", "view_StationUnionNestedCSs");
     CALL SP_view_ObjectsInCSView("view_ShipUnionNestedCSs");
     CALL SP_view_CSpacesInObjectView("view_ObjectsInCSView");
-    CALL SP_unionViews("view_StationUnionNestedCSs", "view_CSpacesInObjectView");
+    CALL SP_unionViews("view_StationUnionNestedCSs", "view_CSpacesInObjectView",
+        "view_StationUnionNextedCSs_Deep");
 END //
 
 DROP PROCEDURE IF EXISTS SP_expand_obj_view //
@@ -275,7 +267,7 @@ CREATE PROCEDURE SP_view_StationObjects_Deep(IN CSid int(20),
         IN orderBy3 varchar(255), IN ascending3 varchar(255))
 BEGIN
     CALL SP_view_StationUnionNestedCSs(CSid);
-    CALL SP_view_ObjectsInCSView("view_StationUnionNestedCSs");
+    CALL SP_view_ObjectsInCSView("view_StationUnionNextedCSs_Deep");
     CALL SP_expand_obj_view("view_ObjectsInCSView", 
                             orderBy1, ascending1,
                             orderBy2, ascending2,
@@ -305,6 +297,7 @@ BEGIN
         WHERE name = itemname);
 END //
 
+DROP PROCEDURE IF EXISTS SP_getLocs //
 CREATE PROCEDURE SP_getLocs(IN sourceLoc varchar(255),
                             IN linkLoc varchar(255))
 BEGIN
@@ -314,6 +307,7 @@ BEGIN
         WHERE name = linkLoc);
 END //
 
+DROP PROCEDURE IF EXISTS SP_getCSid
 CREATE PROCEDURE SP_getCSid(IN playerName varchar(255),
                               IN itemUseName varchar(255))
 BEGIN
@@ -395,14 +389,13 @@ BEGIN
     SET @stationCSid = (SELECT id FROM EVE2_CargoSpace WHERE 
         id in (SELECT MAX(id) FROM EVE2_CargoSpace));
 
-
-    DROP VIEW IF EXISTS 
+   
+    DROP VIEW IF EXISTS temp1;
+    CREATE VIEW temp1 as SELECT id FROM EVE2_CargoSpace;
     INSERT INTO EVE2_CargoSpace (name, player_id, itemUse_id, location_id, object_id) VALUES
         (CONCAT(playerName, "'s Pod"), @newestPlayerID, @podIUID, @jitaID, NULL);
+    SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE id not in (SELECT id FROM temp1));
 
-
-    SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE
-        id in (SELECT MAX(id) FROM EVE2_CargoSpace));
     CALL SP_DockShip(@shipCSid, @stationCSid);
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
         (@preciousMetalsID, @stationCSid, 100, 1);
@@ -411,6 +404,7 @@ BEGIN
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
         (@oxygenID, @stationCSid, 100, 1);
     UPDATE EVE2_Players SET piloting_CS_id = @shipCSid WHERE id = @newestPlayerID;
+    DROP VIEW IF EXISTS temp1;
 END //
 
 CREATE PROCEDURE SP_putPlayerInPod(IN playerName varchar(255))
