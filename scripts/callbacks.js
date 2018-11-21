@@ -458,7 +458,7 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			}
 		}
 	}
-	if (req.body['AddPlayer']){
+	if (req.body['AddPlayer']) {
 		// console.log("AddPlayer post invoked.");
 		sql.post = queries.insert.insert_player;
 		tag.post = 'AddPlayer';
@@ -466,7 +466,7 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		// console.log("AddPlayer post values mutated.");
 		complete(cbName);
 	}
-	if (req.body['DeletePlayer']){
+	if (req.body['DeletePlayer']) {
 		// console.log("DeletePlayer post invoked.");
 		sql.post = queries.delete.del_player;
 		inserts.post = [req.body.playerID];
