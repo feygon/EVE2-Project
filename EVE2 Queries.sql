@@ -127,7 +127,6 @@ SELECT
         AND OWNS.id = ?;
 
     -- place in stored procedure with 3 parameters for ?, ?, ?, takes 2 parameters from values
--- unpackaged containers in that container (inside_CS_id = OWNS.id)
 DROP VIEW IF EXISTS cargoSpaces_in_cargoSpace_?;
 CREATE VIEW cargoSpaces_in_cargoSpace_? AS
 SELECT
@@ -136,14 +135,15 @@ SELECT
     structures.type AS itemType,
     structures.vol_packed,
     structures.vol_unpacked,
-    OWNS.id AS OCTid,
-    OWNS.name AS OCTname,
-    OWNS.itemUse_id AS OCT_base_id
+    CS.id AS OCTid,
+    CS.name AS OCTname,
+    CS.itemUse_id AS OCT_base_id
     FROM EVE2_CargoSpace AS OWNS
     INNER JOIN EVE2_ItemUse as itemUse ON itemUse.id = Object.itemUse_id
     INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id
-    INNER JOIN EVE2_Objects as Object ON Object.cargoSpace_id = OWNS.id
-            AND OWNS.inside_CS_id = ?;
+    INNER JOIN EVE2_Objects as Object ON Object.cargoSpace_id = CS.id
+            AND CS.object_id = ?;
+
 -- IDs of objects that don't correspond to unpackaged containers
 DROP VIEW IF EXISTS non_CS_objects_in_CS_?;
 CREATE VIEW non_CS_objects_in_CS_? AS
@@ -177,7 +177,7 @@ SELECT
     player.name AS playerName,
     ship.name AS playerShip,
     ship.location AS playerLocation,
-    ship.inside_CS_id AS playerPosition
+    ship.object_id AS playerPosition
     FROM EVE2_Players as player
     INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id
     ORDER BY ?, ?;
@@ -242,93 +242,6 @@ INSERT INTO Object (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES 
     -- ****delete them from the top container****
     -- ****insert them into the target container****
 
-
---  UPDATE to dock: move NESTS IN location of container 
---          by session player -> container_piloting, location id in dropdown
-UPDATE EVE2_CargoSpace
-    SET EVE2_CargoSpace.inside_CS_id = ? -- ? is id of station if docking or null if undocking.
-    WHERE EVE2_CargoSpace.id = ( -- the id of the player's piloted ship, by player.
-        CALL SP_getPilotedCS_id(?); -- ? is player id
-    )
-;
-
-DELIMITER //
-DROP PROCEDURE IF EXISTS SP_addObjectToCS;
-CREATE PROCEDURE SP_addObjectToCS(
-    IN structureID int,
-    IN qty INT,
-    IN packed TINYINT(1),
-    IN OCT int)
-BEGIN
-    INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
-                              (structureID,  OCT,      qty,      packed);
-END //
-
-DROP PROCEDURE IF EXISTS SP_remObjectFromCS;
-CREATE PROCEDURE SP_remObjectFromCS(
-    IN OCT int,
-    IN structureID INT,
-    IN packed TINYINT(1),
-    IN qty INT)
-BEGIN
-    WITH (SELECT ) AS itemInfo
-    IF (itemInfo) NOT NULL
-    END IF
-END //
-
--- get an item id of the unpackaged item of qty 1 corresponsing to a container
-DROP PROCEDURE IF EXISTS SP_getItemUseItemID;
-CREATE PROCEDURE SP_getItemUseItemID(
-    IN OCTid int,
-    OUT structureID int)
-BEGIN
-    structureID = (SELECT structure.id FROM EVE2_ItemStructure as structure
-                INNER JOIN EVE2_ItemUse as CTs ON CTs.itemStructure_id = item
-                INNER JOIN EVE2_CargoSpace as OCT ON OCT.itemUse_id = CTs.id
-                    AND OCT.id = OCTid
-             );
-END //
-
--- returns player.piloting_CS_id of piloted ship
-DROP PROCEDURE IF EXISTS SP_getPilotedCS_id;
-CREATE PROCEDURE SP_getPilotedCS_id(
-    IN playerID int,
-    OUT shipID int)
-BEGIN
-    SET shipID = (
-        SELECT piloting_CS_id FROM EVE2_Players
-    );
-END //
-
--- for moving a container into another container
--- can be used for docking from space too.
-DROP PROCEDURE IF EXISTS SP_moveOCTIntoOCT;
-CREATE PROCEDURE SP_moveCSintoCS(
-    IN subOCT int,
-    IN newOCT int)
-BEGIN
-/*
-first, update the parent OCT in the child OCT.
-then, remove the child item from the old parent OCT
-finally, add the child item to the new parent OCT
-*/
-    DECLARE oldOCT int;
-    oldOCT = (SELECT inside_CS_id FROM EVE2_CargoSpace WHERE id = subOCT);
-    
-    UPDATE EVE2_CargoSpace AS OWNS 
-        SET (inside_CS_id) VALUES (subOCT)
-        WHERE OWNS.id = newOCT;
-    
-    DECLARE structureID int;
-    SET structureID = (SELECT structureID FROM (CALL getCorrespondintItem_xOCT(subOCT)));
-
-    IF (oldOCT) NOT NULL THEN
-        remItemFromOCT(structureID, 1, 1, oldOCT);
-    END IF;
-    addItemToOCT(structureID, 1, 1, newOCT); -- i.e. box's id of quantity 1 is unpacked.
-END //
-
-DELIMITER ;
 
 --  UPDATE to undock: new outer OCT NULL
 UPDATE EVE2_CargoSpace SET inside_CS_id = NULL WHERE id = ?;

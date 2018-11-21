@@ -5,113 +5,174 @@ module.exports = (function() {
     var router = express.Router();
     var callbacks = require('./scripts/callbacks');
     var queries = require('./scripts/queries');
-    
 
-    /********************************************
-     *
-     *  Basic Get routes without callbacks      *
-     * 
-     *******************************************/
+    /*
+    *   HandlerProgress_Get class
+    *       Handles complete callback counting for asynchronous calls
+    *       Affords two phases of calls, for 
+    */
+    class HandlerProgress_Get {
+        constructor(renderString, callbackTotalCount, behavior, 
+                    preCallbackTotalCount, preBehavior) {
+            this.renderString = renderString;
+            this.callbackTotalCount = callbackTotalCount;
+            this.preCallbackTotalCount = preCallbackTotalCount;
+            this.count = 0;
+            this.precount = 0;
+            this.behavior = behavior;
+            this.prebehavior = preBehavior;
 
-    function renderComplete(res, count, renderString, callbackCount, context) {
-        return function() {
-            callbackCount++;
-            if (callbackCount >= count){
-                res.render(renderString, context);
-            }
+            this.complete = function(cbName) {
+                this.count++;
+                console.log(renderString + "'s callback " + cbName + " complete.\n"
+                    + " CallbackCount = " + this.count + " / " + this.callbackTotalCount);
+                if (this.count >= this.callbackTotalCount) {
+                    console.log("---------------HandlerProgress_Get----------------");
+                    this.behavior();
+                }
+            };
+
+            this.incomplete = function(cbName) {
+                this.precount++;
+                console.log(this.renderString + "'s pre-loading callback " + cbName + " complete.\n"
+                    + "PrecallbackCount = " + this.precount + " / " + this.preCallbackTotalCount);
+                if (this.precount >= this.preCallbackTotalCount){
+                    this.prebehavior();
+                }
+            };
+
+            this.render = function(res, context) {
+                res.render(this.renderString, context);
+            };
         }
     }
 
-    
-
     /********************************
-     *                              *
      *      DEFAULT ROUTER          *
-     *                              *
      *******************************/
     router.get('/', function(req, res){
-        /** example call to getSessionValues:
-         * getSessionValues(req, res, mysql, context, complete);
-         * Should be after mysql is instantiated, context is set,
-         *  and should have access to a complete() function callback.
-         */
-        if (!req.session.count){
-            req.session.count = 0;
-        }
-        req.session.count += 1;
-
-
-        var callbackCount = 0;
         var context = {};
         context.counter = req.session.count;
-        var mysql = req.app.get('mysql');
         res.render('homepage', context);
     });
 
-    router.get('/player/', function(req, res){
-        console.log("Req.session before any of this crap:\n"
-            + JSON.stringify(req.session) + "\n-----------------------------");
-        var callbackCount = 0;
-        var context = {};
-        var mysql = req.app.get('mysql');
-        var complete = renderComplete(res, 1, 'player', callbackCount, context);
 
-        // columns in all_players: playerID, playerName, playerShip,
-        //  playerLocation, locationName, playerShipCSid
-        callbacks.select.all_players(res, mysql, context, complete); // id, name, piloting_CS_id, locationID
-     });
-
-    router.get('/space_station/', function(req, res){
-        var callbackCount = 0;
-        var context = {};
-        var mysql = req.app.get('mysql');
-        var complete = renderComplete(
-            res, 1, 'space_station', callbackCount, context);
-
-        callbacks.session.checkSession(req, res, complete);
-    });
-
-    router.get('/out_in_space/', function(req, res){
-        var callbackCount = 0;
-        var context = {};
-        var mysql = req.app.get('mysql');
-        var complete = renderComplete(
-            res, 1, 'out_in_space', callbackCount, context); 
-            // increment if adding callbacks.
-
-        callbacks.session.checkSession(req, res, complete);
-        
-    });
-    
     router.get('/readMe/', function(req, res){
         var context = {};
         res.render('readme', context);
     });
-         
-     
-        /********************************************
-         * 
-         *      Get routes w/ callbacks             *
-         * 
-         *******************************************/
 
-    // get industry page
-    //      call back to get item list
-
-    router.get('/industry/', function(req, res){
-        var callbackCount = 0;
+    /********************************
+    *       SESSION CHECKER         *
+    ********************************/
+    router.get('/player/', function(req, res){
         var context = {};
         var mysql = req.app.get('mysql');
-        var complete = renderComplete(
-            res, 6, 'industry', callbackCount, context); // increment if adding callbacks.
+        var renderString = 'player';
+        let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null);
 
-        //console.log("mysql3: " + mysql);
-        callbacks.session.checkSession(req, res, context, complete);
-        callbacks.select.item_structure_list(res, mysql, context, complete);
-        callbacks.select.itemUse_list_orderbyqq(res, mysql, context, complete);
-        callbacks.select.item_structure_types(res, mysql, context, complete);
-        callbacks.select.item_use_scales(res, mysql, context, complete);
-        callbacks.select.useless_item_structures(res, mysql, context, complete);
+        callbacks.select.all_players(res, mysql, context, progress); // id, name, piloting_CS_id, locationID
+
+        function ready() {
+            progress.render(res, context); 
+        }
+    });
+
+    router.post('/player/', function(req, res) {
+        var callerName = "player_post";
+        var mysql = req.app.get('mysql');
+        var callbackCount = 0;
+        var tag = { };
+        var sql = { };
+        var inserts = { };
+        var context = { };
+        context = callbacks.pre.session.copySessionObjToContext(context, req.session, callerName);
+
+        callbacks.post.player(req, res, tag, sql, inserts, mysql, complete);
+
+        function complete(cbname) {
+            console.log(cbname + " complete.");
+            callbackCount++;
+            if (callbackCount >= 1) {
+                mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
+                    if(error) {
+                        res.write("player(" + tag.post + ") post router tag says: " 
+                            + JSON.stringify(error));
+                        res.end();
+                    } else {
+                        res.redirect('/eve2/player');
+                    }
+                }); // end sql query anonymous error logging function
+            } // end callbackCount check
+        } // end complete
+    });
+
+
+    router.all('*', function(req, res, next){
+        var url = req.url;
+        console.log("Navigating to " + url + "\n------router-all-/------");
+        var check = callbacks.session.checkSession(req, res, url);
+        if (check == true){
+            next(); // session details valid. go to intended route handler.
+        }
+    });
+
+
+    router.get('/out_in_space/', function(req, res){
+        var callerName = "out_in_space";
+        var context = {};
+        var mysql = req.app.get('mysql');
+        var renderString = 'out_in_space';
+
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session, callerName);
+
+        let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
+
+	    /* callbacks go here. */
+        callbacks.select.stations_in_space(res, req, mysql, context, progress);
+        callbacks.select.linked_locations(res, req, mysql, context, progress);
+
+        function ready() {
+            // console.log("progress count is " + progress.count + " / " + progress.callbackTotalCount);
+            // console.log("Ready called.-----------------------------------");
+            // console.log("Ready's context reads: " + JSON.stringify(context) 
+            //     + "\n--------------final context--------------");
+            progress.render(res, context);
+        }
+    });
+
+/*********************************good above here*************************************/
+
+    router.get('/space_station/', function(req, res){
+        var context = {};
+        var mysql = req.app.get('mysql');
+        var renderString = 'space_station';
+        let progress = new HandlerProgress_Get(renderString, 0, ready, 0, null);
+        ready();    // temporary for testing purposes.
+        /* callbacks go here. */
+        function ready() {
+            progress.render(res, context); 
+        }
+    });
+
+
+    router.get('/industry/', function(req, res){
+        var renderString = "industry";
+        var context = {};
+        var mysql = req.app.get('mysql');
+        let progress = new HandlerProgress_Get(renderString, 5, ready, 0, null);
+
+        /* callbacks go here. */
+        callbacks.select.item_structure_list(res, mysql, context, progress);
+        callbacks.select.itemUse_list_orderbyqq(res, mysql, context, progress);
+        callbacks.select.item_structure_types(res, mysql, context, progress);
+        callbacks.select.item_use_scales(res, mysql, context, progress);
+        callbacks.select.useless_item_structures(res, mysql, context, progress);
+
+        function ready() {
+            progress.render(res, context); 
+        }
     });
 
     /************************************************
@@ -122,65 +183,47 @@ module.exports = (function() {
     
     // remember later to hook this up with 2 inserts to EVE2_LINKS.
     router.post('/out_in_space/', function(req,res){
-        var mysql = req.app.get('mysql');
-        var callbackCount = 0;
-        var tag = "";
-        var sql = "";
-        var inserts = [];
-        var context = {};
-        context.session = req.session;
-        callbacks.post.out_in_space(req, res, tag, sql, inserts, complete);
-        
-        function complete(){
-            callbackCount++;
-            if (callbackCount == 1){
-                callbacks.session.setSession(req, res, mysql, context, complete);
-            }
-
-            if (callbackCount >= 2){
-                sql = mysql.pool.query(sql, inserts, function(error, results, fields){
-                    if(error){
-                        res.write("out_in_space(" + tag + ") post router tag says: " 
-                            + JSON.stringify(error));
-                        res.end();
-                    }else{
-                        res.redirect('/eve2/out_in_space');
-                    }
-                }); // end sql query anonymous error logging function
-            } // end callbackCount check
-        } // end complete
-    });
-
-    router.post('/player/', function(req, res){
+        console.log("Posting to out in space");
         var mysql = req.app.get('mysql');
         var callbackCount = 0;
         var tag = {};
         var sql = {};
         var inserts = {};
         var context = {};
-        context = callbacks.session.copySessionObjToContext(context, req.session);
-        callbacks.post.player(req, res, tag, sql, inserts, mysql, context, complete);
-        //post.player includes setSession
-
-        function complete(){
+        context.session = req.session;
+        callbacks.post.out_in_space(req, tag, sql, inserts, complete);
+        // curious about tag left as "" and not {}. Will it work?
+        
+        function complete(cbName) {
+            console.log(cbName + " complete.");
             callbackCount++;
-            if (callbackCount >= 1){
-                console.log("1 player post callback completed. SQL = " + sql);
-
+            if (callbackCount >= 1) {
+                console.log("querying: " + sql.post 
+                + "with tag " + JSON.stringify(tag) 
+                + " and inserts" + JSON.stringify(inserts.post));
                 sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields){
                     if(error){
-                        res.write("player(" + tag.post + ") post router tag says: " 
+                        res.write("out_in_space(" + JSON.stringify(tag) + ") post router tag says: " 
                             + JSON.stringify(error));
                         res.end();
                     }else{
-                        res.redirect('/eve2/player');
+                        if (req.session.shipNest) {
+                            console.log("Ship has docked. Redirecting post to get space station view.");
+                            res.redirect('/eve2/space_station/');
+                        } else {
+                            console.log("Ship still in space. Redirecting post to get out in space view.");
+                            res.redirect('/eve2/out_in_space/');
+                        }
                     }
                 }); // end sql query anonymous error logging function
             } // end callbackCount check
         } // end complete
     });
 
+
+
     router.post('/industry/inventstructure/', function(req,res){
+        var callerName = "industry/inventstructure_post";
         var mysql = req.app.get('mysql');
         
 	    var sql = queries.insert.insert_item_structure;
@@ -200,6 +243,7 @@ module.exports = (function() {
   
   
     router.post('/industry/designitemuse/', function(req,res){
+        var callerName = "industry/designitemuse_post";
         var mysql = req.app.get('mysql');
         var pilotable = false;
         if (req.body.scale == "Ship") { pilotable = true; }
