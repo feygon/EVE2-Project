@@ -62,11 +62,13 @@ BEGIN
     DECLARE IStrID int(20);
     SET @mangled_tempObjID = 0;
     CALL SP_GetIStrFromCSid(CSid, IStrID);
+    DROP VIEW IF EXISTS allObjects;
+    CREATE VIEW allObjects as SELECT id FROM EVE2_Objects;
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged)
         VALUES ( IStrID, StationID, 1, 0);
 
-    CALL SP_getMaxCargoSpace(mangled_tempObjID);
-    UPDATE EVE2_CargoSpace SET object_id = mangled_tempObjID WHERE id = CSid;
+    SET @mangled_tempObjID = (SELECT ID FROM EVE2_Objects WHERE ID not in (SELECT id FROM allObjects));
+    UPDATE EVE2_CargoSpace SET object_id = @mangled_tempObjID WHERE id = CSid;
 END //
 
 -- delete ship's object. nullify ship object id.
@@ -296,13 +298,6 @@ BEGIN
                             orderBy3, ascending3);
 END //
 
-DROP PROCEDURE IF EXISTS SP_getMaxCargoSpace //
-CREATE PROCEDURE SP_getMaxCargoSpace(OUT _CSid int(20))
-BEGIN
- SET _CSid = (SELECT id FROM EVE2_CargoSpace WHERE 
-        id in (SELECT MAX(id) FROM EVE2_CargoSpace));
-END //
-
 DROP PROCEDURE IF EXISTS SP_getItemStructureID //
 CREATE PROCEDURE SP_getItemStructureID(IN itemname varchar(255))
 BEGIN
@@ -399,8 +394,13 @@ BEGIN
 
     SET @stationCSid = (SELECT id FROM EVE2_CargoSpace WHERE 
         id in (SELECT MAX(id) FROM EVE2_CargoSpace));
+
+
+    DROP VIEW IF EXISTS 
     INSERT INTO EVE2_CargoSpace (name, player_id, itemUse_id, location_id, object_id) VALUES
         (CONCAT(playerName, "'s Pod"), @newestPlayerID, @podIUID, @jitaID, NULL);
+
+
     SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE
         id in (SELECT MAX(id) FROM EVE2_CargoSpace));
     CALL SP_DockShip(@shipCSid, @stationCSid);
