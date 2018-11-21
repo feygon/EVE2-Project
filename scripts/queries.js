@@ -132,10 +132,8 @@ queries.select.objects_in_CSnumqlist = "SELECT "
 queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
        + "innerCS.id AS CSid "
     + "FROM EVE2_CargoSpace as outerCS "
-    + "FROM EVE2_CargoSpace as innerCS "
-        + "ON obj.id = innerCS.object_id"
-    + "INNER JOIN EVE2_Objects as obj "
-        + "ON obj.cargoSpace_id = outerCS.id "
+    + "INNER JOIN EVE2_CargoSpace as innerCS ON obj.id = innerCS.object_id "
+    + "INNER JOIN EVE2_Objects as obj ON obj.cargoSpace_id = outerCS.id "
         + "AND outerCS.id = ? ";
 
 // queries.select.non_CS_item_structures = "SELECT "
