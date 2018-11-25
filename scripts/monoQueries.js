@@ -1,16 +1,16 @@
 var monoQueries = {};
-monoQueries.create_view_CS_aggregate = {};
-monoQueries.create_view_obj_aggregate = {};
+monoQueries.create_table_CS_aggregate = {};
+monoQueries.create_table_obj_aggregate = {};
 monoQueries.getShipContents = {};
 monoQueries.getStationContents = {};
 
 
-monoQueries.create_view_CS_aggregate = "DROP VIEW IF EXISTS view_CS_aggregate; "
-    + " CREATE VIEW view_CS_aggregate as SELECT id FROM EVE2_CargoSpace WHERE id = ?";
-monoQueries.create_view_obj_aggregate = "DROP VIEW IF EXISTS view_obj_aggregate; "
-    + " CREATE VIEW view_obj_aggregate as "
+monoQueries.create_table_CS_aggregate = "DROP TABLE IF EXISTS temp_CS_aggregate; "
+    + " CREATE TABLE temp_CS_aggregate as SELECT id FROM EVE2_CargoSpace WHERE id = ?";
+monoQueries.create_table_obj_aggregate = "DROP TABLE IF EXISTS temp_obj_aggregate; "
+    + " CREATE TABLE temp_obj_aggregate as "
     + " SELECT obj.id FROM EVE2_Objects as obj "
-    + " WHERE obj.cargoSpace_id in (SELECT * FROM view_CS_aggregate)";
+    + " WHERE obj.cargoSpace_id in (SELECT * FROM temp_CS_aggregate)";
 
     //CALL SP_insert_station_deep()
     //CALL SP_insert_ship_deep()
@@ -28,7 +28,7 @@ monoQueries.onboardCargoSpaces = "SELECT "
     + " LEFT JOIN EVE2_Objects as Obj ON CS.object_id = Obj.id "
     + " LEFT JOIN EVE2_CargoSpace as outerCS ON Obj.cargoSpace_id = outerCS.id "
     + " WHERE CS.id IN ("
-        + " SELECT id FROM view_CS_aggregate"
+        + " SELECT id FROM temp_CS_aggregate"
     + " )";
 
 monoQueries.onboardObjects = "SELECT "
@@ -36,17 +36,20 @@ monoQueries.onboardObjects = "SELECT "
         + " IStr.vol_packed, "
         + " IStr.vol_unpacked, "
         + " IStr.type, "
+        + " Obj.id as objectID, "
+        + " Obj.cargoSpace_id as inside_CSid, "
         + " Obj.quantity, " 
         + " Obj.packaged, "
         + " IU.pilotable, "
         + " IU.capacity, "
         + " IU.scale, "
+        + " CS.id as CSid, "
         + " CS.name as CSName "
     + " FROM EVE2_Objects as Obj "
     + " INNER JOIN EVE2_ItemStructure as IStr ON Obj.itemStructure_id = IStr.id "
     + " LEFT JOIN EVE2_ItemUse as IU ON IStr.id = IU.itemStructure_id "
     + " LEFT JOIN EVE2_CargoSpace as CS ON Obj.id = CS.object_id "
     + " WHERE Obj.id IN ("
-        + " SELECT id FROM view_obj_aggregate"
+        + " SELECT id FROM temp_obj_aggregate"
     + " )";
 module.exports = monoQueries;

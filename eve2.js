@@ -6,8 +6,6 @@ module.exports = (function() {
     var express = require('express');
     var router = express.Router();
     var callbacks = require('./scripts/callbacks');
-    var queries = require('./scripts/queries');
-
 
     /*
     *   HandlerProgress_Get class
@@ -53,7 +51,9 @@ module.exports = (function() {
             };
 
             this.render = function(res, context) {
-                console.log("Rendering " + renderString);
+                console.log(" Context at render time reads:\n" + JSON.stringify(context)
+                + "\n---------render context------------");
+                console.log("Rendering " + renderString + "\n--------------rendering----------------");
                 res.render(this.renderString, context);
             };
         }
@@ -62,8 +62,10 @@ module.exports = (function() {
     /********************************
      *      DEFAULT ROUTER          *
      *******************************/
-    router.get('/', function(req, res){
+    router.get('/', function(req, res) {
         var context = {};
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session);
         context.counter = req.session.count;
         res.render('homepage', context);
 
@@ -73,7 +75,7 @@ module.exports = (function() {
     });
 
 
-    router.get('/readMe/', function(req, res){
+    router.get('/readMe/', function(req, res) {
         var context = {};
         res.render('readme', context);
     });
@@ -81,8 +83,10 @@ module.exports = (function() {
     /********************************
     *       SESSION CHECKER         *
     ********************************/
-    router.get('/player/', function(req, res){
+    router.get('/player/', function(req, res) {
         var context = {};
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session);
         var mysql = req.app.get('mysql');
         var renderString = 'player';
         let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null);
@@ -102,7 +106,8 @@ module.exports = (function() {
         var sql = { };
         var inserts = { };
         var context = { };
-        context = callbacks.pre.session.copySessionObjToContext(context, req.session, callerName);
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session);
 
         callbacks.post.player(req, res, tag, sql, inserts, mysql, complete);
 
@@ -124,7 +129,7 @@ module.exports = (function() {
     });
 
 
-    router.all('*', function(req, res, next){
+    router.all('*', function(req, res, next) {
         var url = req.url;
         console.log("Navigating to " + url + "\n------router-all-/------");
         var check = callbacks.session.checkSession(req, res, url);
@@ -133,7 +138,7 @@ module.exports = (function() {
         }
     });
 
-    router.get('/operations/', function(req, res){
+    router.get('/operations/', function(req, res) {
         console.log("operations handler called.")
         if (req.session.shipNest) {
             res.redirect('/eve2/space_station/');
@@ -142,7 +147,7 @@ module.exports = (function() {
         }
     });
 
-    router.get('/out_in_space/:pr', function(req,res){
+    router.get('/out_in_space/:pr', function(req,res) {
         console.log("\n----parameter handler----\n")
         var callerName = "out_in_space";
         var mysql = req.app.get('mysql');
@@ -155,7 +160,7 @@ module.exports = (function() {
         }
     });
 
-    router.get('/out_in_space/', function(req, res){
+    router.get('/out_in_space/', function(req, res) {
         console.log("\n----main handler----\n")
         var callerName = "out_in_space";
         var context = {};
@@ -163,7 +168,7 @@ module.exports = (function() {
         var renderString = 'out_in_space';
 
         context = callbacks.pre.session.copySessionObjToContext(
-            context, req.session, callerName);
+            context, req.session);
         let progress = new HandlerProgress_Get(renderString, 3, ready, 0, null);
 
         console.log("\n---------This should only show up once.--------\n");
@@ -183,14 +188,15 @@ module.exports = (function() {
             // console.log("Ready called.-----------------------------------");
             // console.log("Ready's context reads: " + JSON.stringify(context) 
             //     + "\n--------------final context--------------");
-            console.log("Context reads: " + JSON.stringify(context));
             progress.render(res, context);
         }
     });
 
 
-    router.get('/space_station/', function(req, res){
+    router.get('/space_station/', function(req, res) {
         var context = {};
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session);
         var mysql = req.app.get('mysql');
         var renderString = 'space_station';
         let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null);
@@ -202,10 +208,11 @@ module.exports = (function() {
         }
     });
 
-
-    router.get('/industry/', function(req, res){
+    router.get('/industry/', function(req, res) {
         var renderString = "industry";
         var context = {};
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session, callerName);
         var mysql = req.app.get('mysql');
         let progress = new HandlerProgress_Get(renderString, 5, ready, 0, null);
         console.log("industry req.session reads" + JSON.stringify(req.session));
@@ -233,7 +240,7 @@ module.exports = (function() {
     ************************************************/
     
     // remember later to hook this up with 2 inserts to EVE2_LINKS.
-    router.post('/out_in_space/', function(req,res){
+    router.post('/out_in_space/', function(req,res) {
         console.log("Posting to out in space");
         var mysql = req.app.get('mysql');
         var callbackCount = 0;
@@ -271,7 +278,7 @@ module.exports = (function() {
         } // end complete
     });
 
-    router.post('/industry/', function(req,res){
+    router.post('/industry/', function(req,res) {
         var mysql = req.app.get('mysql');
         var sql = {};
         var inserts = {};

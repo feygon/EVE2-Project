@@ -4,7 +4,7 @@ var monoQueries = require('./monoQueries');
 monoCBs.create_view_CS_aggregate = 
 function create_view_CS_aggregate(res, mysql, CSid, caller, complete) {
     var cbName = "monoCBs.create_view_CS_aggregate";
-    var sql = monoQueries.create_view_CS_aggregate;
+    var sql = monoQueries.create_table_CS_aggregate;
     var inserts = [CSid]; // could be station or ship.
 
     mysql.pool.query(sql, inserts, function(error, results, fields){
@@ -20,7 +20,7 @@ function create_view_CS_aggregate(res, mysql, CSid, caller, complete) {
 monoCBs.create_view_obj_aggregate = 
 function create_view_obj_aggregate(res, mysql, caller, complete) {
     var cbName = "monoCBs.create_view_obj_aggregate";
-    var sql = monoQueries.create_view_obj_aggregate;
+    var sql = monoQueries.create_table_obj_aggregate;
     
     mysql.pool.query(sql, function(error, results, fields) {
 		if(error) {

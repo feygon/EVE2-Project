@@ -450,61 +450,64 @@ END //
 DROP PROCEDURE IF EXISTS SP_insert_ship_deep //
 CREATE PROCEDURE SP_insert_ship_deep()
 BEGIN
-    INSERT INTO view_CS_aggregate (id)  
-        SELECT CS.id FROM EVE2_CargoSpace as CS
-            WHERE CS.object_id IN (
-                SELECT id FROM view_obj_aggregate
-            );
-    INSERT INTO EVE2_SP_debug (report) VALUES ("insert into CS aggregate view complete.");
+INSERT INTO EVE2_SP_debug (report) VALUES ("Beginning SP_insert_ship_deep");
+INSERT INTO temp_CS_aggregate (id)  
+    SELECT CS.id FROM EVE2_CargoSpace as CS
+        WHERE CS.object_id IN (
+            SELECT id FROM temp_obj_aggregate
+        ) AND CS.id NOT IN (
+            SELECT id FROM temp_CS_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert into CS aggregate view complete.");
 
-    INSERT INTO view_obj_aggregate (id)
-        SELECT obj.id FROM EVE2_Objects as obj
-            WHERE obj.cargoSpace_id IN (
-                SELECT id FROM view_CS_aggregate
-            ) AND obj.id NOT IN (
-                SELECT id from view_obj_aggregate
-            );
-    INSERT INTO EVE2_SP_debug (report) VALUES ("insert into object aggregate view complete.");
-END //
+INSERT INTO temp_obj_aggregate (id)
+    SELECT obj.id FROM EVE2_Objects as obj
+        WHERE obj.cargoSpace_id IN (
+            SELECT id FROM temp_CS_aggregate
+        ) AND obj.id NOT IN (
+            SELECT id from temp_obj_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert into object aggregate view complete.");END //
 
 DROP PROCEDURE IF EXISTS SP_insert_station_deep //
 CREATE PROCEDURE SP_insert_station_deep()
 BEGIN
-    INSERT INTO view_CS_aggregate (id)  
-        SELECT CS.id FROM EVE2_CargoSpace as CS
-            WHERE CS.object_id IN (
-                SELECT id FROM view_obj_aggregate
-            );
+INSERT INTO EVE2_SP_debug (report) VALUES ("Beginning SP_insert_station_deep");
+INSERT INTO temp_CS_aggregate (id)  
+    SELECT CS.id FROM EVE2_CargoSpace as CS
+        WHERE CS.object_id IN (
+            SELECT id FROM temp_obj_aggregate
+        ) AND CS.id NOT IN (
+            SELECT id FROM temp_CS_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert1 into CS aggregate view complete.");
 
-    INSERT INTO view_obj_aggregate (id)
-        SELECT obj.id FROM EVE2_Objects as obj
-            WHERE obj.cargoSpace_id IN (
-                SELECT id FROM view_CS_aggregate
-            );
+INSERT INTO temp_obj_aggregate (id)
+    SELECT obj.id FROM EVE2_Objects as obj
+        WHERE obj.cargoSpace_id IN (
+            SELECT id FROM temp_CS_aggregate
+        ) AND obj.id NOT IN (
+            SELECT id from temp_obj_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert2 into object aggregate view complete.");
 
-    DROP VIEW if exists temp;
-    CREATE VIEW temp as SELECT id FROM view_CS_aggregate;
+INSERT INTO temp_CS_aggregate (id)  
+    SELECT CS.id FROM EVE2_CargoSpace as CS
+        WHERE CS.object_id IN (
+            SELECT id FROM temp_obj_aggregate
+        ) AND CS.id NOT IN (
+            SELECT id FROM temp_CS_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert 2 into CS aggregate view complete.");
 
-    INSERT INTO view_CS_aggregate (id)
-        SELECT CS.id FROM EVE2_CargoSpace as CS
-            WHERE CS.object_id IN (
-                SELECT id FROM view_obj_aggregate
-            ) AND NOT IN (
-                SELECT id FROM temp
-            );
-
-    DROP VIEW IF EXISTS temp;
-    CREATE VIEW temp as SELECT id FROM view_obj_aggregate;
-
-    INSERT INTO view_obj_aggregate (id)
-        SELECT obj.id FROM EVE2_Objects as obj
-            WHERE obj.cargoSpace_id IN (
-                SELECT id FROM view_CS_aggregate
-            ) AND NOT IN (
-                SELECT id FROM temp
-            );
-
-    DROP VIEW IF EXISTS temp;
+INSERT INTO temp_obj_aggregate (id)
+    SELECT obj.id FROM EVE2_Objects as obj
+        WHERE obj.cargoSpace_id IN (
+            SELECT id FROM temp_CS_aggregate
+        ) AND obj.id NOT IN (
+            SELECT id from temp_obj_aggregate
+        );
+INSERT INTO EVE2_SP_debug (report) VALUES ("insert 2 into object aggregate view complete.");
 END //
 
 CREATE PROCEDURE SP_CreateItemStructure()
@@ -1268,7 +1271,8 @@ DROP TABLE IF EXISTS EVE2_SP_debug;
 CREATE TABLE EVE2_SP_debug(
     id int(11)not null auto_increment,
     primary key (id),
-    report varchar(255)
+    report varchar(255),
+    timstamp Date not null default CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE EVE2_ItemStructure(

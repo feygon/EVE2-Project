@@ -38,7 +38,7 @@ callbacks.monolithic = monoCBs;
 
 // don't use w/ req as context.
 callbacks.pre.session.copySessionObjToContext = 
-function copySessionToContext(context, obj){
+function copySessionToContext(context, obj) {
 	context.session = {};
 	context.session.playerID = obj.playerID;
 	context.session.playerName = obj.playerName;
