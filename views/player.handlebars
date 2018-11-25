@@ -18,7 +18,14 @@
     <tbody> 
         {{#each all_players}}
         <tr> 
-            <td>{{playerName}}</td> 
+            <td>
+                <form>
+                    <p>{{playerName}}</p>
+                    <input type="hidden" value={{playerID}} name="playerID">
+                    <input type="submit" value="Use player" name="UsePlayer" class="inlineButton">
+                    <input type="submit" value="Delete player" name="DeletePlayer" class="inlineButton">
+                </form>
+            </td> 
             <td>{{shipName}}</td>
             <td>{{locationName}}{{#if stationName}}, in {{stationName}}{{/if}}</td>
         </tr> 
@@ -28,17 +35,5 @@
 <br/>
 
 <label style = "color:red">(Reviewer - There is not actually any security implemented here. Anyone can access your player after it's made.)</label>
-<!-- at least make sessions functional for step 5 draft -->
-<form id="choose-player" action="/eve2/player/" method="post">
-    <label>Player:</label> <select name="playerID">
-        <option>None</option>
-        {{#each all_players}}
-        <option value="{{playerID}}">{{playerName}}</option>
-        {{/each}}
-    </select>
-    <input type="submit" value="Use player" name="UsePlayer"><br>
-    <label></label><label></label>
-    <input type="submit" value="Delete player" name="DeletePlayer">
-</form>
 
 </html>

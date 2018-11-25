@@ -157,3 +157,7 @@ label:after { content: ":"; }
 .inlineWithSelect{
     display : inline;
 }
+
+.inlineButton{
+    display:inline;
+}
