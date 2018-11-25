@@ -209,6 +209,7 @@ module.exports = (function() {
     });
 
     router.get('/industry/', function(req, res) {
+        var callerName = "industry";
         var renderString = "industry";
         var context = {};
         context = callbacks.pre.session.copySessionObjToContext(

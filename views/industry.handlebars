@@ -1,4 +1,5 @@
 <html>
+<div class="page">
 <h1>Industry Page</h1><br>
 
 <div>
@@ -30,7 +31,11 @@
             <option value="{{type}}">{{type}}</option>
         {{/each}}
     </select><br>
-    <label style = "color:red">(Reviewer - This is an insert to the item structures entity.)</label>
+    <p style = "color:red">
+        (Reviewer - This is an insert to the item structures entity.<br>
+        There are plans to add item uses for charges and materials, but as yet, <br>
+        the only application-level implementation is for containers:
+        as ships, space stations, and boxes)</p>
     <input type="submit" value="Invent" name="invent">
 </form>
 <br>
@@ -70,7 +75,14 @@
 <label style = "color:red">(Reviewer - This is an insert to the Objects entity.)</label>
 <input type="submit" value="Produce" name="produce">
 </form>
+
 <br>
 {{#if sessionAlert}}<h3>Alert: {{sessionAlert}}</h3>{{/if}}
+
+</div>
+
+<div id="sidebar">
+
+</div>
 
 </html>
