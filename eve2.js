@@ -1,3 +1,5 @@
+
+
 // default method export, overloading the get function with string cases.
 module.exports = (function() {
     
@@ -5,6 +7,7 @@ module.exports = (function() {
     var router = express.Router();
     var callbacks = require('./scripts/callbacks');
     var queries = require('./scripts/queries');
+
 
     /*
     *   HandlerProgress_Get class
@@ -21,6 +24,13 @@ module.exports = (function() {
             this.precount = 0;
             this.behavior = behavior;
             this.prebehavior = preBehavior;
+            this.timeout = true;
+            // setTimeout(function(){ 
+            //     if (this.timeout) {
+            //         alert("Possible callback timeout condition or database is taking a while.");
+            //     }
+            // }, 5000);
+
 
             this.complete = function(cbName) {
                 this.count++;
@@ -28,6 +38,7 @@ module.exports = (function() {
                     + " CallbackCount = " + this.count + " / " + this.callbackTotalCount);
                 if (this.count >= this.callbackTotalCount) {
                     console.log("---------------HandlerProgress_Get----------------");
+                    // this.timeout = false;
                     this.behavior();
                 }
             };
@@ -42,6 +53,7 @@ module.exports = (function() {
             };
 
             this.render = function(res, context) {
+                console.log("Rendering " + renderString);
                 res.render(this.renderString, context);
             };
         }
@@ -54,6 +66,10 @@ module.exports = (function() {
         var context = {};
         context.counter = req.session.count;
         res.render('homepage', context);
+
+        var hbs = req.app.get('hbs');
+        console.log("helpers reads: " + JSON.stringify(hbs['helpers']) + "\n----end----");
+        // hbs.helpers.comparison.comparison();
     });
 
 
@@ -117,8 +133,30 @@ module.exports = (function() {
         }
     });
 
+    router.get('/operations/', function(req, res){
+        console.log("operations handler called.")
+        if (req.session.shipNest) {
+            res.redirect('/eve2/space_station/');
+        } else {
+            res.redirect('/eve2/out_in_space/');
+        }
+    });
+
+    router.get('/out_in_space/:pr', function(req,res){
+        console.log("\n----parameter handler----\n")
+        var callerName = "out_in_space";
+        var mysql = req.app.get('mysql');
+        var renderString = 'out_in_space:/pr';
+        let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null); 
+        callbacks.procedure_call.undockShip(
+            res, req, mysql, callerName, progress);
+        function ready() {
+            res.redirect('/eve2/out_in_space')
+        }
+    });
 
     router.get('/out_in_space/', function(req, res){
+        console.log("\n----main handler----\n")
         var callerName = "out_in_space";
         var context = {};
         var mysql = req.app.get('mysql');
@@ -126,23 +164,30 @@ module.exports = (function() {
 
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session, callerName);
+        let progress = new HandlerProgress_Get(renderString, 3, ready, 0, null);
 
-        let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
-
+        console.log("\n---------This should only show up once.--------\n");
 	    /* callbacks go here. */
         callbacks.select.stations_in_space(res, req, mysql, context, progress);
         callbacks.select.linked_locations(res, req, mysql, context, progress);
 
+        console.log("code of callbacks.monolithic.getCargo_Deep reads: \n"
+            + callbacks.monolithic.getCargo_Deep.toString());
+
+        callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Ship", progress);
+        console.log("\n---------This should ALSO ONLY show up once.--------\n");
+
         function ready() {
+            console.log("Ready?");
             // console.log("progress count is " + progress.count + " / " + progress.callbackTotalCount);
             // console.log("Ready called.-----------------------------------");
             // console.log("Ready's context reads: " + JSON.stringify(context) 
             //     + "\n--------------final context--------------");
+            console.log("Context reads: " + JSON.stringify(context));
             progress.render(res, context);
         }
     });
 
-/*********************************good above here*************************************/
 
     router.get('/space_station/', function(req, res){
         var context = {};
@@ -162,14 +207,19 @@ module.exports = (function() {
         var context = {};
         var mysql = req.app.get('mysql');
         let progress = new HandlerProgress_Get(renderString, 5, ready, 0, null);
+        console.log("industry req.session reads" + JSON.stringify(req.session));
 
         /* callbacks go here. */
         callbacks.select.item_structure_list(res, mysql, context, progress);
-        callbacks.select.itemUse_list_orderbyqq(res, mysql, context, progress);
+        callbacks.select.itemUse_list_orderbyq(res, mysql, context, progress);
         callbacks.select.item_structure_types(res, mysql, context, progress);
         callbacks.select.item_use_scales(res, mysql, context, progress);
         callbacks.select.useless_item_structures(res, mysql, context, progress);
 
+        if (req.session.alertMsg) {
+            context.sessionAlert = req.session.alertMsg;
+            req.session.alertMsg = null;
+        }
         function ready() {
             progress.render(res, context); 
         }
@@ -220,45 +270,19 @@ module.exports = (function() {
         } // end complete
     });
 
-
-
-    router.post('/industry/inventstructure/', function(req,res){
-        var callerName = "industry/inventstructure_post";
+    router.post('/industry/', function(req,res){
         var mysql = req.app.get('mysql');
-        
-	    var sql = queries.insert.insert_item_structure;
- 	    var inserts = [req.body.name,
- 		    req.body.packaged,
- 		    req.body.unpackaged,
- 		    req.body.type];
- 	    sql = mysql.pool.query(sql,inserts,function(error,results,fields){
-		    if(error){
-		 	    res.write("invent item structure post router says: " + JSON.stringify(error));
-			    res.end();
-		    }else{
-			    res.redirect('/eve2/industry');
-		    }
-	    });
-    });
-  
-  
-    router.post('/industry/designitemuse/', function(req,res){
-        var callerName = "industry/designitemuse_post";
-        var mysql = req.app.get('mysql');
-        var pilotable = false;
-        if (req.body.scale == "Ship") { pilotable = true; }
+        var sql = {};
+        var inserts = {};
+        var tag = {};
+        callbacks.post.industry(req, tag, sql, inserts);
 
-        var sql = queries.insert.insert_item_use;
-        var inserts = [req.body.fromitemname,
-                       pilotable,
-                       req.body.capacity,
-                       req.body.scale];
-
-        sql = mysql.pool.query(sql,inserts,function(error,results,fields){
+        sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
             if(error){
-                res.write("design item use post router says: " + JSON.stringify(error));
+                res.write(tag.post + "-tagged industry post says: "
+                    + JSON.stringify(error));
                 res.end();
-            }else{
+            } else {
                 res.redirect('/eve2/industry');
             }
         });

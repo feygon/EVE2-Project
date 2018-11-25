@@ -62,12 +62,15 @@ BEGIN
     DECLARE IStrID int(20);
     SET @mangled_tempObjID = 0;
     CALL SP_GetIStrFromCSid(CSid, IStrID);
-    DROP VIEW IF EXISTS allObjects;
-    CREATE VIEW allObjects as SELECT id FROM EVE2_Objects;
+
+    DROP TABLE IF EXISTS tempTable_allObjects;
+    CREATE TABLE tempTable_allObjects as SELECT id FROM EVE2_Objects;
+
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged)
         VALUES ( IStrID, StationID, 1, 0);
 
-    SET @mangled_tempObjID = (SELECT ID FROM EVE2_Objects WHERE ID not in (SELECT id FROM allObjects));
+    SET @mangled_tempObjID = (SELECT ID FROM EVE2_Objects WHERE ID not in (SELECT id FROM tempTable_allObjects));
+    DROP TABLE tempTable_allObjects;
     UPDATE EVE2_CargoSpace SET object_id = @mangled_tempObjID WHERE id = CSid;
 END //
 
@@ -370,7 +373,7 @@ CREATE PROCEDURE SP_newPlayerGetsPodInJita(IN playerName varchar(255))
 BEGIN
     INSERT INTO EVE2_Players (name, piloting_CS_id) VALUES (playerName, NULL);
     SET @newestPlayerID = (SELECT id FROM EVE2_Players WHERE name = playerName);
-    SET @newestPlayerName = (SELECT name FROM EVE2_Players where id=@newestPlayerID);
+    SET @newestPlayerName = (SELECT name FROM EVE2_Players where id = @newestPlayerID);
     CALL SP_getItemStructureID("Keepstar");
     SET @stationISid = @itemStructureID;
     SET @stationIUID = (SELECT id from EVE2_ItemUse WHERE itemStructure_id = @stationISid);
@@ -383,6 +386,9 @@ BEGIN
     SET @waterID = @itemStructureID;
     CALL SP_getItemStructureID("Oxygen");
     SET @oxygenID = @itemStructureID;
+    -- good to here...
+-- bla
+    INSERT INTO EVE2_SP_debug (report) values ("Good to here 1.");
 
     SET @jitaID = (SELECT loc.id FROM EVE2_Locations as loc WHERE loc.name="Jita");
     INSERT INTO EVE2_CargoSpace (
@@ -392,14 +398,20 @@ BEGIN
     SET @stationCSid = (SELECT id FROM EVE2_CargoSpace WHERE 
         id in (SELECT MAX(id) FROM EVE2_CargoSpace));
 
+    INSERT INTO EVE2_SP_debug (report) values ("Good to here 2.");
    
-    DROP VIEW IF EXISTS temp1;
-    CREATE VIEW temp1 as SELECT id FROM EVE2_CargoSpace;
+    DROP table IF EXISTS tempTable;
+    CREATE table tempTable as SELECT id FROM EVE2_CargoSpace;
     INSERT INTO EVE2_CargoSpace (name, player_id, itemUse_id, location_id, object_id) VALUES
         (CONCAT(playerName, "'s Pod"), @newestPlayerID, @podIUID, @jitaID, NULL);
-    SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE id not in (SELECT id FROM temp1));
+    SET @shipCSid = (SELECT id FROM EVE2_CargoSpace WHERE id not in (SELECT id FROM tempTable));
+
+    INSERT INTO EVE2_SP_debug (report) values ("Good to here 3.");
 
     CALL SP_DockShip(@shipCSid, @stationCSid);
+
+    INSERT INTO EVE2_SP_debug (report) values ("Good to here 4.");
+
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
         (@preciousMetalsID, @stationCSid, 100, 1);
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
@@ -407,7 +419,8 @@ BEGIN
     INSERT INTO EVE2_Objects (itemStructure_id, cargoSpace_id, quantity, packaged) VALUES
         (@oxygenID, @stationCSid, 100, 1);
     UPDATE EVE2_Players SET piloting_CS_id = @shipCSid WHERE id = @newestPlayerID;
-    DROP VIEW IF EXISTS temp1;
+    DROP TABLE IF EXISTS tempTable;
+    INSERT INTO EVE2_SP_debug (report) values ("Good to here 5.");
 END //
 
 DROP PROCEDURE IF EXISTS SP_putPlayerInPod //
@@ -432,6 +445,66 @@ BEGIN
         VALUES (source, @maxID);
     INSERT INTO EVE2_LINKS (source_id, link_id)
         VALUES (@maxID, source);
+END //
+
+DROP PROCEDURE IF EXISTS SP_insert_ship_deep //
+CREATE PROCEDURE SP_insert_ship_deep()
+BEGIN
+    INSERT INTO view_CS_aggregate (id)  
+        SELECT CS.id FROM EVE2_CargoSpace as CS
+            WHERE CS.object_id IN (
+                SELECT id FROM view_obj_aggregate
+            );
+    INSERT INTO EVE2_SP_debug (report) VALUES ("insert into CS aggregate view complete.");
+
+    INSERT INTO view_obj_aggregate (id)
+        SELECT obj.id FROM EVE2_Objects as obj
+            WHERE obj.cargoSpace_id IN (
+                SELECT id FROM view_CS_aggregate
+            ) AND obj.id NOT IN (
+                SELECT id from view_obj_aggregate
+            );
+    INSERT INTO EVE2_SP_debug (report) VALUES ("insert into object aggregate view complete.");
+END //
+
+DROP PROCEDURE IF EXISTS SP_insert_station_deep //
+CREATE PROCEDURE SP_insert_station_deep()
+BEGIN
+    INSERT INTO view_CS_aggregate (id)  
+        SELECT CS.id FROM EVE2_CargoSpace as CS
+            WHERE CS.object_id IN (
+                SELECT id FROM view_obj_aggregate
+            );
+
+    INSERT INTO view_obj_aggregate (id)
+        SELECT obj.id FROM EVE2_Objects as obj
+            WHERE obj.cargoSpace_id IN (
+                SELECT id FROM view_CS_aggregate
+            );
+
+    DROP VIEW if exists temp;
+    CREATE VIEW temp as SELECT id FROM view_CS_aggregate;
+
+    INSERT INTO view_CS_aggregate (id)
+        SELECT CS.id FROM EVE2_CargoSpace as CS
+            WHERE CS.object_id IN (
+                SELECT id FROM view_obj_aggregate
+            ) AND NOT IN (
+                SELECT id FROM temp
+            );
+
+    DROP VIEW IF EXISTS temp;
+    CREATE VIEW temp as SELECT id FROM view_obj_aggregate;
+
+    INSERT INTO view_obj_aggregate (id)
+        SELECT obj.id FROM EVE2_Objects as obj
+            WHERE obj.cargoSpace_id IN (
+                SELECT id FROM view_CS_aggregate
+            ) AND NOT IN (
+                SELECT id FROM temp
+            );
+
+    DROP VIEW IF EXISTS temp;
 END //
 
 CREATE PROCEDURE SP_CreateItemStructure()
@@ -1279,8 +1352,8 @@ CREATE TABLE EVE2_Objects(
     constraint FK_Object_CS_id foreign key (cargoSpace_id) references EVE2_CargoSpace(id)
     	ON DELETE CASCADE
     	ON UPDATE CASCADE,
-    primary key (itemStructure_id, cargoSpace_id),
     id int(20) unique not null auto_increment,
+    primary key (id),
     quantity int(20) not null default 1,
     packaged tinyint(1) not null default 1
 ) ENGINE=InnoDB;
@@ -1288,7 +1361,7 @@ CREATE TABLE EVE2_Objects(
 ALTER TABLE EVE2_CargoSpace ADD COLUMN object_id int(20);
 ALTER TABLE EVE2_CargoSpace ADD constraint FK_CS_Object_id foreign key (object_id)
         references EVE2_Objects(id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE; 
 
 CALL SP_CreateItemStructure();

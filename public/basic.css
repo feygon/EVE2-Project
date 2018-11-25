@@ -152,3 +152,8 @@ div.BPC, div.BPO {
 .BPC label  { text-align:right; }
 .BPO label  { text-align:right; }
 label:after { content: ":"; }
+.bold-option{font-weight: bolder;}
+
+.inlineWithSelect{
+    display : inline;
+}

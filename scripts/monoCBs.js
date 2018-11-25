@@ -1,4 +1,5 @@
 var monoCBs = {};
+var monoQueries = require('./monoQueries');
 
 monoCBs.create_view_CS_aggregate = 
 function create_view_CS_aggregate(res, mysql, CSid, caller, complete) {
@@ -68,26 +69,39 @@ function disgorge(res, mysql, context, caller, complete){
     var cbName = "monoCBs.onboardEntities";
     var sql1 = monoQueries.onboardCargoSpaces;
     var sql2 = monoQueries.onboardObjects;
+    var doneCount = 0;
 
-    mysql.pool.query(sql1, function(error, results, fields) {
+    mysql.pool.query(sql1, function(error, results1, fields) {
 		if(error) {
             res.write(caller + "'s callback " + cbName
                 + " query sql1 = monoQueries.onboardCargoSpaces returns: " 
                 + JSON.stringify(error));
             res.end();
         }
-        context.onboardCargoSpaces = results;
+        console.log("results1 are: " + JSON.stringify(results1) 
+            + "\n------dejavu 1-----");
+        context.onboardCargoSpaces = results1;
+        done();
     });
-    mysql.pool.query(sql2, function(error, results, fields) {
+    mysql.pool.query(sql2, function(error, results2, fields) {
 		if(error) {
             res.write(caller + "'s callback " + cbName
                 + " query sql2 = monoQueries.onboardObjects returns: " 
                 + JSON.stringify(error));
             res.end();
         }
-        context.onboardObjects = results;
+        console.log("results2 are: " + JSON.stringify(results2) 
+        + "\n------dejavu 2-----");
+        context.onboardObjects = results2;
+        done();
     });
-    complete(cbName);
+    // this line marks the spot of an incredible leap of debugging intuition. Let its infamy go unsung.
+    function done(){
+        doneCount++;
+        if (doneCount == 2) {
+            complete(cbName);
+        }
+    }
 };
 
 
@@ -105,33 +119,39 @@ function insert_entities_deep(scale, res, mysql, caller, complete) {
         }
         complete(cbName);
     });
-}
+};
 
 // scale is a string, either "Station" or "Ship". Caps sensitive.
-monoCBs.monolithicCallbacksInOrder =
-function callbacksInOrder(res, req, mysql, context, scale, complete) {
+// mutate context to contain: onboardObjects and onboardCargoSpaces
+monoCBs.getCargo_Deep =
+function getCargo_Deep(res, req, mysql, context, scale, complete) {
+    console.log("getCargo Called.\n--------call--------");
     var readyCounter = 0;
-    var cbName = "monoCBs.monolithicCallbacksInOrder";
+    var cbName = "monoCBs.getCargo_Deep";
     var total = 4;
     monoCBs.create_view_CS_aggregate(res, mysql, req.session.shipNest, cbName, ready);
 
     function ready(caller){
         readyCounter++;
         console.log(caller + " reports ready: " + readyCounter + " / " + total);
-        if (readyCounter >= 1) {
+        if (readyCounter == 1) {
+            console.log("create_view_CS_aggregate complete. running create_view_obj_aggregate")
             monoCBs.create_view_obj_aggregate(res, mysql, cbName, ready);
         }
-        if (readyCounter >= 2) {
+        if (readyCounter == 2) {
+            console.log("create_view_obj_aggregate complete. Running insert_entities_deep")
             monoCBs.insert_entities_deep(scale, res, mysql, cbName, ready);
         }
-        if (readyCounter >= 3) {
+        if (readyCounter == 3) {
+            console.log("insert_entities_deep complete. Running onboardEntities")
             monoCBs.onboardEntities(res, mysql, context, cbName, ready);
         }
-        if (readyCounter >= 4) {
-            complete(cbName);
+        if (readyCounter == 4) {
+            console.log("getCargo_Deep complete.\n---------note---------")
+            complete.complete(cbName);
         }
-    }
-}
+    };
+};
 
 
 module.exports = monoCBs;

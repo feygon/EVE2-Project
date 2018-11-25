@@ -122,34 +122,40 @@ queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
         + "AND outerCS.id = ? ";
 
 queries.select.all_players = "SELECT "
-        + "player.id AS playerID, "
-        + "player.name AS playerName, "
-        + "ship.id AS playerShipCSid, "
-        + "Obj.cargoSpace_id AS shipNest, " // can be null.
-        + "ship.name AS shipName, "
-        + "ship.location_id AS locationID, "
-        + "loc.name AS locationName "
-    + "FROM EVE2_Players as player "
-    + "INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id "
-    + "INNER JOIN EVE2_Locations as loc ON ship.location_id = loc.id "
-    + "LEFT JOIN EVE2_Objects as Obj ON ship.id = Obj.cargoSpace_id "
-    + "ORDER BY ? ?, playername";
+        + " player.id AS playerID, "
+        + " player.name AS playerName, "
+        + " ship.id AS playerShipCSid, "
+        + " Obj.cargoSpace_id AS shipNest, " // can be null.
+        + " station.name AS stationName, "
+        + " ship.name AS shipName, "
+        + " ship.location_id AS locationID, "
+        + " loc.name AS locationName "
+    + " FROM EVE2_Players as player "
+    + " INNER JOIN EVE2_CargoSpace as ship ON ship.id = player.piloting_CS_id "
+    + " INNER JOIN EVE2_Locations as loc ON ship.location_id = loc.id "
+    + " LEFT JOIN EVE2_Objects as Obj ON ship.object_id = Obj.id "
+    + " LEFT JOIN (SELECT id, name FROM EVE2_CargoSpace) "
+    + " as station ON Obj.cargoSpace_id = station.id "
+    + " ORDER BY ? ?, playername";
 
-queries.select.indy_views_union = "SELECT structureID, itemName FROM indyItems_? "
-    + "UNION "
-    + "SELECT CTid, CTitemName FROM indyCTs_ ? "
-    + "ORDER BY itemName";
+queries.select.indy_views_union = " SELECT structureID, itemName FROM indyItems_? "
+    + " UNION "
+    + " SELECT CTid, CTitemName FROM indyCTs_ ? "
+    + " ORDER BY itemName";
 
 queries.select.item_structure_types = "SELECT structures.type "
     + "FROM EVE2_ItemStructure AS structures GROUP BY type ORDER BY type";
 
-queries.select.item_structure_list = "SELECT "
-        + "structures.id, "
-        + "structures.name, "
-        + "structures.type, "
-        + "structures.vol_packed, "
-        + "structures.vol_unpacked "
-    + "FROM EVE2_ItemStructure as structures ORDER BY name";
+queries.select.item_structure_list = " SELECT "
+        + " structures.id, "
+        + " structures.name, "
+        + " structures.type, "
+        + " structures.vol_packed, "
+        + " structures.vol_unpacked, "
+        + " IU.scale "
+    + " FROM EVE2_ItemStructure as structures "
+    + " LEFT JOIN EVE2_ItemUse as IU ON IU.itemStructure_id = structures.id "
+    + " ORDER BY name";
 
 queries.select.item_use_scales = "SELECT itemUse.scale "
     + "FROM EVE2_ItemUse as itemUse GROUP BY scale ORDER BY scale";
@@ -191,28 +197,30 @@ queries.select.linked_locations = "SELECT "
     + "ORDER BY desto.name";
 
 queries.select.itemUse_list_orderbyq = "SELECT "
-        + "structures.name, "
-        + "itemUse.id, "
-        + "itemUse.pilotable, "
-        + "itemUse.capacity, "
-        + "itemUse.scale "
-    + "FROM EVE2_ItemUse as itemUse "
-    + "INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id "
-    + "ORDER BY ?";
+        + " structures.name, "
+        + " itemUse.id, "
+        +  "itemUse.pilotable, "
+        + " itemUse.capacity, "
+        + " itemUse.scale "
+    + " FROM EVE2_ItemUse as itemUse "
+    + " INNER JOIN EVE2_ItemStructure as structures ON structures.id = itemUse.itemStructure_id "
+    + " ORDER BY ?";
 
 queries.select.session_player = "SELECT "
-        + "player.id as playerID, "
-        + "player.name as playerName, "
-        + "CS.id as shipID, "
-        + "CS.name as shipName, "
-        + "Obj.cargoSpace_id as shipNest, "
-        + "loc.id as locationID, "
-        + "loc.name as locationName "
-    + "FROM EVE2_Players as player "
-    + "INNER JOIN EVE2_CargoSpace AS CS on CS.id = player.piloting_CS_id "
-    + "INNER JOIN EVE2_Locations AS loc ON loc.id = CS.location_id "
-    + "LEFT JOIN EVE2_Objects AS Obj ON CS.object_id = Obj.id "
-    + "WHERE player.id = ?";
+        + " player.id as playerID, "
+        + " player.name as playerName, "
+        + " CS.id as shipID, "
+        + " CS.name as shipName, "
+        + " Obj.cargoSpace_id as shipNest, "
+        + " station.name as stationName, "
+        + " loc.id as locationID, "
+        + " loc.name as locationName "
+    + " FROM EVE2_Players as player "
+    + " INNER JOIN EVE2_CargoSpace AS CS on CS.id = player.piloting_CS_id "
+    + " INNER JOIN EVE2_Locations AS loc ON loc.id = CS.location_id "
+    + " LEFT JOIN EVE2_Objects AS Obj ON CS.object_id = Obj.id "
+    + " LEFT JOIN EVE2_CargoSpace as station on Obj.cargoSpace_id = station.id"
+    + " WHERE player.id = ?";
 
 queries.select.stations_in_space = "SELECT "
         + "station.id as stationID, "
@@ -239,8 +247,8 @@ queries.insert.insert_item_structure = "INSERT INTO EVE2_ItemStructure( "
     + "name, vol_packed, vol_unpacked, type) "
     + "VALUES(?,?,?,?)";
 queries.insert.insert_item_use = "INSERT INTO EVE2_ItemUse ( "
-    + "itemStructure_id, pilotable, capacity, type) "
-    + "VALUES(?,?,?,?)";
+    + "itemStructure_id, capacity, scale) "
+    + "VALUES(?,?,?)";
 queries.insert.insert_object = "INSERT INTO EVE2_Objects ( "
     + "itemStructure_id, cargoSpace_id, quantity, packaged) "
     + "VALUES (?,?,?,?)";

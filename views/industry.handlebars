@@ -5,7 +5,7 @@
     <label>Current Items</label>
     <select name="CurrentItems">
     {{#each item_structure_list}}
-    <option>{{name}}, type: {{type}}, vol: {{vol_packed}}</option>
+    <option>{{name}}, type: {{type}}, vol: {{vol_packed}}{{#compare vol_packed vol_unpacked operator="!="}}, unpacked: {{vol_unpacked}}{{/compare}}</option>
     {{/each}}
     </select>
 </div>
@@ -16,12 +16,9 @@
     <option>{{name}}, capacity: {{capacity}}m3, scale: {{scale}}</option>
     {{/each}}
     </select>
-</div>
-<div>
-    <label>Objects under construction.</label>
-</div>
+</div><br>
 
-<form id="inventstructure" action="/eve2/industry/inventstructure/" method="post">
+<form id="inventstructure" action="/eve2/industry/" method="post">
     
     <h2>Invent Item </h2>
     <label>Item Name </label><input type="text" name="name" value="Name"><br>
@@ -34,16 +31,16 @@
         {{/each}}
     </select><br>
     <label style = "color:red">(Reviewer - This is an insert to the item structures entity.)</label>
-    <input type="submit" value="Invent">
+    <input type="submit" value="Invent" name="invent">
 </form>
 <br>
 
-<form id="designuse" action="/eve2/industry/designitemuse/" method="post">
+<form id="designuse" action="/eve2/industry/" method="post">
     <h2>Design a use for an item</h2> <br>
     <label>Based on item </label><select name="fromitemname">
         <option>None</option>
     {{#each useless_item_structures}}
-        <option value="{{id}}">{{name}}, {{type}}</option>
+        <option value="{{id}}">{{name}} {{#compare type "Container"}}(Hull Structure){{/compare}}</option>
     {{/each}}
 
     </select><br>
@@ -53,22 +50,27 @@
         {{#each item_use_scales}}
             <option value="{{scale}}">{{scale}}</option>
         {{/each}}
-    </select><br>
+    </select><p style ="color:red" class="inlineWithSelect"> (Bay scale doesn't do anything yet.)</p><br>
 
     <label style = "color:red">(Reviewer - This is an insert to the item uses entity.)</label>
-    <input type="submit" value="Design">
+    <input type="submit" value="Design" name="design">
 </form><br>
 
-<form id="choose-item" action="/eve2/industry/produce/" method="get">
+<form id="choose-item" action="/eve2/industry/" method="post">
 <h2>Get an inventory item</h2>
     <label>Item </label><select name="id"> 
         <option>None</option>
         {{#each item_structure_list}}
-            <option value="{{id}}">{{name}}</option>
+            <option value="{{id}}" {{#if scale}}class="bold-option"{{/if}}>
+                {{name}} ({{#if scale}}{{scale}}{{else}}{{type}}{{/if}})
+            </option>
         {{/each}}
     </select><br>
+    <label>Quantity</label><input type="number" min="0" name="quantity" value="1"><br>
 <label style = "color:red">(Reviewer - This is an insert to the Objects entity.)</label>
-<input type="submit" value="Produce">
+<input type="submit" value="Produce" name="produce">
 </form>
+<br>
+{{#if sessionAlert}}<h3>Alert: {{sessionAlert}}</h3>{{/if}}
 
 </html>

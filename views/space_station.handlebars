@@ -1,9 +1,20 @@
 <html>
 
 <h1>Space Station Page</h1><br>
-<a href="/eve2/industry">Industry</a><br>
-<a href="/eve2/out_in_space">undock</a><br>
+<a href="/eve2/industry/">Industry</a><br>
+<a href="/eve2/out_in_space/undock">undock</a><br>
 <br/>
+
+<form id="choose-ship" action="/eve2/space_station/" method="post">
+    <label>Change Piloting ship:</label> <select name="id"> 
+        <option>None</option>
+        {{#each item}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+</select>
+
+    <label></label><button onclick="changeContainer({{id}})">Change</button><br>
+</form><br>
 
 <h3>Ships and Containers:</h3>
 <table>
@@ -58,21 +69,8 @@
 <br/>
 <br/>
 
-
-<form id="choose-ship" action="/eve2/space_station/container" method="get">
-    <label>Change Piloting ship:</label> <select name="id"> 
-        <option>None</option>
-        {{#each item}}
-        <option value="{{id}}">{{name}}</option>
-        {{/each}}
-</select>
-
-    <label></label><button onclick="changeContainer({{id}})">Change</button><br>
-</form>
-
-
-<form id="sort-item" action="/eve2/space_station/item" method="get">
-   <label>Get structures of type:</label> <select name="id"> 
+<form id="sort-item" action="/eve2/space_station/" method="post">
+   <label>Filter by structures of type:</label> <select name="id"> 
        <option>None</option>
         {{#each item}}
         <option value="id">type</option>
@@ -82,8 +80,8 @@
     <label></label><button onclick="selectType({{id}})">Select</button><br>
 </form>
 
-    <form id="sort-container" action="/eve2/space_station/container" method="get">
-   <label>Get containers of type:</label> <select name="id"> 
+    <form id="sort-container" action="/eve2/space_station/" method="post">
+   <label>Filter by cargo spaces of scale:</label> <select name="id"> 
        <option>None</option>
         {{#each item}}
         <option value="id">type</option>

@@ -1,3 +1,5 @@
+
+
 var callbacks = {};
 callbacks.select = {};
 callbacks.post = {};
@@ -5,6 +7,7 @@ callbacks.session = {};
 callbacks.delete = {};
 callbacks.insert = {};
 callbacks.pre = {};
+callbacks.procedure_call = {};
 callbacks.pre.session = {};
 callbacks.pre.session.copySessionObjToContext = {};
 callbacks.session.setSession = {};
@@ -24,10 +27,14 @@ callbacks.delete.del_object = {};
 callbacks.insert.insert_object = {};			// itemStructure_id, cargoSpace_id, quantity, packaged
 callbacks.post.out_in_space = {};				// id, name, type, vol_packed, vol_unpacked, qty, packaged
 callbacks.post.player = {};
+callbacks.procedure_call.undockShip = {};
+
 
 //console.log("parsing callbacks.js");
 var queries = require('./queries');
 var monoCBs = require('./monoCBs.js');
+
+callbacks.monolithic = monoCBs;
 
 // don't use w/ req as context.
 callbacks.pre.session.copySessionObjToContext = 
@@ -37,6 +44,7 @@ function copySessionToContext(context, obj){
 	context.session.playerName = obj.playerName;
 	context.session.shipID = obj.shipID;
 	context.session.shipNest = obj.shipNest;
+	context.session.stationName = obj.stationName;
 	context.session.shipName = obj.shipName;
 	context.session.locationID = obj.locationID;
 	context.session.locationName = obj.locationName;
@@ -62,13 +70,14 @@ function setSession(req, res, playerID, mysql, complete) {
 			req.session.playerName = subcontext.session_player[0].playerName;
 			req.session.shipID = subcontext.session_player[0].shipID;
 			req.session.shipNest = subcontext.session_player[0].shipNest;
+			req.session.stationName = subcontext.session_player[0].stationName;
 			req.session.shipName = subcontext.session_player[0].shipName;
 			req.session.locationID = subcontext.session_player[0].locationID;
 			req.session.locationName = subcontext.session_player[0].locationName;
 			req.session.count = 0;
-			console.log("SetSession says: \n" +
-				"req.session in setsession is " + JSON.stringify(req.session)
-				+ "\n-----------------------------------------------");
+			// console.log("SetSession says: \n" +
+			// 	"req.session in setsession is " + JSON.stringify(req.session)
+			// 	+ "\n-----------------------------------------------");
 			complete(cbName);
 		}
 	}
@@ -100,6 +109,8 @@ function all_players(res, mysql, context, complete) {
 			res.write("callback.select.all_players returns: " + JSON.stringify(error));
 			res.end();
 		}
+		console.log("callbacks.select.all_players results: " + JSON.stringify(results)
+			+ "\n---------------results--------------");
 		context.all_players = results;
 		complete.complete(cbName);
 	});
@@ -120,7 +131,7 @@ function item_structure_list(res, mysql, context, complete) {
 			res.end();
 		}
 		context.item_structure_list = results;
-		complete(cbName);
+		complete.complete(cbName);
 	});
 };
 
@@ -137,7 +148,7 @@ function item_structure_types(res, mysql, context, complete) {
 			res.end();
 		}
 		context.item_structure_types = results;
-		complete(cbName);
+		complete.complete(cbName);
 	});
 };
 
@@ -154,16 +165,16 @@ function item_use_scales(res, mysql, context, complete) {
 			res.end();
 		}
 		context.item_use_scales = results;
-		complete(cbName);
+		complete.complete(cbName);
 	});
 };
 
 // column names: name, id, pilotable, capacity, scale
-callbacks.select.itemUse_list_orderbyqq = 
+callbacks.select.itemUse_list_orderbyq = 
 function itemUse_list_orderbyqq(res, mysql, context, complete) {
 	var cbName = "callbacks.select.itemUse_list_orderbyqq";
 	var sql = "";
-	sql += queries.select.itemUse_list_orderbyqq;
+	sql += queries.select.itemUse_list_orderbyq;
 	var inserts = ['name'];
 	
 	sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
@@ -172,7 +183,7 @@ function itemUse_list_orderbyqq(res, mysql, context, complete) {
 			res.end();
 		}
 		context.itemUse_list_orderbyqq = results;
-		complete(cbName);
+		complete.complete(cbName);
 	});
 };
 
@@ -190,7 +201,7 @@ function useless_item_structures(res, mysql, context, complete) {
 			res.end();
 		}
 		context.useless_item_structures = results;
-		complete(cbName);
+		complete.complete(cbName);
 	});
 };
 
@@ -407,7 +418,7 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		callbacks.session.setSession(req, res, playerID, mysql, done);
 		function done() {
 			console.log("session details in callbacks.post.player after setSession call: "
-			+ JSON.stringify(req.session));
+				+ JSON.stringify(req.session));
 			doneCount++;
 			if (doneCount >= 1) {
 				if (!req.session.shipNest) { // if nothing returned here.
@@ -439,6 +450,135 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		tag.post = 'DeletePlayer';
 		complete(cbName);
 	}
+
+	callbacks.post.industry = function industry(req,tag,sql,inserts) {
+		req.session.alertMsg = "";
+		if(req.body['invent']) {
+			sql.post = queries.insert.insert_item_structure;
+			inserts.post = [req.body.name, req.body.packaged,
+				req.body.unpackaged, req.body.type];
+			tag.post = 'invent';
+			req.session.alertMsg = "";
+			var str = "item structure " + req.body.name
+				+ " invented. Available to produce as a " + req.body.type
+				+ " with " + req.body.packaged
+				+ "m3 packaged volume and " + req.body.unpackaged
+				+ "m3 unpackaged volume.";
+			if(req.body.type == "Container"){
+				str += " Please design an item use for the new container."
+			}
+		}
+		if(req.body['design']) {
+			tag.post = 'design';
+			sql.post = queries.insert.insert_item_use;
+			inserts.post = [req.body.fromitemname, req.body.capacity,
+				req.body.scale];
+			var str = "Chosen item use designed and available to produce as a " + req.body.scale
+				+ " with " + req.body.capacity
+				+ "m3 capacity.";
+		}
+		if(req.body['produce']) {
+			tag.post = 'produce';
+			sql.post = queries.insert.insert_object;
+			inserts.post = [req.body.id, req.session.shipNest,
+				req.body.quantity, 1];
+			req.session.alertMsg = "";
+			var str = req.body.quantity + " objects placed in "
+				+ req.session.stationName + ".";
+		}
+		req.session.alertMsg = str;
+	}
+
+	callbacks.procedure_call.undockShip = 
+	function (res, req, mysql, caller, complete){
+		var cbName = "callbacks.procedure_call.undockShip";
+		var sql = queries.procedure_call.undockShip;
+		var inserts = [req.session.shipID];
+
+		mysql.pool.query(sql, inserts, function(error, results, fields) {
+			if(error) {
+				res.write(caller + "'s callback " + cbName
+					+ "returns: " + JSON.stringify(error));
+				res.end();
+			}
+			complete.complete(cbName);
+		});
+	}
 };
 
 module.exports = callbacks;
+
+// class typicalCallback {
+// 	constructor(res, req, done, cbName, caller, context, sql, inserts, numberOfQueries, asynchronous) {
+// 		this.caller = caller;
+// 		this.cbName = cbName;
+// 		this.numberOfQueries = numberOfQueries || 1;
+// 		this.count = 0;
+// 		this.complete = function complete(caller){
+// 			this.count++;
+// 			if (asynchronous){
+// 				this.completes(this.count);
+// 			} else if (this.count >= numberOfQueries){
+// 				done("typicalCallback: " + cbName);
+// 			}
+// 		}
+// 		this.completes = {};
+// 		if (asynchronous){
+// 			for (let index = 0; index < numberOfQueries; index++) {
+// 				completes[toString(index)] = function(index){ 
+// 					return function() {
+// 						if (this.count == index){
+// 							this.queries[index](this.sql[index], this.inserts[index],);
+// 						}
+// 					}
+// 				}();
+				
+// 			}
+// 		}
+		
+
+// 		this.mysql = req.app.get('mysql');
+// 		this.queries = {};
+// 		this.context = context;
+
+// 		if (numberOfQueries != undefined && numberOfQueries > 1){
+// 			this.sql = {};
+// 			this.inserts = {};
+// 			for (let index = 0; index < numberOfQueries; index++) {
+// 				this.sql[toString(index)] = sql[index];
+// 				this.inserts[toString(index)] = inserts[index];
+// 				this.queries[toString(index)] = function(index){
+// 					return function(innerSql, innerInserts, innerCaller, innerCbName) {
+// 						this.mysql.pool.query(innerSql, innerInserts, function(error, results, fields) {
+// 							if(error) {
+// 								res.write(innerCaller + "'s typicalCallback number " + index
+// 									 + ", " + innerCbName + " returns: "
+// 									+ JSON.stringify(error));
+// 								res.end();
+// 							}
+// 							this.context[toString(innerCbName)] = results;
+// 							this.complete(innerCbName);
+// 						});
+// 					}
+// 				}
+// 			}
+// 		} else {
+// 			this.sql = sql;
+// 			this.inserts = inserts;
+// 			this.queries = function (innerSql, innerInserts, innerCaller, innerCbName) {
+// 				this.mysql.pool.query(innerSql, innerInserts, function(error, results, fields) {
+// 					if(error) {
+// 						res.write(innerCaller + "'s typicalCallback " + innerCbName + " returns: "
+// 							+ JSON.stringify(error));
+// 						res.end();
+// 					}
+// 					this.context[toString(innerCbName)] = results;
+// 					this.complete(innerCbName);
+// 				});
+// 			}
+// 		}
+// 		if (asynchronous != undefined && asynchronous == true){
+// 			return this.complete;
+// 		}
+// 	}
+// }

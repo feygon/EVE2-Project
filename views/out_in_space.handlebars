@@ -71,31 +71,7 @@
     </tbody>
 </table>
 
-<!-- create post handler for this -->
-<form id="choose-station" action="/eve2/out_in_space/" method="post">
- <label>Station:</label> <select name="stationCSid"> 
-        <option>None</option>
-        {{#each stations_in_space}}
-        <option value="{{stationID}}">{{stationName}}</option>
-        {{/each}}
-    </select><br>
-<label></label><input type="submit" value="Dock" name="dock"><br>
-</form>
-<br/>
-
-<!-- create post handler for this -->
-<form id="choose-location" action="/eve2/out_in_space/" method="post">
-    <label>Location:</label> <select name="locationID"> 
-        <option>None</option>
-        {{#each linked_locations}}
-        <option value="{{id}}">{{name}}</option>
-        {{/each}}
-    </select><br>
-<label></label><input type="submit" value="Travel" name="moveLocation">
-</form>
-<br/>
-
-<!-- create post handler for this -->
+<!-- may replace this later with jettison functionality. -->
 <form id="choose-item" action="/eve2/out_in_space/" method="post">
     <label>Item:</label> <select name="objectID"> 
         <option>None</option>
@@ -108,7 +84,28 @@
 </form>
 <br>
 
-<!-- create post handler for this -->
+<form id="choose-station" action="/eve2/out_in_space/" method="post">
+ <label>Station:</label> <select name="stationCSid"> 
+        <option>None</option>
+        {{#each stations_in_space}}
+        <option value="{{stationID}}">{{stationName}}</option>
+        {{/each}}
+    </select><br>
+<label></label><input type="submit" value="Dock" name="dock"><br>
+</form>
+<br/>
+
+<form id="choose-location" action="/eve2/out_in_space/" method="post">
+    <label>Location:</label> <select name="locationID"> 
+        <option>None</option>
+        {{#each linked_locations}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+<label></label><input type="submit" value="Travel" name="moveLocation">
+</form>
+<br/>
+
 <form id="annihilate-wormhole" action="/eve2/out_in_space/" method="post">
     <label>Wormhole to:</label> <select name="wormhole_id">
         <option>None></option>

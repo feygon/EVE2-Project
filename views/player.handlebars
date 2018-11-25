@@ -20,7 +20,7 @@
         <tr> 
             <td>{{playerName}}</td> 
             <td>{{shipName}}</td>
-            <td>{{locationName}}</td>
+            <td>{{locationName}}{{#if stationName}}, in {{stationName}}{{/if}}</td>
         </tr> 
         {{/each}}
     </tbody> 

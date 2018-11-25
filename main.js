@@ -2,13 +2,19 @@ var express=require('express');
 var mysql = require('./dbcon.js');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var helpers = require('./views/helpers/comparison');
+var partials = require('./views/partials/partials')
 
 var app = express();
-var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var handlebars = require('express-handlebars').create({
+    defaultLayout:'main',
+    helpers: helpers,   // get helpers code from require above.
+    partials: partials  // get partials from require above. Probably...
+});
 var queries = require('./scripts/queries.js'); // big object full of sql strings
 
 app.use(session({
-    secret:'SuperSecretPasswordReallyItsLikeTheBestPa55word',
+    secret:'5uper5ecretPa55wordReallyIt5LikeTheBe5tPa55wordEvar',
     resave: true,
     saveUninitialized: false,
     cookie: {
@@ -21,18 +27,19 @@ app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use('/static', express.static('public'));
 app.set('view engine', 'handlebars');
-if (process.argv[2]===undefined){process.argv[2]="3001";}
+if (process.argv[2]===undefined) { process.argv[2]="8020"; }
 app.set('port', process.argv[2]);
 app.set('mysql', mysql);
 app.set('hbs', handlebars);
 
 var callbacks = require('./scripts/callbacks.js');  // callback functions
+app.set('callbacks', callbacks);
 
 app.set('queries', queries); // needed?
 
 app.use('/eve2', require('./eve2.js'));
 
-app.use(function(req,res){
+app.use(function(req, res){
     res.status(404);
     res.render('404');
 });
