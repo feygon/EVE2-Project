@@ -40,7 +40,8 @@ var queries = {
         "insert_CS": "",
         "insert_item_structure": "",
         "insert_item_use": "",
-        "insert_object": ""     // itemStructure_id, cargoSpace_id, quantity, packaged
+        "insert_object": "",
+        "insert_unpack_object": ""     // itemStructure_id, cargoSpace_id, quantity, packaged
     }],
     "delete": [
     {
@@ -252,6 +253,10 @@ queries.insert.insert_item_use = "INSERT INTO EVE2_ItemUse ( "
 queries.insert.insert_object = "INSERT INTO EVE2_Objects ( "
     + "itemStructure_id, cargoSpace_id, quantity, packaged) "
     + "VALUES (?,?,?,?)";
+
+queries.insert.insert_unpack_object = "INSERT INTO EVE2_CargoSpace "
+    + " (player_id, itemUse_id, location_id, object_id)  VALUES "
+    + " (?, ?, ?, ?) ";
     
 queries.update.set_object_id = "UPDATE EVE2_CargoSpace SET object_id = ? WHERE id = ?";
 queries.update.set_object_id_of_selection = "UPDATE EVE2_CargoSpace SET object_id = ? "

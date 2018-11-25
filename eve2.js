@@ -193,9 +193,10 @@ module.exports = (function() {
         var context = {};
         var mysql = req.app.get('mysql');
         var renderString = 'space_station';
-        let progress = new HandlerProgress_Get(renderString, 0, ready, 0, null);
-        ready();    // temporary for testing purposes.
-        /* callbacks go here. */
+        let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null);
+
+        callbacks.select.all_players(res, mysql, context, progress);
+
         function ready() {
             progress.render(res, context); 
         }

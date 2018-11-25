@@ -5,17 +5,20 @@
 <a href="/eve2/out_in_space/undock">undock</a><br>
 <br/>
 
+<h2 style="color: red">Please don't click anything below here. You will make the puppies cry.</h2>
+
 <form id="choose-ship" action="/eve2/space_station/" method="post">
-    <label>Change Piloting ship:</label> <select name="id"> 
+    <label>Change Piloting ship:</label> <select name="changeToShipID"> 
         <option>None</option>
         {{#each item}}
         <option value="{{id}}">{{name}}</option>
         {{/each}}
 </select>
 
-    <label></label><button onclick="changeContainer({{id}})">Change</button><br>
+    <label></label><input type="submit" name="changeShip" value='Change'><br>
 </form><br>
 
+<br>
 <h3>Ships and Containers:</h3>
 <table>
     <thead> 
@@ -34,34 +37,46 @@
     <tbody> 
         {{#each CS}}
         <tr> 
-            <td>{{Name}}</td>
+            <td>{{ObjectName}}</td>
             <td>{{Pilotable}}</td>
             <td>{{capacity}}</td>
             <td>{{type}}</td>
             <td>
-            <form id="move-item" action="/item" method="get">
-    <select name="id"> 
-        {{#each item}}
-        <option value="{{id}}">{{name}}</option>
-        {{/each}}
-    </select><br>
-    </form>
+            <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
+                <select name="id"> 
+                    {{#each item}}
+                    <option value="{{CSid}}">{{CSname}}</option>
+                    {{/each}}
+                </select><br>
+                <input type="submit" name="moveObject" value='Move'>
+            </form>
             </td>
-            <td><button onclick="deleteItem({{id}})">Give</button></td>
-            <td><button onclick="deleteItem({{id}})">Delete</button></td>
-            <td><button onclick="deleteItem({{id}})">Repackage</button></td>
-
-    <table>
-    <thead> 
-        <th>Inside Item</th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{Item.name}}</td>
-        </tr>
-    </tbody>   
-    </table>
-
+            <td>
+                <form id="give-item-{{id}}" action="eve2/space_station" method="post">
+                    <select name="playerToGiveObjectTo">
+                        <option>None</option>
+                        {{#each players}}
+                        <option value="{{playerID}}">{{playerName}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="submit" name="giveObjectToPlayer">
+                </form>
+            </td>
+            <td><input type="submit" name="deleteObject" value="Delete"</td>
+            <td><input type="submit" name="repackageObject" value="Repackage"></td>
+            <td>
+                <!-- sub-table... -->
+                <table>
+                    <thead> 
+                        <th>Inside Item</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{Item.name}}</td>
+                        </tr>
+                    </tbody>   
+                </table>
+            </td>
         </tr> 
         {{/each}}
     </tbody> 
@@ -70,26 +85,28 @@
 <br/>
 
 <form id="sort-item" action="/eve2/space_station/" method="post">
-   <label>Filter by structures of type:</label> <select name="id"> 
-       <option>None</option>
-        {{#each item}}
-        <option value="id">type</option>
+   <label>Filter by structures of type:</label>
+        <select name="id"> 
+            <option>None</option>
+            {{#each itemStructure}}
+            <option value="id">type</option>
+            {{/each}}
+        </select>
+    <label></label>
+    <input type="submit" name="select_typeFilter" value="Filter objects by type"><br>
+</form>
+<form id="sort-container" action="/eve2/space_station/" method="post">
+    <label>Filter by cargo spaces of scale:</label>
+    <select name="id"> 
+        <option>None</option>
+        {{#each itemUse}}
+        <option value="id">{{scale}}</option>
         {{/each}}
+
     </select>
 
-    <label></label><button onclick="selectType({{id}})">Select</button><br>
+    <label></label>
+    <input type="submit" name="select_scaleFilter" value="Filter cargo spaces by scale">
 </form>
-
-    <form id="sort-container" action="/eve2/space_station/" method="post">
-   <label>Filter by cargo spaces of scale:</label> <select name="id"> 
-       <option>None</option>
-        {{#each item}}
-        <option value="id">type</option>
-        {{/each}}
-
-</select>
-
-    <label></label><button onclick="selectType({{id}})">Select</button><br>
-</form>
-
+<br>
 </html>

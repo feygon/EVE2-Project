@@ -96,6 +96,7 @@ function checkSession(req, res, caller) {
 	}
 };
 
+// columns: playerID, playerName, playerShip, playerLocation, locationName, playerShipCSid
 callbacks.select.all_players =
 function all_players(res, mysql, context, complete) {
 	var cbName = "callbacks.select.all_players";
@@ -453,13 +454,14 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 
 	callbacks.post.industry = function industry(req,tag,sql,inserts) {
 		req.session.alertMsg = "";
+		var str = "";
 		if(req.body['invent']) {
 			sql.post = queries.insert.insert_item_structure;
 			inserts.post = [req.body.name, req.body.packaged,
 				req.body.unpackaged, req.body.type];
 			tag.post = 'invent';
 			req.session.alertMsg = "";
-			var str = "item structure " + req.body.name
+			str = "item structure " + req.body.name
 				+ " invented. Available to produce as a " + req.body.type
 				+ " with " + req.body.packaged
 				+ "m3 packaged volume and " + req.body.unpackaged
@@ -473,7 +475,7 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			sql.post = queries.insert.insert_item_use;
 			inserts.post = [req.body.fromitemname, req.body.capacity,
 				req.body.scale];
-			var str = "Chosen item use designed and available to produce as a " + req.body.scale
+			str = "Chosen item use designed and available to produce as a " + req.body.scale
 				+ " with " + req.body.capacity
 				+ "m3 capacity.";
 		}
@@ -482,12 +484,63 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			sql.post = queries.insert.insert_object;
 			inserts.post = [req.body.id, req.session.shipNest,
 				req.body.quantity, 1];
-			req.session.alertMsg = "";
-			var str = req.body.quantity + " objects placed in "
+			str = req.body.quantity + " objects placed in "
 				+ req.session.stationName + ".";
 		}
 		req.session.alertMsg = str;
 	}
+
+
+	callbacks.post.space_station = 
+	function(req, tag, sql, inserts) {
+		var str = "";
+		req.session.alertMsg = "";
+		if(req.body['changeShip']) {
+			sql.post = queries.update.set_piloting;
+			tag.post = "changeShip";
+			inserts.post = [req.body.changeToShipID];
+			str = "Changed ship. Session change complete.";
+			req.session.shipID = req.body.changeToShipID
+		}
+		if(req.body['moveObject']) {
+			sql.post = "SELECT 1";
+			tag.post = "moveObject";
+			inserts.post = [null];
+			str =  + "move object not yet implemented. Why is this being called?";
+		}
+		if(req.body['giveObjectToPlayer']) {
+			sql.post = "";
+			tag.post = "giveObjectToPlayer";
+			inserts.post = [""];
+			str = "give object not yet implemented. Why is this being called?";
+		}
+		if(req.body['deleteObject']) {
+			sql.post = "";
+			tag.post = "deleteObject";
+			inserts.post = [""];
+			str = "delete object not yet implemented. Why is this being called?";
+		}
+		if(req.body['repackageObject']) {
+			sql.post = "";
+			tag.post = "repackageObject";
+			inserts.post = [""];
+			str = "repackage object not yet implemented. Why is this being called?";
+		}
+		if(req.body['select_typeFilter']) {
+			sql.post = "";
+			tag.post = "select_typeFilter";
+			inserts.post = [""];
+			str = "filter object not yet implemented. Why is this being called?";
+		}
+		if(req.body['select_scaleFilter']) {
+			sql.post = "";
+			tag.post = "select_scaleFilter";
+			inserts.post = [""];
+			str = "move cargo space not yet implemented. Why is this being called?";
+		}
+		req.session.alertMsg = str;
+	}
+
 
 	callbacks.procedure_call.undockShip = 
 	function (res, req, mysql, caller, complete){

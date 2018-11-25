@@ -129,7 +129,12 @@ function getCargo_Deep(res, req, mysql, context, scale, complete) {
     var readyCounter = 0;
     var cbName = "monoCBs.getCargo_Deep";
     var total = 4;
-    monoCBs.create_view_CS_aggregate(res, mysql, req.session.shipNest, cbName, ready);
+    if (scale == "Station") {
+        monoCBs.create_view_CS_aggregate(res, mysql, req.session.shipNest, cbName, ready);
+    }
+    if (scale == "Ship") {
+        monoCBs.create_view_CS_aggregate(res, mysql, req.session.shipID, cbName, ready);
+    }
 
     function ready(caller){
         readyCounter++;
