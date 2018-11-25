@@ -9,21 +9,22 @@
  </form>
 <br/>
 <h3>Existing player:</h3>
-<table>
+<table class="playerTable">
     <thead> 
-        <th>Name</th>
+        <th class="playerTableTH">Player</th>
         <th>Piloting</th> 
         <th>Location</th>
     </thead> 
     <tbody> 
         {{#each all_players}}
         <tr> 
-            <td>
-                <form>
-                    <p>{{playerName}}</p>
+            <td style="width:25%">
+                <form action="/eve2/player/" method="post" >
+                    <label>{{playerName}}</label>
                     <input type="hidden" value={{playerID}} name="playerID">
                     <input type="submit" value="Use player" name="UsePlayer" class="inlineButton">
                     <input type="submit" value="Delete player" name="DeletePlayer" class="inlineButton">
+                    
                 </form>
             </td> 
             <td>{{shipName}}</td>

@@ -5,7 +5,7 @@ table td {padding: .25em;
     border-left-color: #fff;border-right-color: #fff;
 }
 th, td {border: 1px solid #000;padding: .5em;}
-td[Attributes Style] {background-color: rgb(255, 255, 255);}
+/* td[Attributes Style] {background-color: rgb(255, 255, 255); border: 1px solid #000;} */
 table {font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
     font-size: .93em;
     margin: 25px auto;width: 97%;
@@ -18,7 +18,7 @@ table {font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
 }
 td, th {display: table-cell;vertical-align: inherit;}
 a {outline: none;  text-decoration: none;  padding: 2px 1px 0;}
-a:link {  color: #blue; border-bottom: 1px solid;}
+a:link {  color: blue; border-bottom: 1px solid;}
 a:visited {  color: #437A16;}
 a:focus {  border-bottom: 1px solid;  background: gray;}
 a:hover {  border-bottom: 1px solid;       background: gray;}
@@ -113,7 +113,7 @@ ul li a {
 }
 
 .title{
-    font size: 16px;
+    font-size: 16px;
     padding: 10px 10px;
 }
 
@@ -159,5 +159,18 @@ label:after { content: ":"; }
 }
 
 .inlineButton{
-    display:inline;
+    display : inline;
+}
+
+.playerTable{
+    padding:40px;
+    background-color:lightblue;
+    border: 1px solid black;
+}
+.playerTableTH{
+    width:100px
+}
+.playerTable td{
+    width: 25%;
+    border: 2px inset;
 }
