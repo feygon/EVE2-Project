@@ -60,19 +60,40 @@
                                         {{structureName}}
                                         {{/if}}
                                     </td>
-                                    <td><!-- Volume -->
-                                        
+                                    <td id="target-{{objectID}}"><!-- Volume -->
+                                        {{#compare packaged 1 operator="=="}}
+                                            <script>
+                                                document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_packed}} * {{quantity}};
+                                            </script>
+                                        {{else}}
+                                            <script>
+                                                document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_unpacked}} * {{quantity}};
+                                            </script>
+                                        {{/compare}}
                                     </td>
                                     <td><!-- Type/Scale -->
-
+                                        {{#if CSid}}
+                                            {{type}}: {{scale}}
+                                        {{else}}
+                                            {{type}}
+                                        {{/if}}
                                     </td>
                                     <td><!-- Quantity -->
-
+                                        {{quantity}}
                                     </td>
                                     <td><!-- Packaged -->
-
+                                        {{#compare packaged 1}}
+                                        True
+                                        {{else}}
+                                        False
+                                        {{/compare}}
                                     </td>
                                     <td><!-- Operations-->
+
+                                        <form id="choose-item" action="/eve2/out_in_space/" method="post">
+                                            <input type="hidden" value={{objectID}} name="objectIDtoJettison">
+                                            <input class="operationsButton" type="submit" value="Jettison" name="jettison">
+                                        </form>
 
                                     </td>
                                 </tr>
@@ -87,16 +108,7 @@
 </table>
 
 <!-- may replace this later with jettison functionality. -->
-<form id="choose-item" action="/eve2/out_in_space/" method="post">
-    <label>Item:</label> <select name="objectID"> 
-        <option>None</option>
-        {{#each item}}
-        <option value="{{id}}">{{name}}</option>
-        {{/each}}
-    </select><br>
-<label></label>
-<input type="submit" value="Jettison" name="jettison">
-</form>
+
 <br>
 
 <form id="choose-station" action="/eve2/out_in_space/" method="post">
