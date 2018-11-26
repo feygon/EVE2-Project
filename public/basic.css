@@ -203,19 +203,23 @@ label:after { content: ":"; }
 .sidebarForm select{
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     padding: 5px;
-    border: 1px solid black;
+    border: 1px solid lightblue;
     border-radius: 5px;
     margin-left: 5px;
     margin-right: 5px;
-    color: coral;
+    /* color: coral; */
+    background-color: coral;
+    width: 90%;
 }
 
-.sidebarForm button{
+.sidebarForm input{
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
+    border: 1px solid lightblue;
+    border-radius: 4px;
     margin-left: 5px;
     margin-right: 5px;
-    color: coral;
+    background-color: coral;
+    width: 75%;
+
 }
