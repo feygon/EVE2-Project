@@ -199,9 +199,10 @@ module.exports = (function() {
             context, req.session);
         var mysql = req.app.get('mysql');
         var renderString = 'space_station';
-        let progress = new HandlerProgress_Get(renderString, 1, ready, 0, null);
+        let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
 
         callbacks.select.all_players(res, mysql, context, progress);
+        callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Station", progress);
 
         function ready() {
             progress.render(res, context); 

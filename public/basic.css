@@ -40,7 +40,12 @@ h3 {font-size: 15px;}
     display: block;
 }
 #bg-shadow {width: 100%;background: url(/inc/banner-shadow.png) center 157px no-repeat;z-index: 100;background-position: center 139px;}
-#top-hat div.wrapper4 {width: 974px; text-align: center}
+#top-hat div.wrapper4 {
+    margin-left:120px;
+    width: 974px;
+    text-align: center;
+    border-left:lightblue 1px dashed;
+}
 
 
 #doc, #doc2, #doc3, #doc4, .yui-t1, .yui-t2, .yui-t3, .yui-t4, .yui-t5, .yui-t6, .yui-t7 {
@@ -56,12 +61,13 @@ h3 {font-size: 15px;}
     left: 0;
     background-color: #111; /* Black */
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px;
+    padding-top: 5px;
+    
 }
 
 /* The navigation menu links */
 #sidebar a {
-    padding: 6px 8px 6px 16px;
+    padding: 9px 8px 6px 16px;
     text-decoration: none;
     font-size: 12px;
     color: #818181;
@@ -237,6 +243,7 @@ label:after { content: ":"; }
 }
 
 .sidebarFormDiv{
+    margin-top: 2px;
     padding-bottom: 10px;
     padding-top: 5px;
     border-bottom: lightblue double 2px;
@@ -247,6 +254,8 @@ label:after { content: ":"; }
     color: White;
     text-align:center;
     padding-bottom: 10px;
+    padding-top: 5px;
+    margin-bottom: 10px;
 }
 
 .cargoSpaceRow{
@@ -268,10 +277,52 @@ label:after { content: ":"; }
     margin-left: 5px;
     margin-right: 5px;
     background-color: red;
-    width: 75%;
+    width: auto;
+    min-width:80px;
 }
 .operationsButton:hover{
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
     border: 2px double black;
     padding:4px;
+}
+.ShipView, .StationView{
+    border:2px black inset;
+    background-color: lightblue;
+}
+
+.auxiliaryFunctions{
+    display:inline-block;
+    padding: 20px;
+    border: inset 3px coral;
+}
+.operationsForm{
+    min-width:80px;
+    max-width:100%;
+    display:inline-block;
+    vertical-align: middle;
+}
+.operationsForm input{
+    background-color: coral;
+}
+
+.operationsForm select{
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    padding: 5px;
+    border: 1px solid lightblue;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    /* color: coral; */
+    background-color: coral;
+    width: 90%;
+}
+#unpackageButton{
+    background-color: coral;
+}
+#badButton{
+    background-color: red;
+}
+#badButton:hover{
+    background-color: darkred;
+    
 }
