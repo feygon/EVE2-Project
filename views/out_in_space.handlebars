@@ -138,6 +138,20 @@
 <input type="submit" value="Dock" name="dock"><br>
 </form>
 </div>
+
+<div class="sidebarFormDiv">
+
+<form class="sidebarForm" id="choose-location" action="/eve2/out_in_space/" method="post">
+    <label>Location</label> <select name="locationID"> 
+        <option>None</option>
+        {{#each linked_locations}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+<input type="submit" value="Travel" name="moveLocation">
+</form>
+</div>
+
 </div>
 
 </html>
