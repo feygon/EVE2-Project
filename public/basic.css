@@ -217,11 +217,11 @@ label:after { content: ":"; }
     padding: 5px;
     border: 1px solid lightblue;
     border-radius: 4px;
+    margin-top: 4px;
     margin-left: 5px;
     margin-right: 5px;
     background-color: coral;
     width: 75%;
-
 }
 
 #sidebar form label{
@@ -234,4 +234,11 @@ label:after { content: ":"; }
     text-indent: 25px;
     width: 600px;
     text-align: justify;
+}
+
+.sidebarFormDiv{
+    padding-bottom: 10px;
+    padding-top: 5px;
+    border-bottom: white double 2px;
+    border-top: white solid 1px;
 }

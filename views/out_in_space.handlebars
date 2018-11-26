@@ -11,23 +11,16 @@
         <th class="ShipViewData">{{session.shipName}}</th>
     </thead>
     <tbody>
-        <tr>
+        <tr class="top" style="border: 2px black double;">
             <td>Ship Location:</td>
             <td>{{session.locationName}} System, Security Status: Unknown</td>
-        </tr>
-        <tr>
-            <td>Move along.</td>
-            <td>
-                Nothing to see here.
 {{!-- Need context to contain selection of ship contents and capacity data. --}}
             {{!-- {{#each cargoSpaceList}} --}}
                 {{!-- {{#if CSid == session.shipID}} --}}
                 {{!-- <td>Ship Capacity: {{capacity}}</td> --}}
                 {{!-- {{/if}} --}}
             {{!-- {{/each}} --}}
-            </td>
-        </tr>
-        <tr>
+        <tr style="border-top:2px black double">
             <td>Ship Contents:</td>
             <td>
                 <table>
@@ -87,7 +80,7 @@
 <br>
 
 <form id="choose-station" action="/eve2/out_in_space/" method="post">
- <label>Station:</label> <select name="stationCSid"> 
+ <label>Station</label> <select name="stationCSid"> 
         <option>None</option>
         {{#each stations_in_space}}
         <option value="{{stationID}}">{{stationName}}</option>
@@ -134,16 +127,17 @@
 </div> <!-- end page -->
 
 <div id="sidebar">
-
+<div class="sidebarFormDiv">
 <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
- <label>Station:</label> <select name="stationCSid"> 
+ <label>Dock at Station</label> <select name="stationCSid"> 
         <option>None</option>
         {{#each stations_in_space}}
         <option value="{{stationID}}">{{stationName}}</option>
         {{/each}}
     </select><br>
-<label></label><input type="submit" value="Dock" name="dock"><br>
+<input type="submit" value="Dock" name="dock"><br>
 </form>
+</div>
 </div>
 
 </html>
