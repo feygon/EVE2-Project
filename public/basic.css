@@ -224,7 +224,7 @@ label:after { content: ":"; }
     width: 75%;
 }
 
-#sidebar form label{
+#sidebar label{
     color: lightblue;
     text-align: left;
 }
@@ -239,6 +239,23 @@ label:after { content: ":"; }
 .sidebarFormDiv{
     padding-bottom: 10px;
     padding-top: 5px;
-    border-bottom: white double 2px;
-    border-top: white solid 1px;
+    border-bottom: lightblue double 2px;
+    border-top: lightblue solid 1px;
+}
+
+#sidebar h3{
+    color: White;
+    text-align:center;
+    padding-bottom: 10px;
+}
+
+.cargoSpaceRow{
+    width: auto;
+}
+
+.cargoSpaceRow .CSR-labelColumn{
+    text-align:left;
+}
+.cargoSpaceRow .CSR-label{
+    text-align: center;
 }

@@ -20,49 +20,69 @@
                 {{!-- <td>Ship Capacity: {{capacity}}</td> --}}
                 {{!-- {{/if}} --}}
             {{!-- {{/each}} --}}
-        <tr style="border-top:2px black double">
-            <td>Ship Contents:</td>
-            <td>
-                <table>
-                    <thead>
-                        <th>
-                            <label>Object</label>
-                        </th>
-                        <th>
-                            <label>Volume</label>
-                        </th>
-                        <th>
-                            <label>Type</label>
-                        </th>
-                        <th>
-                            <label>Quantity</label>
-                        </th>
-                        <th>
-                            <label>Packaged</label>
-                        </th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                ...string...
-                            </td>
-                            <td>
-                                ...float 20,2...
-                            </td>
-                            <td>
-                                ...string...
-                            </td>
-                            <td>
-                                ...int...
-                            </td>
-                            <td>
-                                ...bool...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
+        {{#each this.onboardCargoSpaces}}
+        {{!-- put a table in the 2nd cell of the 1st row of each cargo space. --}} 
+            <tr class="cargoSpaceRow">
+                <td class="CSR-labelColumn">
+                    <div><label>{{scale}}: {{name}}</label></div>
+                    <label class="CSR-label">Contents</label>
+                </td>
+                <td class="CSR-table-cell">
+                    <table class="CSR-table">
+                        <thead>
+                            <th>
+                                <label>Object Name</label>
+                            </th>
+                            <th>
+                                <label>Volume</label>
+                            </th>
+                            <th>
+                                <label>Type/Scale</label>
+                            </th>
+                            <th>
+                                <label>Quantity</label>
+                            </th>
+                            <th>
+                                <label>Packaged</label>
+                            </th>
+                            <th>
+                                <label>Operations</label>
+                            </th>
+                        </thead>
+                        <tbody>
+                            {{#each ../onboardObjects}}
+                                {{#compare inside_CSid ../CSid}}
+                                <tr>
+                                    <td><!-- object Name -->
+                                        {{#if CSName}}
+                                        {{CSName}}
+                                        {{else}}
+                                        {{structureName}}
+                                        {{/if}}
+                                    </td>
+                                    <td><!-- Volume -->
+                                        
+                                    </td>
+                                    <td><!-- Type/Scale -->
+
+                                    </td>
+                                    <td><!-- Quantity -->
+
+                                    </td>
+                                    <td><!-- Packaged -->
+
+                                    </td>
+                                    <td><!-- Operations-->
+
+                                    </td>
+                                </tr>
+                                {{/compare}}
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {{/each}}{{!-- end onboardCargoSpaces --}}
     </tbody>
 </table>
 
@@ -127,17 +147,21 @@
 </div> <!-- end page -->
 
 <div id="sidebar">
-<div class="sidebarFormDiv">
-<form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
- <label>Dock at Station</label> <select name="stationCSid"> 
-        <option>None</option>
-        {{#each stations_in_space}}
-        <option value="{{stationID}}">{{stationName}}</option>
-        {{/each}}
-    </select><br>
-<input type="submit" value="Dock" name="dock"><br>
-</form>
-</div>
+    <div>
+    <h3>{{session.locationName}}</h3>
+    </div>
+
+    <div class="sidebarFormDiv">
+        <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
+        <label>Dock at Station</label> <select name="stationCSid"> 
+                <option>None</option>
+                {{#each stations_in_space}}
+                <option value="{{stationID}}">{{stationName}}</option>
+                {{/each}}
+            </select><br>
+        <input type="submit" value="Dock" name="dock"><br>
+        </form>
+    </div>
 </div>
 
 </html>

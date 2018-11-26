@@ -2,7 +2,7 @@ var express=require('express');
 var mysql = require('./dbcon.js');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var helpers = require('./views/helpers/comparison');
+var helpers = require('./views/helpers/helpers');
 var partials = require('./views/partials/partials')
 
 var app = express();
