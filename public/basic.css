@@ -223,3 +223,14 @@ label:after { content: ":"; }
     width: 75%;
 
 }
+#sidebar form label{
+    color: lightblue;
+    text-align: left;
+}
+
+.instructions{
+    text-align: left;
+    text-indent: 25px;
+    width: 600px;
+    text-align: justify;
+}
