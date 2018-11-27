@@ -203,7 +203,22 @@
 <div id="sidebar">
 
 <a href="/eve2/industry/">Industry</a><br>
+
 <a href="/eve2/out_in_space/undock">undock</a><br>
+
+<form class="sidebarForm" id="choose-ship" action="/eve2/space_station/" method="post">
+    <label>Change <br>Piloting ship</label>
+    <select name="changeToShipID"> 
+        <option>None</option>
+        {{#each onboardCargoSpaces}}
+        {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
+        <option value="{{id}}">{{name}}</option>
+        {{/compare2customString}}
+        {{/each}}
+    </select>
+    
+    <input type="submit" name="changeShip" value='Change'><br>
+</form><br>
 </div>
 
 </html>
