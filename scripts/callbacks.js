@@ -384,7 +384,7 @@ function out_in_space(req, tag, sql, inserts, complete) {
 		sql.post = queries.update.set_location +
 		"; " + queries.update.set_location_selection +
 		"(SELECT CSid FROM(" + queries.select.cargoSpaceIDs_in_CargoSpace +
-		") );";
+		") as subQ );";
 		// double check session names when set up boilerplate session callback.
 		inserts.post = [req.body.locationID, req.session.shipID, 
 						req.body.locationID, req.session.shipID];

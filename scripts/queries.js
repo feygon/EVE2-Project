@@ -118,8 +118,8 @@ queries.select.objects_in_CSnumqlist = "SELECT "
 queries.select.cargoSpaceIDs_in_CargoSpace = "SELECT "
        + "innerCS.id AS CSid "
     + "FROM EVE2_CargoSpace as outerCS "
-    + "INNER JOIN EVE2_CargoSpace as innerCS ON obj.id = innerCS.object_id "
     + "INNER JOIN EVE2_Objects as obj ON obj.cargoSpace_id = outerCS.id "
+    + "INNER JOIN EVE2_CargoSpace as innerCS ON obj.id = innerCS.object_id "
         + "AND outerCS.id = ? ";
 
 queries.select.all_players = "SELECT "
@@ -266,7 +266,7 @@ queries.update.set_piloting = "UPDATE EVE2_Players SET piloting_CS_id = ? "
 queries.update.set_location = "UPDATE EVE2_CargoSpace SET EVE2_CargoSpace.location_id = ? "
     + "WHERE id = ?";
 queries.update.set_location_selection = "UPDATE EVE2_CargoSpace "
-    + "SET EVE2_CargoSpace.location_id = ? WHERE  CSid in "/****/; // concat with selection
+    + "SET EVE2_CargoSpace.location_id = ? WHERE  id in "/****/; // concat with selection
 
 queries.delete.del_player = "DELETE FROM EVE2_Players WHERE id = ?";
 queries.delete.del_object = "DELETE FROM EVE2_Objects WHERE id = ?";
