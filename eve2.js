@@ -270,14 +270,19 @@ module.exports = (function() {
                         if (req.session.shipNest) {
                             console.log("Ship has docked. Redirecting post to get space station view.");
                             res.redirect('/eve2/space_station/');
-                        } else {
-                            console.log("Ship still in space. Redirecting post to get out in space view.");
-                            res.redirect('/eve2/out_in_space/');
+                        } else if (req.body['moveLocation']){
+                            callbacks.session.setSession(req, res, req.session.playerID, mysql, done);
+                        } else { 
+                            done();
                         }
                     }
                 }); // end sql query anonymous error logging function
             } // end callbackCount check
         } // end complete
+        function done() {
+            console.log("Ship still in space. Redirecting post to get out in space view.");
+            res.redirect('/eve2/out_in_space/');
+        }
     });
 
     router.post('/industry/', function(req,res) {

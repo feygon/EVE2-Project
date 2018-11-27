@@ -51,6 +51,7 @@ function copySessionToContext(context, obj) {
 	return context;
 };
 
+// must be called with non-object-property callback function for complete.
 callbacks.session.setSession =
 function setSession(req, res, playerID, mysql, complete) {
 	var cbName = "callbacks.session.setSession";
@@ -374,11 +375,13 @@ function out_in_space(req, tag, sql, inserts, complete) {
 		inserts.post = [req.session.locationID, req.body.wormhole_id, // here, there,
 						req.body.wormhole_id, req.session.locationID];// there, here.
 		tag.post = 'Annihilate';
+		done();
 	}
 	if (req.body['jettison']) {
 		sql.post = queries.delete.del_object;
 		inserts = [req.body.objectID];
 		tag.post = 'Jettison';
+		done();
 	}
 	if (req.body['moveLocation']) {
 		sql.post = queries.update.set_location +
@@ -389,19 +392,24 @@ function out_in_space(req, tag, sql, inserts, complete) {
 		inserts.post = [req.body.locationID, req.session.shipID, 
 						req.body.locationID, req.session.shipID];
 		tag.post = 'Travel';
+		done();
 	}
 	if (req.body['chartWormhole']) {
 		sql.post = queries.insert.insert_location;
 		inserts.post = [req.session.locationID, req.body.name, req.body.Security];
 		tag.post = 'chartWormhole';
+		done();
 	}
 	if (req.body['dock']) {
 		sql.post = queries.procedure_call.docking;
 		inserts.post = [req.session.shipID, req.body.stationCSid];
 		req.session.shipNest = req.body.stationCSid;
 		tag.post = 'Dock';
+		done();
 	}
-	complete(cbName);
+	function done(){
+		complete(cbName);
+	}
 };
 
 
