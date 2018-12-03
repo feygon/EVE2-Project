@@ -17,20 +17,6 @@
 <h2 style="color: red; font-size:80px;">Please don't click anything below here.<br> You will make the puppies cry.</h2>
 <p style="color:red">Also, your classmates will not be able to test this site after you crash the node.</p><br>
 
-<form id="choose-ship" action="/eve2/space_station/" method="post">
-    <label>Change Piloting ship:</label>
-    <select name="changeToShipID"> 
-        <option>None</option>
-        {{#each onboardCargoSpaces}}
-        {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
-        <option value="{{id}}">{{name}}</option>
-        {{/compare2customString}}
-        {{/each}}
-    </select>
-    <label></label>
-    <input type="submit" name="changeShip" value='Change'><br>
-</form><br>
-
 <br>
 <h3>Ships and Containers:</h3>
 

@@ -512,12 +512,6 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			inserts.post = [null];
 			str =  + "move object not yet implemented. Why is this being called?";
 		}
-		if(req.body['giveObjectToPlayer']) {
-			sql.post = "";
-			tag.post = "giveObjectToPlayer";
-			inserts.post = [""];
-			str = "give object not yet implemented. Why is this being called?";
-		}
 		if(req.body['deleteObject']) {
 			sql.post = "";
 			tag.post = "deleteObject";
