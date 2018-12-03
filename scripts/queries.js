@@ -300,6 +300,6 @@ queries.procedure_call.SP_getShipAndBoxes = "CALL SP_getShipAndBoxes(?)";
 queries.procedure_call.SP_getStationShipAndBoxes = "CALL SP_getStationShipAndBoxes(?)";
 queries.procedure_call.SP_getObjectsInCSView = "CALL SP_getObjectsInCSView(??)";
 queries.procedure_call.repackageObject = "CALL SP_repackageObject(?)";
-queries.procedure_call.unpackageObject = "CALL SP_unpackageObject(?)";
+queries.procedure_call.unpackageObject = "CALL SP_unpackageObject(?, ?)";
 // requiring this file will automatically make the var into this object, with the above sub-objects.
 module.exports = queries;

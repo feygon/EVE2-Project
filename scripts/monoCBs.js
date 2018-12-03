@@ -168,8 +168,6 @@ function getCargo_Deep(res, req, mysql, context, scale, complete, filterOption) 
         monoCBs.create_view_CS_aggregate(res, mysql, req.session.shipID, cbName, ready);
     }
 
-
-    if (filterOption)
     function ready(caller){
         readyCounter++;
         console.log(caller + " reports ready: " + readyCounter + " / " + total);

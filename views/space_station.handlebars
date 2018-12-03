@@ -127,47 +127,49 @@
                                             {{/compare}}
                                         </td>
                                         <td><!-- Operations-->
-                                            {{#compare CSid ../../../session.shipID}}
-                                            Cannot Repackage, move, or trash a piloted ship. You must first move to another ship and/or remove all contents.
-                                            {{else}}
-                                            {{#if CSid}}
-                                            <div class="operationsForm">
-                                                <form id="rename-CS" action="/eve2/space_station/" method="post">
-                                                    <input type="hidden" name="changeCSname_CSid">
-                                                    <input type="text" name="newCSname" value="(Rename this Cargo Space)"><br>
-                                                    <input class="operationsButton" type="submit" value="Submit" name="ChangeCSName">
-                                                </form>
-                                            </div>
-                                            {{/if}}
-                                            <div class="operationsForm">
-                                                <form id="packaging-item" action="/eve2/space_station/" method="post">
-                                                    <input type="hidden" value="{{objectID}}" name="packagingObjectID">
-                                                    {{#compare packaged 1}}
-                                                        <input class="operationsButton" type="submit" name="unpackageObject" value="Unpackage">
-                                                    {{else}}
-                                                        <input class="operationsButton" id="badButton" type="submit" name="repackageObject" value="Repackage">
-                                                    {{/compare}}
-                                                </form>
-                                            </div>
-                                            <div class="operationsForm">
-                                                <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
-                                                    <select name="CStoMoveObjectTo">
-                                                        {{#each ../../../onboardCargoSpaces}}
-                                                        <option value="{{CSid}}">{{name}}</option>
-                                                        {{/each}}
-                                                    </select>
-                                                    <input type="hidden" value={{objectID}} name="moveObjectID">
-                                                    <input class="operationsButton" type="submit" name="moveObject" value='Move'>
-                                                </form>
-                                            </div> <!-- end operationsForm moveObject -->
+{{!--  Depth Offset 41 --}}
+{{#compare CSid ../../../session.shipID}}
+    Cannot Repackage, move, or trash a piloted ship. You must first move to another ship and/or remove all contents.
+{{else}}
+    {{#if CSid}}
+        <div class="operationsForm">
+            <form id="rename-CS" action="/eve2/space_station/" method="post">
+                <input type="hidden" name="changeCSname_CSid" value={{CSid}}>
+                <input type="text" name="newCSname" value="(Rename this Cargo Space)"><br>
+                <input class="operationsButton" type="submit" value="Submit" name="ChangeCSName">
+            </form>
+        </div>
+    {{/if}}
+    <div class="operationsForm">
+        <form id="packaging-item" action="/eve2/space_station/" method="post">
+            <input type="hidden" value="{{objectID}}" name="packagingObjectID">
+            {{#compare packaged 1}}
+                <input class="operationsButton" type="submit" name="unpackageObject" value="Unpackage">
+            {{else}}
+                <input class="operationsButton" id="badButton" type="submit" name="repackageObject" value="Repackage">
+            {{/compare}}
+        </form>
+    </div>
+    <div class="operationsForm">
+        <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
+            <select name="CStoMoveObjectTo">
+                {{#each ../../../onboardCargoSpaces}}
+                <option value="{{CSid}}">{{name}}</option>
+                {{/each}}
+            </select>
+            <input type="hidden" value={{objectID}} name="moveObjectID">
+            <input class="operationsButton" type="submit" name="moveObject" value='Move'>
+        </form>
+    </div> <!-- end operationsForm moveObject -->
 
-                                            <div class="operationsForm">
-                                                <form id="choose-item" action="/eve2/space_station/" method="post">
-                                                    <input type="hidden" value={{objectID}} name="trashObjectID">
-                                                    <input class="operationsButton" id="badButton" type="submit" value="Trash" name="null">
-                                                </form>
-                                            {{/compare}}
-                                            </div><!-- end operationsForm null -->
+    <div class="operationsForm">
+        <form id="choose-item" action="/eve2/space_station/" method="post">
+            <input type="hidden" value={{objectID}} name="trashObjectID">
+            <input class="operationsButton" id="badButton" type="submit" value="Trash" name="null">
+        </form>
+    </div><!-- end operationsForm null -->
+{{/compare}}
+{{!--  End Depth Offset 41 --}}
                                         </td>
                                     </tr>
                                 {{/compare}}{{!-- end compare inside_CSid --}}

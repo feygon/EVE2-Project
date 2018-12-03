@@ -456,33 +456,39 @@ CREATE PROCEDURE SP_repackageObject(IN packagingObjectID int(20))
 BEGIN
     SET @nest = (SELECT EVE2_Objects.cargoSpace_id FROM EVE2_Objects
         WHERE id = packagingObjectID);
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_repackageObject: Good to here 1");
     UPDATE EVE2_Objects SET EVE2_Objects.cargoSpace_id = @nest
         WHERE EVE2_Objects.cargoSpace_id = packagingObjectID;
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_repackageObject: Good to here 2");
     DELETE FROM EVE2_CargoSpace WHERE object_id = packagingObjectID;
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_repackageObject: Good to here 3");
     UPDATE EVE2_Objects SET EVE2_Objects.packaged = 1
         WHERE id = packagingObjectID;
+        INSERT INTO EVE2_SP_debug (report) VALUES ("SP_repackageObject: Done");
 END //
 
 DROP PROCEDURE IF EXISTS SP_unpackageObject //
-CREATE PROCEDURE SP_unpackageObject(IN packagingObjectID int(20))
+CREATE PROCEDURE SP_unpackageObject(IN packagingObjectID int(20),
+                                    IN playerID int(20))
 BEGIN
     UPDATE EVE2_Objects SET EVE2_Objects.packaged = 0
         WHERE id = packagingObjectID;
-    SET @playerID = (SELECT player.id FROM EVE2.EVE2_Players as player
-        INNER JOIN EVE2_CargoSpace as CS ON player.id = CS.player_id
-            AND CS.object_id = packagingObjectID
-    );
-    SET @IUID = (SELECT IU.id FROM EVE2_ItemUse
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 1");
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 2");
+    SET @IUID = (SELECT IU.id FROM EVE2_ItemUse AS IU
         INNER JOIN EVE2_ItemStructure as IStr ON IU.itemStructure_id = IStr.id
-        INNER JOIN EVE2_Objects as Obj ON Istr.id = Obj.itemStructure_id
+        INNER JOIN EVE2_Objects as Obj ON IStr.id = Obj.itemStructure_id
             AND Obj.id = packagingObjectID
     );
-    SET @locID = (SELECT CS.loc FROM EVE2_CargoSpace as CS
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 3");
+    SET @locID = (SELECT CS.location_id FROM EVE2_CargoSpace as CS
         INNER JOIN EVE2_Objects as Obj on CS.id = Obj.cargoSpace_id
         AND Obj.id = packagingObjectID
     );
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 4");
     INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, object_id)
-        VALUES (@playerID, @IUID, @locID, packagingObjectID);
+        VALUES (playerID, @IUID, @locID, packagingObjectID);
+    INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Done");
 END //
 
 

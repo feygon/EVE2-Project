@@ -171,16 +171,10 @@ module.exports = (function() {
             context, req.session);
         let progress = new HandlerProgress_Get(renderString, 3, ready, 0, null);
 
-        console.log("\n---------This should only show up once.--------\n");
 	    /* callbacks go here. */
         callbacks.select.stations_in_space(res, req, mysql, context, progress);
         callbacks.select.linked_locations(res, req, mysql, context, progress);
-
-        console.log("code of callbacks.monolithic.getCargo_Deep reads: \n"
-            + callbacks.monolithic.getCargo_Deep.toString());
-
         callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Ship", progress);
-        console.log("\n---------This should ALSO ONLY show up once.--------\n");
 
         function ready() {
             console.log("Ready?");
@@ -196,16 +190,20 @@ module.exports = (function() {
         var context = {};
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
-        var mysql = req.app.get('mysql');
+        context.filter_by = req.params.by;
+            var mysql = req.app.get('mysql');
         var renderString = 'space_station';
         let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
 
         callbacks.select.all_players(res, mysql, context, progress);
-        context.filter_by = req.params.by;
         callbacks.monolithic.getCargo_Deep(
             res,req,mysql,context,"Station", progress, req.params.by);
 
         function ready() {
+            if (req.session.alertMsg) {
+                context.sessionAlert = req.session.alertMsg;
+                req.session.alertMsg = null;
+            }
             progress.render(res, context); 
         }
     });
@@ -222,6 +220,10 @@ module.exports = (function() {
         callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Station", progress);
 
         function ready() {
+            if (req.session.alertMsg) {
+                context.sessionAlert = req.session.alertMsg;
+                req.session.alertMsg = null;
+            }
             progress.render(res, context); 
         }
     });

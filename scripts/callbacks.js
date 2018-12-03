@@ -388,6 +388,7 @@ function out_in_space(req, tag, sql, inserts, complete) {
 		inserts.post = [req.body.locationID, req.session.shipID, 
 						req.body.locationID, req.session.shipID];
 		tag.post = 'Travel';
+		req.session.locationID = req.body.locationID;
 		done();
 	}
 	if (req.body['chartWormhole']) {
@@ -543,7 +544,7 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		} else if (req.body['unpackageObject']) {
 			sql.post = queries.procedure_call.unpackageObject;
 			tag.post = 'unpackageObject';
-			inserts.post = [req.body.packagingObjectID];
+			inserts.post = [req.body.packagingObjectID, req.session.playerID];
 			str = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
 			+ "You may also rename cargo spaces if you like.";
 			done();
@@ -553,7 +554,12 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			} else if (req.body['scaleFilter']) {
 				res.redirect('eve2/space_station/' + req.body.scaleFilter);
 			}
-		} else done();
+			// should capture all possibilities.
+		} else {
+			console.error("Fallthrough error in callbacks.post.space_station.");
+			console.log("Fallthrough error in callbacks.post.space_station.");
+			done();
+		}
 
 		function done(){
 			req.session.alertMsg = str;
