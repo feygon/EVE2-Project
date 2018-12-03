@@ -15,7 +15,7 @@
 <br/>
 
 <h2 style="color: red; font-size:80px;">Please don't click anything below here.<br> You will make the puppies cry.</h2>
-<p style="color:red">Also, your classmates will not be able to test this page after you when you crash the node.</p><br>
+<p style="color:red">Also, your classmates will not be able to test this site after you crash the node.</p><br>
 
 <form id="choose-ship" action="/eve2/space_station/" method="post">
     <label>Change Piloting ship:</label>
@@ -130,7 +130,7 @@
                                     </td>
                                     <td><!-- Operations-->
                                         {{#compare CSid ../../../session.shipID}}
-                                        Cannot Repackage, move, give away, or trash a piloted ship. You must first move to another ship and/or remove all contents.
+                                        Cannot Repackage, move, or trash a piloted ship. You must first move to another ship and/or remove all contents.
                                         {{else}}
                                         <div class="operationsForm">
                                             <form id="packaging-item" action="/eve2/space_station/" method="post">
@@ -145,7 +145,6 @@
                                         <div class="operationsForm">
                                             <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
                                                 <select name="CStoMoveObjectTo">
-                                                    <option>None</option>
                                                     {{#each ../../../onboardCargoSpaces}}
                                                     <option value="{{CSid}}">{{name}}</option>
                                                     {{/each}}
@@ -155,19 +154,6 @@
                                             </form>
                                         </div> <!-- end operationsForm moveObject -->
                                         <div class="operationsForm">
-                                            <form id="give-item" action="eve2/space_station" method="post">
-                                                <input type="hidden" value={{objectID}} name="giveObjectID">
-                                                <select name="playerToGiveObjectTo">
-                                                    <option>None</option>
-                                                    {{#each ../../../all_players}}
-                                                    <option value="{{playerID}}">{{playerName}}</option>
-                                                    {{/each}}
-                                                </select>
-                                                <input class="operationsButton" type="submit" name="giveObjectToPlayer" value="Give">
-                                            </form>
-                                        </div>
-                                        <div class="operationsForm">
-
                                             <form id="choose-item" action="/eve2/space_station/" method="post">
                                                 <input type="hidden" value={{objectID}} name="trashObjectID">
                                                 <input class="operationsButton" id="badButton" type="submit" value="Trash" name="null">
@@ -209,11 +195,10 @@
 <form class="sidebarForm" id="choose-ship" action="/eve2/space_station/" method="post">
     <label>Change <br>Piloting ship</label>
     <select name="changeToShipID"> 
-        <option>None</option>
         {{#each onboardCargoSpaces}}
-        {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
-        <option value="{{id}}">{{name}}</option>
-        {{/compare2customString}}
+            {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
+            <option value="{{id}}">{{name}}</option>
+            {{/compare2customString}}
         {{/each}}
     </select>
     

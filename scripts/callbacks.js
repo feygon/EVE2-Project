@@ -1,5 +1,3 @@
-
-
 var callbacks = {};
 callbacks.select = {};
 callbacks.post = {};
@@ -207,7 +205,6 @@ function useless_item_structures(res, mysql, context, complete) {
 	});
 };
 
-
 callbacks.select._session_player = 
 function session_player(res, mysql, subcontext, subcomplete) {
 	var cbName = "callbacks.select.session_player";
@@ -232,7 +229,6 @@ function session_player(res, mysql, subcontext, subcomplete) {
 		subcomplete();
 	});
 };
-
 
 callbacks.select.ship_in_space = 
 function ship_in_space(res, req, mysql, context, complete) {
@@ -555,6 +551,8 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		var cbName = "callbacks.procedure_call.undockShip";
 		var sql = queries.procedure_call.undockShip;
 		var inserts = [req.session.shipID];
+		req.session.shipNest = null;
+		req.session.stationName = null;
 
 		mysql.pool.query(sql, inserts, function(error, results, fields) {
 			if(error) {

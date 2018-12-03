@@ -74,7 +74,7 @@ exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
     }
 };
 
-exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, customString, options) {
+exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, operator_2ndSet, options) {
 
     if (arguments.length < 5){
         throw new Error("Handlebars Helper dual 'comparison' needs 4 parameters");
@@ -100,7 +100,7 @@ exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, cust
     // arrayed inputs must always use the same comparison operator.
     var result1 = operators[operator](lvalue1, rvalue1);
 
-    var result2 = result1 && (operators[customString](lvalue2, rvalue2));
+    var result2 = result1 && (operators[operator_2ndSet](lvalue2, rvalue2));
 
     if(result2) {
         return options.fn(this);

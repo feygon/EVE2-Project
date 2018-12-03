@@ -22,7 +22,8 @@
         <label>Wormhole Name:</label> <input type="text" name="name" value="Name"><br>
         <label>Wormhole Security Status:</label> 
         <input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
-
+{{!-- Check entry against existing before attempting to create.
+      Currently no limit on exits to/from systems. --}}
         <label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label>
         <input type="submit" value="Chart" name="chartWormhole">
     </form>
@@ -31,7 +32,8 @@
     <h3>Annihilate A Wormhole</h3>
     <form id="annihilate-wormhole" action="/eve2/out_in_space/" method="post">
         <label>Wormhole to:</label> <select name="wormhole_id">
-            <option>None></option>
+{{!-- Currently, people can annihilate the last wormhole out of a system. --}}
+{{!-- So this needs to be greyed out if there's only 1 exit. --}}
             {{#each linked_locations}}
             <option value="{{id}}">{{name}}</option>
             {{/each}}
@@ -148,7 +150,7 @@
 <div class="sidebarFormDiv">
     <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
     <label>Dock at Station</label> <select name="stationCSid"> 
-            <option>None</option>
+{{!--  --}}
             {{#each stations_in_space}}
             <option value="{{stationID}}">{{stationName}}</option>
             {{/each}}
@@ -161,7 +163,7 @@
 
     <form class="sidebarForm" id="choose-location" action="/eve2/out_in_space/" method="post">
         <label>Location</label> <select name="locationID"> 
-            <option>None</option>
+{{!-- There'll always be linked locations. No need for count-0-fading. --}}
             {{#each linked_locations}}
             <option value="{{id}}">{{name}}</option>
             {{/each}}
