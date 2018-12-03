@@ -261,13 +261,14 @@ queries.insert.insert_unpack_object = "INSERT INTO EVE2_CargoSpace "
     + " (player_id, itemUse_id, location_id, object_id)  VALUES "
     + " (?, ?, ?, ?) ";
     
-queries.update.set_object_id = "UPDATE EVE2_CargoSpace SET object_id = ? WHERE id = ?";
-queries.update.set_object_id_of_selection = "UPDATE EVE2_CargoSpace SET object_id = ? "
-    + " WHERE id IN "; // ...concat w/ selection: 
-queries.update.set_piloting = "UPDATE EVE2_Players SET piloting_CS_id = ? "
-    + " WHERE id = ?"; // ...concat w/ selection: 
-queries.update.set_location = "UPDATE EVE2_CargoSpace SET EVE2_CargoSpace.location_id = ? "
-    + " WHERE id = ?";
+queries.update.set_object_id = "UPDATE EVE2_CargoSpace "
+    + " SET object_id = ? WHERE id = ?";
+queries.update.set_object_id_of_selection = "UPDATE EVE2_CargoSpace "
+    + " SET object_id = ? WHERE id IN "; // ...concat w/ selection: 
+queries.update.set_piloting = "UPDATE EVE2_Players "
+    + "SET piloting_CS_id = ? WHERE id = ?";
+queries.update.set_location = "UPDATE EVE2_CargoSpace "
+    + " SET EVE2_CargoSpace.location_id = ? WHERE id = ?";
 queries.update.set_location_selection = "UPDATE EVE2_CargoSpace "
     + " SET EVE2_CargoSpace.location_id = ? WHERE  id in "/****/; // concat with selection
 queries.update.change_CS_name = "UPDATE EVE2_CargoSpace "

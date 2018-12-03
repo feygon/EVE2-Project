@@ -498,22 +498,41 @@ callbacks.post.industry = function industry(req,tag,sql,inserts) {
 }
 
 callbacks.post.space_station = 
-function(res, req, tag, sql, inserts, complete) {
-	var place = "";
+function(res, req, mysql, tag, sql, inserts, complete) {
+	var alertMsg = "";
 	req.session.alertMsg = "";
 	if(req.body['changeShip']) {
+		var count = 0;
 		sql.post = queries.update.set_piloting;
 		tag.post = "changeShip";
-		inserts.post = [req.body.changeToShipID, req.body.playerID];
-		place = "Changed ship. Session change complete.";
-		req.session.shipID = req.body.changeToShipID;
-		done();
+		inserts = [req.body.changeToShipID, req.body.playerID];
+		alertMsg = "Changed ship. Session change complete.";
+
+		mysql.pool.query(sql, inserts, function(error, results, fields) {
+			if(error) {
+				res.write("callbacks.post.space_station returns: " 
+					+ JSON.stringify(error));
+				res.end();
+			}
+			notDone();
+		});
+
+		function notDone(){
+			count++;
+			if (count == 1) {
+				callbacks.session.setSession(
+					req, res, req.body.playerID, mysql, notDone);
+			}
+			if (count == 2) { 
+				done(); 
+			}
+		}
 	} else if (req.body['ChangeStationName']) {
 		sql.post = queries.update.change_CS_name;
 		tag.post = "moveObject";
 		inserts.post = [req.body.newStationName, req.session.stationCSid];
 		req.session.stationName = req.body.newStationName;
-		place =  + "Station name changed. Spiffy!";
+		alertMsg = "Station name changed. Spiffy!";
 		done();
 	} else if (req.body['ChangeCSName']) {
 		sql.post = queries.update.change_CS_name;
@@ -522,32 +541,32 @@ function(res, req, tag, sql, inserts, complete) {
 		if (req.session.shipID == req.body.changeCSname_CSid) {
 			req.session.shipName = req.body.newCSname;
 		}
-		place =  + "Cargo space name changed. Spiffy!";
+		alertMsg = "Cargo space name changed. Spiffy!";
 		done();
 	} else if (req.body['moveObject']) {
 		sql.post = queries.update.moveObject;
 		tag.post = "moveObject";
 		inserts.post = [req.body.CStoMoveObjectTo, req.body.moveObjectID];
-		place =  + "Moved an object into a different cargo space! Watch out!";
+		alertMsg = "Moved an object into a different cargo space! Watch out!";
 		done();
 		// Currently no constraints in place to keep volume from exceeding capacity.
 	} else if (req.body['deleteObject']) {
 		sql.post = queries.delete.del_object;
 		tag.post = "deleteObject";
 		inserts.post = [req.body.trashObjectID];
-		place = "Trashed an object. How tragic...";
+		alertMsg = "Trashed an object. How tragic...";
 		done();
 	} else if (req.body['repackageObject']) {
 		sql.post = queries.procedure_call.repackageObject;
 		tag.post = "repackageObject";
 		inserts.post = [req.body.packagingObjectID];
-		place = "Repackaged an object.\nIf it was a cargo space, anything still inside is now all over the floor.";
+		alertMsg = "Repackaged an object.\nIf it was a cargo space, anything still inside is now all over the floor.";
 		done();
 	} else if (req.body['unpackageObject']) {
 		sql.post = queries.procedure_call.unpackageObject;
 		tag.post = 'unpackageObject';
 		inserts.post = [req.body.packagingObjectID, req.session.playerID];
-		place = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
+		alertMsg = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
 		+ "You may also rename cargo spaces if you like.";
 		done();
 	} else if (req.body['select_type_filter']) {
@@ -566,7 +585,7 @@ function(res, req, tag, sql, inserts, complete) {
 	}
 
 	function done(){
-		req.session.alertMsg = place;
+		req.session.alertMsg = alertMsg;
 		complete();
 	}
 };
