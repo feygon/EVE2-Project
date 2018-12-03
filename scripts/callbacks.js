@@ -494,9 +494,8 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		req.session.alertMsg = str;
 	}
 
-
 	callbacks.post.space_station = 
-	function(req, tag, sql, inserts) {
+	function(req, tag, sql, inserts, complete) {
 		var str = "";
 		req.session.alertMsg = "";
 		if(req.body['changeShip']) {
@@ -504,39 +503,63 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 			tag.post = "changeShip";
 			inserts.post = [req.body.changeToShipID];
 			str = "Changed ship. Session change complete.";
-			req.session.shipID = req.body.changeToShipID
-		}
-		if(req.body['moveObject']) {
-			sql.post = "SELECT 1";
+			req.session.shipID = req.body.changeToShipID;
+			done();
+		} else if (req.body['ChangeStationName']) {
+			sql.post = queries.update.change_CS_name;
 			tag.post = "moveObject";
-			inserts.post = [null];
-			str =  + "move object not yet implemented. Why is this being called?";
-		}
-		if(req.body['deleteObject']) {
-			sql.post = "";
+			inserts.post = [req.body.newStationName, req.session.stationCSid];
+			req.session.stationName = req.body.newStationName;
+			str =  + "Station name changed. Spiffy!";
+			done();
+		} else if (req.body['ChangeCSName']) {
+			sql.post = queries.update.change_CS_name;
+			tag.post = "ChangeCSName";
+			inserts.post = [req.body.newCSname, req.body.changeCSname_CSid];
+			if (req.session.shipID == req.body.changeCSname_CSid) {
+				req.session.shipName = req.body.newCSname;
+			}
+			str =  + "Cargo space name changed. Spiffy!";
+			done();
+		} else if (req.body['moveObject']) {
+			sql.post = queries.update.moveObject;
+			tag.post = "moveObject";
+			inserts.post = [req.body.CStoMoveObjectTo, req.body.moveObjectID];
+			str =  + "Moved an object into a different cargo space! Watch out!";
+			done();
+			// Currently no constraints in place to keep volume from exceeding capacity.
+		} else if (req.body['deleteObject']) {
+			sql.post = queries.delete.del_object;
 			tag.post = "deleteObject";
-			inserts.post = [""];
-			str = "delete object not yet implemented. Why is this being called?";
-		}
-		if(req.body['repackageObject']) {
-			sql.post = "";
+			inserts.post = [req.body.trashObjectID];
+			str = "Trashed an object. How tragic...";
+			done();
+		} else if (req.body['repackageObject']) {
+			sql.post = queries.procedure_call.repackageObject;
 			tag.post = "repackageObject";
-			inserts.post = [""];
-			str = "repackage object not yet implemented. Why is this being called?";
+			inserts.post = [req.body.packagingObjectID];
+			str = "Repackaged an object.\nIf it was a cargo space, anything still inside is now all over the floor.";
+			done();
+		} else if (req.body['unpackageObject']) {
+			sql.post = queries.procedure_call.unpackageObject;
+			tag.post = 'unpackageObject';
+			inserts.post = [req.body.packagingObjectID];
+			str = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
+			+ "You may also rename cargo spaces if you like.";
+			done();
+		} else if (req.body.select_filter){
+			if (req.body['typeFilter']) {
+				res.redirect('eve2/space_station/' + req.body.typeFilter);
+			} else if (req.body['scaleFilter']) {
+				res.redirect('eve2/space_station/' + req.body.scaleFilter);
+			}
+		} else done();
+
+		function done(){
+			req.session.alertMsg = str;
+			complete();
 		}
-		if(req.body['select_typeFilter']) {
-			sql.post = "";
-			tag.post = "select_typeFilter";
-			inserts.post = [""];
-			str = "filter object not yet implemented. Why is this being called?";
-		}
-		if(req.body['select_scaleFilter']) {
-			sql.post = "";
-			tag.post = "select_scaleFilter";
-			inserts.post = [""];
-			str = "move cargo space not yet implemented. Why is this being called?";
-		}
-		req.session.alertMsg = str;
+
 	}
 
 

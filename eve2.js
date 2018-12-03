@@ -192,6 +192,23 @@ module.exports = (function() {
         }
     });
 
+    router.get('/space_station/:by', function(req, res) {
+        var context = {};
+        context = callbacks.pre.session.copySessionObjToContext(
+            context, req.session);
+        var mysql = req.app.get('mysql');
+        var renderString = 'space_station';
+        let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
+
+        callbacks.select.all_players(res, mysql, context, progress);
+        context.filter_by = req.params.by;
+        callbacks.monolithic.getCargo_Deep(
+            res,req,mysql,context,"Station", progress, req.params.by);
+
+        function ready() {
+            progress.render(res, context); 
+        }
+    });
 
     router.get('/space_station/', function(req, res) {
         var context = {};
@@ -208,6 +225,7 @@ module.exports = (function() {
             progress.render(res, context); 
         }
     });
+
 
     router.get('/industry/', function(req, res) {
         var callerName = "industry";
@@ -261,7 +279,7 @@ module.exports = (function() {
                 console.log("querying: " + sql.post 
                 + "with tag " + JSON.stringify(tag) 
                 + " and inserts" + JSON.stringify(inserts.post));
-                sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields){
+                mysql.pool.query(sql.post, inserts.post, function(error, results, fields){
                     if(error){
                         res.write("out_in_space(" + JSON.stringify(tag) + ") post router tag says: " 
                             + JSON.stringify(error));
@@ -292,7 +310,7 @@ module.exports = (function() {
         var tag = {};
         callbacks.post.industry(req, tag, sql, inserts);
 
-        sql = mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
+        mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
             if(error){
                 res.write(tag.post + "-tagged industry post says: "
                     + JSON.stringify(error));
@@ -301,6 +319,27 @@ module.exports = (function() {
                 res.redirect('/eve2/industry');
             }
         });
+    });
+
+    router.post('/space_station/', function(req,res) {
+        var mysql = req.app.get('mysql');
+        var sql = {};
+        var inserts = {};
+        var tag = {};
+
+        callbacks.post.space_station(req, tag, sql, inserts, complete);
+
+        function complete(){
+            mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
+                if(error){
+                    res.write(tag.post + "-tagged space_station post says: "
+                        + JSON.stringify(error));
+                    res.end();
+                } else {
+                    res.redirect('/eve2/space_station');
+                }
+            });
+        }
     });
 
     return router;

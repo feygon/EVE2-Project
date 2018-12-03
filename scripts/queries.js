@@ -30,7 +30,9 @@ var queries = {
         "docking": "",
         "set_inside_of": "",
         "set_piloting": "",
-        "set_location": ""
+        "set_location": "",
+        "change_CS_name": "",
+        "moveObject": ""
     }],
     "insert": [
     {
@@ -71,7 +73,8 @@ var queries = {
         "undockShip":"",
         "SP_getShipAndBoxes":"",
         "SP_getStationShipAndBoxes":"",
-        "SP_getObjectsInCSView":"" // meant to be used with views from getShipAndBoxes or getStationShipAndBoxes
+        "SP_getObjectsInCSView":"", // meant to be used with views from getShipAndBoxes or getStationShipAndBoxes
+        "repackageObject":""
     }]
 } 
 
@@ -260,13 +263,17 @@ queries.insert.insert_unpack_object = "INSERT INTO EVE2_CargoSpace "
     
 queries.update.set_object_id = "UPDATE EVE2_CargoSpace SET object_id = ? WHERE id = ?";
 queries.update.set_object_id_of_selection = "UPDATE EVE2_CargoSpace SET object_id = ? "
-    + "WHERE id IN "; // ...concat w/ selection: 
+    + " WHERE id IN "; // ...concat w/ selection: 
 queries.update.set_piloting = "UPDATE EVE2_Players SET piloting_CS_id = ? "
-    + "WHERE id = ?"; // ...concat w/ selection: 
+    + " WHERE id = ?"; // ...concat w/ selection: 
 queries.update.set_location = "UPDATE EVE2_CargoSpace SET EVE2_CargoSpace.location_id = ? "
-    + "WHERE id = ?";
+    + " WHERE id = ?";
 queries.update.set_location_selection = "UPDATE EVE2_CargoSpace "
-    + "SET EVE2_CargoSpace.location_id = ? WHERE  id in "/****/; // concat with selection
+    + " SET EVE2_CargoSpace.location_id = ? WHERE  id in "/****/; // concat with selection
+queries.update.change_CS_name = "UPDATE EVE2_CargoSpace "
+    + " SET EVE2_CargoSpace.name = ? WHERE id = ?"; // newCSname, CSid
+queries.update.moveObject = "UPDATE EVE2_Objects "
+    + " SET EVE2_Objects.cargoSpace_id = ? WHERE id = ?"
 
 queries.delete.del_player = "DELETE FROM EVE2_Players WHERE id = ?";
 queries.delete.del_object = "DELETE FROM EVE2_Objects WHERE id = ?";
@@ -292,6 +299,7 @@ queries.procedure_call.undockShip = "Call SP_UndockShip(?)";
 queries.procedure_call.SP_getShipAndBoxes = "CALL SP_getShipAndBoxes(?)";
 queries.procedure_call.SP_getStationShipAndBoxes = "CALL SP_getStationShipAndBoxes(?)";
 queries.procedure_call.SP_getObjectsInCSView = "CALL SP_getObjectsInCSView(??)";
-
+queries.procedure_call.repackageObject = "CALL SP_repackageObject(?)";
+queries.procedure_call.unpackageObject = "CALL SP_unpackageObject(?)";
 // requiring this file will automatically make the var into this object, with the above sub-objects.
 module.exports = queries;
