@@ -456,211 +456,138 @@ function player(req, res, tag, sql, inserts, mysql, complete) {
 		tag.post = 'DeletePlayer';
 		complete(cbName);
 	}
+};
 
-	callbacks.post.industry = function industry(req,tag,sql,inserts) {
+
+callbacks.post.industry = function industry(req,tag,sql,inserts) {
+	req.session.alertMsg = "";
+	var str = "";
+	if(req.body['invent']) {
+		sql.post = queries.insert.insert_item_structure;
+		inserts.post = [req.body.name, req.body.packaged,
+			req.body.unpackaged, req.body.type];
+		tag.post = 'invent';
 		req.session.alertMsg = "";
-		var str = "";
-		if(req.body['invent']) {
-			sql.post = queries.insert.insert_item_structure;
-			inserts.post = [req.body.name, req.body.packaged,
-				req.body.unpackaged, req.body.type];
-			tag.post = 'invent';
-			req.session.alertMsg = "";
-			str = "item structure " + req.body.name
-				+ " invented. Available to produce as a " + req.body.type
-				+ " with " + req.body.packaged
-				+ "m3 packaged volume and " + req.body.unpackaged
-				+ "m3 unpackaged volume.";
-			if(req.body.type == "Container"){
-				str += " Please design an item use for the new container."
-			}
+		str = "item structure " + req.body.name
+			+ " invented. Available to produce as a " + req.body.type
+			+ " with " + req.body.packaged
+			+ "m3 packaged volume and " + req.body.unpackaged
+			+ "m3 unpackaged volume.";
+		if(req.body.type == "Container"){
+			str += " Please design an item use for the new container."
 		}
-		if(req.body['design']) {
-			tag.post = 'design';
-			sql.post = queries.insert.insert_item_use;
-			inserts.post = [req.body.fromitemname, req.body.capacity,
-				req.body.scale];
-			str = "Chosen item use designed and available to produce as a " + req.body.scale
-				+ " with " + req.body.capacity
-				+ "m3 capacity.";
+	}
+	if(req.body['design']) {
+		tag.post = 'design';
+		sql.post = queries.insert.insert_item_use;
+		inserts.post = [req.body.fromitemname, req.body.capacity,
+			req.body.scale];
+		str = "Chosen item use designed and available to produce as a " + req.body.scale
+			+ " with " + req.body.capacity
+			+ "m3 capacity.";
+	}
+	if(req.body['produce']) {
+		tag.post = 'produce';
+		sql.post = queries.insert.insert_object;
+		inserts.post = [req.body.id, req.session.shipNest,
+			req.body.quantity, 1];
+		str = req.body.quantity + " objects placed in "
+			+ req.session.stationName + ".";
+	}
+	req.session.alertMsg = str;
+}
+
+callbacks.post.space_station = 
+function(res, req, tag, sql, inserts, complete) {
+	var place = "";
+	req.session.alertMsg = "";
+	if(req.body['changeShip']) {
+		sql.post = queries.update.set_piloting;
+		tag.post = "changeShip";
+		inserts.post = [req.body.changeToShipID, req.body.playerID];
+		place = "Changed ship. Session change complete.";
+		req.session.shipID = req.body.changeToShipID;
+		done();
+	} else if (req.body['ChangeStationName']) {
+		sql.post = queries.update.change_CS_name;
+		tag.post = "moveObject";
+		inserts.post = [req.body.newStationName, req.session.stationCSid];
+		req.session.stationName = req.body.newStationName;
+		place =  + "Station name changed. Spiffy!";
+		done();
+	} else if (req.body['ChangeCSName']) {
+		sql.post = queries.update.change_CS_name;
+		tag.post = "ChangeCSName";
+		inserts.post = [req.body.newCSname, req.body.changeCSname_CSid];
+		if (req.session.shipID == req.body.changeCSname_CSid) {
+			req.session.shipName = req.body.newCSname;
 		}
-		if(req.body['produce']) {
-			tag.post = 'produce';
-			sql.post = queries.insert.insert_object;
-			inserts.post = [req.body.id, req.session.shipNest,
-				req.body.quantity, 1];
-			str = req.body.quantity + " objects placed in "
-				+ req.session.stationName + ".";
-		}
-		req.session.alertMsg = str;
+		place =  + "Cargo space name changed. Spiffy!";
+		done();
+	} else if (req.body['moveObject']) {
+		sql.post = queries.update.moveObject;
+		tag.post = "moveObject";
+		inserts.post = [req.body.CStoMoveObjectTo, req.body.moveObjectID];
+		place =  + "Moved an object into a different cargo space! Watch out!";
+		done();
+		// Currently no constraints in place to keep volume from exceeding capacity.
+	} else if (req.body['deleteObject']) {
+		sql.post = queries.delete.del_object;
+		tag.post = "deleteObject";
+		inserts.post = [req.body.trashObjectID];
+		place = "Trashed an object. How tragic...";
+		done();
+	} else if (req.body['repackageObject']) {
+		sql.post = queries.procedure_call.repackageObject;
+		tag.post = "repackageObject";
+		inserts.post = [req.body.packagingObjectID];
+		place = "Repackaged an object.\nIf it was a cargo space, anything still inside is now all over the floor.";
+		done();
+	} else if (req.body['unpackageObject']) {
+		sql.post = queries.procedure_call.unpackageObject;
+		tag.post = 'unpackageObject';
+		inserts.post = [req.body.packagingObjectID, req.session.playerID];
+		place = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
+		+ "You may also rename cargo spaces if you like.";
+		done();
+	} else if (req.body['select_type_filter']) {
+		console.log("Redirecting to: '/eve2/space_station/" + req.body.typeFilter +
+			"\n-----------req.body['select_type_filter'] true-----------------");
+		res.redirect('/eve2/space_station/' + req.body.typeFilter);
+	} else if (req.body['select_scale_filter']) {
+		console.log("Redirecting to: '/eve2/space_station/" + req.body.scaleFilter +
+			"\n-----------req.body['select_scale_filter'] true-----------------");
+		res.redirect('/eve2/space_station/' + req.body.scaleFilter);
+	} else {
+	// Above code should capture all possibilities.
+		console.error("Fallthrough error in callbacks.post.space_station.");
+		console.log("Fallthrough error in callbacks.post.space_station.");
+		done();
 	}
 
-	callbacks.post.space_station = 
-	function(req, tag, sql, inserts, complete) {
-		var str = "";
-		req.session.alertMsg = "";
-		if(req.body['changeShip']) {
-			sql.post = queries.update.set_piloting;
-			tag.post = "changeShip";
-			inserts.post = [req.body.changeToShipID];
-			str = "Changed ship. Session change complete.";
-			req.session.shipID = req.body.changeToShipID;
-			done();
-		} else if (req.body['ChangeStationName']) {
-			sql.post = queries.update.change_CS_name;
-			tag.post = "moveObject";
-			inserts.post = [req.body.newStationName, req.session.stationCSid];
-			req.session.stationName = req.body.newStationName;
-			str =  + "Station name changed. Spiffy!";
-			done();
-		} else if (req.body['ChangeCSName']) {
-			sql.post = queries.update.change_CS_name;
-			tag.post = "ChangeCSName";
-			inserts.post = [req.body.newCSname, req.body.changeCSname_CSid];
-			if (req.session.shipID == req.body.changeCSname_CSid) {
-				req.session.shipName = req.body.newCSname;
-			}
-			str =  + "Cargo space name changed. Spiffy!";
-			done();
-		} else if (req.body['moveObject']) {
-			sql.post = queries.update.moveObject;
-			tag.post = "moveObject";
-			inserts.post = [req.body.CStoMoveObjectTo, req.body.moveObjectID];
-			str =  + "Moved an object into a different cargo space! Watch out!";
-			done();
-			// Currently no constraints in place to keep volume from exceeding capacity.
-		} else if (req.body['deleteObject']) {
-			sql.post = queries.delete.del_object;
-			tag.post = "deleteObject";
-			inserts.post = [req.body.trashObjectID];
-			str = "Trashed an object. How tragic...";
-			done();
-		} else if (req.body['repackageObject']) {
-			sql.post = queries.procedure_call.repackageObject;
-			tag.post = "repackageObject";
-			inserts.post = [req.body.packagingObjectID];
-			str = "Repackaged an object.\nIf it was a cargo space, anything still inside is now all over the floor.";
-			done();
-		} else if (req.body['unpackageObject']) {
-			sql.post = queries.procedure_call.unpackageObject;
-			tag.post = 'unpackageObject';
-			inserts.post = [req.body.packagingObjectID, req.session.playerID];
-			str = "Unpackaged an object./nIf it was a cargo space, that space is now available.\n"
-			+ "You may also rename cargo spaces if you like.";
-			done();
-		} else if (req.body.select_filter){
-			if (req.body['typeFilter']) {
-				res.redirect('eve2/space_station/' + req.body.typeFilter);
-			} else if (req.body['scaleFilter']) {
-				res.redirect('eve2/space_station/' + req.body.scaleFilter);
-			}
-			// should capture all possibilities.
-		} else {
-			console.error("Fallthrough error in callbacks.post.space_station.");
-			console.log("Fallthrough error in callbacks.post.space_station.");
-			done();
-		}
-
-		function done(){
-			req.session.alertMsg = str;
-			complete();
-		}
-
-	}
-
-
-	callbacks.procedure_call.undockShip = 
-	function (res, req, mysql, caller, complete){
-		var cbName = "callbacks.procedure_call.undockShip";
-		var sql = queries.procedure_call.undockShip;
-		var inserts = [req.session.shipID];
-		req.session.shipNest = null;
-		req.session.stationName = null;
-
-		mysql.pool.query(sql, inserts, function(error, results, fields) {
-			if(error) {
-				res.write(caller + "'s callback " + cbName
-					+ "returns: " + JSON.stringify(error));
-				res.end();
-			}
-			complete.complete(cbName);
-		});
+	function done(){
+		req.session.alertMsg = place;
+		complete();
 	}
 };
 
+
+callbacks.procedure_call.undockShip = 
+function (res, req, mysql, caller, complete) {
+	var cbName = "callbacks.procedure_call.undockShip";
+	var sql = queries.procedure_call.undockShip;
+	var inserts = [req.session.shipID];
+	req.session.shipNest = null;
+	req.session.stationName = null;
+
+	mysql.pool.query(sql, inserts, function(error, results, fields) {
+		if(error) {
+			res.write(caller + "'s callback " + cbName
+				+ "returns: " + JSON.stringify(error));
+			res.end();
+		}
+		complete.complete(cbName);
+	});
+};
+
 module.exports = callbacks;
-
-// class typicalCallback {
-// 	constructor(res, req, done, cbName, caller, context, sql, inserts, numberOfQueries, asynchronous) {
-// 		this.caller = caller;
-// 		this.cbName = cbName;
-// 		this.numberOfQueries = numberOfQueries || 1;
-// 		this.count = 0;
-// 		this.complete = function complete(caller){
-// 			this.count++;
-// 			if (asynchronous){
-// 				this.completes(this.count);
-// 			} else if (this.count >= numberOfQueries){
-// 				done("typicalCallback: " + cbName);
-// 			}
-// 		}
-// 		this.completes = {};
-// 		if (asynchronous){
-// 			for (let index = 0; index < numberOfQueries; index++) {
-// 				completes[toString(index)] = function(index){ 
-// 					return function() {
-// 						if (this.count == index){
-// 							this.queries[index](this.sql[index], this.inserts[index],);
-// 						}
-// 					}
-// 				}();
-				
-// 			}
-// 		}
-		
-
-// 		this.mysql = req.app.get('mysql');
-// 		this.queries = {};
-// 		this.context = context;
-
-// 		if (numberOfQueries != undefined && numberOfQueries > 1){
-// 			this.sql = {};
-// 			this.inserts = {};
-// 			for (let index = 0; index < numberOfQueries; index++) {
-// 				this.sql[toString(index)] = sql[index];
-// 				this.inserts[toString(index)] = inserts[index];
-// 				this.queries[toString(index)] = function(index){
-// 					return function(innerSql, innerInserts, innerCaller, innerCbName) {
-// 						this.mysql.pool.query(innerSql, innerInserts, function(error, results, fields) {
-// 							if(error) {
-// 								res.write(innerCaller + "'s typicalCallback number " + index
-// 									 + ", " + innerCbName + " returns: "
-// 									+ JSON.stringify(error));
-// 								res.end();
-// 							}
-// 							this.context[toString(innerCbName)] = results;
-// 							this.complete(innerCbName);
-// 						});
-// 					}
-// 				}
-// 			}
-// 		} else {
-// 			this.sql = sql;
-// 			this.inserts = inserts;
-// 			this.queries = function (innerSql, innerInserts, innerCaller, innerCbName) {
-// 				this.mysql.pool.query(innerSql, innerInserts, function(error, results, fields) {
-// 					if(error) {
-// 						res.write(innerCaller + "'s typicalCallback " + innerCbName + " returns: "
-// 							+ JSON.stringify(error));
-// 						res.end();
-// 					}
-// 					this.context[toString(innerCbName)] = results;
-// 					this.complete(innerCbName);
-// 				});
-// 			}
-// 		}
-// 		if (asynchronous != undefined && asynchronous == true){
-// 			return this.complete;
-// 		}
-// 	}
-// }

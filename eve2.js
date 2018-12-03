@@ -195,11 +195,14 @@ module.exports = (function() {
         var renderString = 'space_station';
         let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
 
+        console.log("------------------Testing filter---------------")
+
         callbacks.select.all_players(res, mysql, context, progress);
         callbacks.monolithic.getCargo_Deep(
             res,req,mysql,context,"Station", progress, req.params.by);
 
         function ready() {
+            console.log("------------------Testing filter ready---------------")
             if (req.session.alertMsg) {
                 context.sessionAlert = req.session.alertMsg;
                 req.session.alertMsg = null;
@@ -329,9 +332,12 @@ module.exports = (function() {
         var inserts = {};
         var tag = {};
 
-        callbacks.post.space_station(req, tag, sql, inserts, complete);
+        console.log("-----------router.post('/space_station/------------");
+        callbacks.post.space_station(res, req, tag, sql, inserts, complete);
+        console.log("-----------router.post('/space_station/--2----------");
 
-        function complete(){
+        function complete() {
+            console.log("-----------router.post('/space_station/------complete()------");
             mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
                 if(error){
                     res.write(tag.post + "-tagged space_station post says: "

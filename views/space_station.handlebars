@@ -13,16 +13,12 @@
 <h1>Space Station Page</h1><br>
 
 <br/>
-
-<h2 style="color: red; font-size:80px;">Please don't click anything below here.<br> You will make the puppies cry.</h2>
-<p style="color:red">Also, your classmates will not be able to test this site after you crash the node.</p><br>
-
 <br>
 <div>
     <form id="rename-station" action="/eve2/space_station/" method="post">
         <label>Rename this station:</label>
         <input type="text" name="newStationName"><br>
-        <input type="submit" value="Submit" name="ChangeStationName">
+        <label></label><input type="submit" value="Submit" name="ChangeStationName">
     </form>
 </div>
 <br>
@@ -30,26 +26,33 @@
 <h3>Ships and Containers:</h3>
 
 <div>
-<form id="sort-container" action="/eve2/space_station/" method="post">
-    <label>Filter structures by type:</label>
-    <select name="typeFilter"> 
-        <option value="None">None</option>
-        <option value="Charge">Charge</option>
-        <option value="Container">Container</option>
-        <option value="Material">Material</option>
-        <option value="Module">Module</option>
-        <option value="Satellite">Satellite</option>
-    </select>
-    <label>Filter cargo spaces by scale:</label>
-        <select name="scaleFilter"> 
+    <form id="sort-container" action="/eve2/space_station/" method="post">
+        <label>Filter structures by type:</label>
+        <select name="typeFilter"> 
             <option value="None">None</option>
-            <option value="Bay">Bay</option>
-            <option value="Box">Box</option>
-            <option value="Ship">Ship</option>
+            <option value="Charge">Charge</option>
+            <option value="Container">Container</option>
+            <option value="Material">Material</option>
+            <option value="Module">Module</option>
+            <option value="Satellite">Satellite</option>
         </select>
-    <label></label>
-    <input type="submit" name="select_filter" value="Filter all cargo spaces by scale">
-</form></div>
+        <br><label></label><input type="submit" name="select_type_filter" value="Filter all cargo spaces by scale">
+    </form>
+</div>
+<div>
+    <form id="sort-container" action="/eve2/space_station/" method="post">
+        <br>
+        <label>Filter cargo spaces by scale:</label>
+            <select name="scaleFilter">
+                <option value="None">None</option>
+                <option value="Bay">Bay</option>
+                <option value="Box">Box</option>
+                <option value="Ship">Ship</option>
+            </select>
+        <br>
+        <label></label><input type="submit" name="select_scale_filter" value="Filter all cargo spaces by scale">
+    </form>
+</div>
 
 {{#if filter_by}}
 <h2 style="color: red">Filtering view by {{filter_by}}.</h2><br>
@@ -58,20 +61,14 @@
 <table class="StationView">
     <thead>
         <th class="ViewLabels"><label>{{session.playerName}}'s Station</label></th>
-        <th class="ViewData">{{session.stationName}}</th>
+        <th class="ViewData"><h2>{{session.stationName}}</h2></th>
     </thead>
     <tbody>
         <tr class="top" style="border: 2px black double;">
             <td>Ship Location:</td>
             <td>{{session.locationName}} System, Security Status: Unknown</td>
-{{!-- Need context to contain selection of ship contents and capacity data. --}}
-            {{!-- {{#each cargoSpaceList}} --}}
-                {{!-- {{#if CSid == session.shipID}} --}}
-                {{!-- <td>Ship Capacity: {{capacity}}</td> --}}
-                {{!-- {{/if}} --}}
-            {{!-- {{/each}} --}}
-        {{#each this.onboardCargoSpaces}}
-        {{!-- put a table in the 2nd cell of the 1st row of each cargo space. --}} 
+
+            {{#each this.onboardCargoSpaces}}
             <tr class="cargoSpaceRow">
                 <td class="CSR-labelColumn">
                     <div><label>{{scale}}: {{name}}</label></div>
@@ -153,7 +150,7 @@
     <div class="operationsForm">
         <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
             <select name="CStoMoveObjectTo">
-                {{#each ../../../onboardCargoSpaces}}
+                {{#each ../../../../onboardCargoSpaces}}
                 <option value="{{CSid}}">{{name}}</option>
                 {{/each}}
             </select>
@@ -211,7 +208,6 @@
             {{/compare2customString}}
         {{/each}}
     </select>
-    
     <input type="submit" name="changeShip" value='Change'><br>
 </form><br>
 </div>

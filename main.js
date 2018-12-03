@@ -40,7 +40,6 @@ app.set('queries', queries); // needed?
 app.use('/eve2', require('./eve2.js'));
 
 app.use(function(req, res){
-    console.log("404'd!");
     res.status(404);
     res.render('404');
 });

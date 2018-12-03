@@ -19,7 +19,7 @@ table {font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
 td, th {display: table-cell;vertical-align: inherit;}
 a {outline: none;  text-decoration: none;  padding: 2px 1px 0;}
 a:link {  color: blue; border-bottom: 1px solid;}
-a:visited {  color: #437A16;}
+a:visited {  color: rgb(136, 41, 224);}
 a:focus {  border-bottom: 1px solid;  background: gray;}
 a:hover {  border-bottom: 1px solid;       background: gray;}
 a:active {  background: #265301;  color: #CDFEAA;}
