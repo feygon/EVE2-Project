@@ -1317,7 +1317,7 @@ CREATE TABLE EVE2_SP_debug(
     id int(11)not null auto_increment,
     primary key (id),
     report varchar(255),
-    timstamp Date not null default CURRENT_TIMESTAMP
+    timestamp DATETIME not null default CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE EVE2_ItemStructure(

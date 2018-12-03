@@ -196,7 +196,7 @@
     <select name="changeToShipID"> 
         {{#each onboardCargoSpaces}}
             {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
-            <option value="{{id}}">{{name}}</option>
+            <option value={{CSid}}>{{name}}</option>
             {{/compare2customString}}
         {{/each}}
     </select>

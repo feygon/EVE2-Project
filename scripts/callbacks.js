@@ -53,18 +53,18 @@ function copySessionToContext(context, obj) {
 callbacks.session.setSession =
 function setSession(req, res, playerID, mysql, complete) {
 	var cbName = "callbacks.session.setSession";
-	// console.log("------Setting session------");
+	console.log("------Setting session------");
 	var subcompleteCount = 0;
 	var subcontext = {};
 	subcontext.playerID = playerID;
-	// console.log("subcontext playerID: " + subcontext.playerID);
+	console.log("subcontext playerID: " + subcontext.playerID);
 	callbacks.select._session_player(res, mysql, subcontext, subcomplete);
 
 	function subcomplete(){
 		subcompleteCount++;
 		if (subcompleteCount >= 1){
-			// console.log("-------------SetSession says: \n" + 
-			// 	"external subcontext: " + JSON.stringify(subcontext.session_player));
+			console.log("-------------SetSession says: \n" + 
+				"external subcontext: " + JSON.stringify(subcontext.session_player));
 			req.session.playerID = subcontext.session_player[0].playerID;
 			req.session.playerName = subcontext.session_player[0].playerName;
 			req.session.shipID = subcontext.session_player[0].shipID;
@@ -74,9 +74,9 @@ function setSession(req, res, playerID, mysql, complete) {
 			req.session.locationID = subcontext.session_player[0].locationID;
 			req.session.locationName = subcontext.session_player[0].locationName;
 			req.session.count = 0;
-			// console.log("SetSession says: \n" +
-			// 	"req.session in setsession is " + JSON.stringify(req.session)
-			// 	+ "\n-----------------------------------------------");
+			console.log("SetSession says: \n" +
+				"req.session in setsession is " + JSON.stringify(req.session)
+				+ "\n-----------------------------------------------");
 			complete(cbName);
 		}
 	}
@@ -503,9 +503,11 @@ function(res, req, mysql, tag, sql, inserts, complete) {
 	req.session.alertMsg = "";
 	if(req.body['changeShip']) {
 		var count = 0;
-		sql.post = queries.update.set_piloting;
+		sql = queries.update.set_piloting;
 		tag.post = "changeShip";
-		inserts = [req.body.changeToShipID, req.body.playerID];
+		console.log("Req.body = " + JSON.stringify(req.body) +
+			"\n-----------------------------------");
+		inserts = [req.body.changeToShipID, req.session.playerID];
 		alertMsg = "Changed ship. Session change complete.";
 
 		mysql.pool.query(sql, inserts, function(error, results, fields) {
@@ -520,11 +522,13 @@ function(res, req, mysql, tag, sql, inserts, complete) {
 		function notDone(){
 			count++;
 			if (count == 1) {
+				console.log("first callback done. trying second.")
 				callbacks.session.setSession(
-					req, res, req.body.playerID, mysql, notDone);
+					req, res, req.session.playerID, mysql, notDone);
 			}
 			if (count == 2) { 
-				done(); 
+				console.log("----post callback done.-----")
+				res.redirect('/eve2/space_station');
 			}
 		}
 	} else if (req.body['ChangeStationName']) {
@@ -579,7 +583,7 @@ function(res, req, mysql, tag, sql, inserts, complete) {
 		res.redirect('/eve2/space_station/' + req.body.scaleFilter);
 	} else {
 	// Above code should capture all possibilities.
-		console.error("Fallthrough error in callbacks.post.space_station.");
+//		console.error("Fallthrough error in callbacks.post.space_station.");
 		console.log("Fallthrough error in callbacks.post.space_station.");
 		done();
 	}
