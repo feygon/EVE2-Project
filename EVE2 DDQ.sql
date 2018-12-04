@@ -486,7 +486,8 @@ BEGIN
         AND Obj.id = packagingObjectID
     );
     INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 4");
-    INSERT INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, object_id)
+
+    INSERT IGNORE INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, object_id)
         VALUES (playerID, @IUID, @locID, packagingObjectID);
     INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Done");
 END //
