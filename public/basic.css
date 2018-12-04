@@ -304,7 +304,7 @@ label:after { content: ":"; }
     max-width:100%;
     display:inline-block;
     vertical-align: middle;
-    margin-left: 5%;
+    margin-left: 10px;
     margin-right: 10px;
 }
 .operationsForm input{
