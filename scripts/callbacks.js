@@ -375,7 +375,7 @@ function out_in_space(req, mysql, tag, sql, inserts, complete) {
 	}
 	if (req.body['jettison']) {
 		sql.post = queries.delete.del_object;
-		inserts = [req.body.objectID];
+		inserts.post = [req.body.objectIDtoJettison];
 		tag.post = 'Jettison';
 		done();
 	}
@@ -513,40 +513,19 @@ callbacks.post.industry = function industry(req,tag,sql,inserts) {
 	req.session.alertMsg = str;
 }
 
+
 callbacks.post.space_station = 
 function(res, req, mysql, tag, sql, inserts, complete) {
 	var alertMsg = "";
 	req.session.alertMsg = "";
 	if(req.body['changeShip']) {
-		var count = 0;
-		sql = queries.update.set_piloting;
+		sql.post = queries.update.set_piloting;
 		tag.post = "changeShip";
 		console.log("Req.body = " + JSON.stringify(req.body) +
 			"\n-----------------------------------");
-		inserts = [req.body.changeToShipID, req.session.playerID];
+		inserts.post = [req.body.changeToShipID, req.session.playerID];
 		alertMsg = "Changed ship. Session change complete.";
-
-		mysql.pool.query(sql, inserts, function(error, results, fields) {
-			if(error) {
-				res.write("callbacks.post.space_station returns: " 
-					+ JSON.stringify(error));
-				res.end();
-			}
-			notDone();
-		});
-
-		function notDone(){
-			count++;
-			if (count == 1) {
-				console.log("first callback done. trying second.")
-				callbacks.session.setSession(
-					req, res, req.session.playerID, mysql, notDone);
-			}
-			if (count == 2) { 
-				console.log("----post callback done.-----")
-				res.redirect('/eve2/space_station');
-			}
-		}
+		done();
 	} else if (req.body['ChangeStationName']) {
 		sql.post = queries.update.change_CS_name;
 		tag.post = "moveObject";
@@ -590,12 +569,8 @@ function(res, req, mysql, tag, sql, inserts, complete) {
 		+ "You may also rename cargo spaces if you like.";
 		done();
 	} else if (req.body['select_type_filter']) {
-		console.log("Redirecting to: '/eve2/space_station/" + req.body.typeFilter +
-			"\n-----------req.body['select_type_filter'] true-----------------");
 		res.redirect('/eve2/space_station/' + req.body.typeFilter);
 	} else if (req.body['select_scale_filter']) {
-		console.log("Redirecting to: '/eve2/space_station/" + req.body.scaleFilter +
-			"\n-----------req.body['select_scale_filter'] true-----------------");
 		res.redirect('/eve2/space_station/' + req.body.scaleFilter);
 	} else {
 	// Above code should capture all possibilities.
@@ -625,8 +600,13 @@ function (res, req, mysql, caller, complete) {
 				+ "returns: " + JSON.stringify(error));
 			res.end();
 		}
-		complete.complete(cbName);
+		callbacks.session.setSession(req, res, req.session.playerID, mysql, done);
 	});
+
+	function done(){
+		complete.complete(cbName);
+	}
+
 };
 
 module.exports = callbacks;

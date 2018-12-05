@@ -331,22 +331,31 @@ module.exports = (function() {
         var sql = {};
         var inserts = {};
         var tag = {};
+        var completeCount = 0;
 
-        console.log("-----------router.post('/space_station/------------");
         callbacks.post.space_station(res, req, mysql, tag, sql, inserts, complete);
-        console.log("-----------router.post('/space_station/--2----------");
 
         function complete() {
-            console.log("-----------router.post('/space_station/------complete()------");
-            mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
-                if(error){
-                    res.write(tag.post + "-tagged space_station post says: "
-                        + JSON.stringify(error));
-                    res.end();
-                } else {
-                    res.redirect('/eve2/space_station');
-                }
-            });
+            completeCount++;
+            // call whatever the post callback says to
+            if (completeCount == 1) {
+                mysql.pool.query(sql.post, inserts.post, function(error, results, fields) {
+                    if(error){
+                        res.write(tag.post + "-tagged space_station post says: "
+                            + JSON.stringify(error));
+                        res.end();
+                    } else {
+                        complete();
+                    }
+                });
+            }
+            // then, set the session details to the new data.
+            if (completeCount == 2) {
+                callbacks.session.setSession(req, res, req.session.playerID, mysql, allDone);
+            } 
+        }
+        function allDone(){
+            res.redirect('/eve2/space_station');
         }
     });
 

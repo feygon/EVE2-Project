@@ -71,7 +71,7 @@
             {{#each this.onboardCargoSpaces}}
             <tr class="cargoSpaceRow">
                 <td class="CSR-labelColumn">
-                    <div><label>{{scale}}: {{name}}</label></div>
+                    <div><label>{{scale}}:<br> {{name}}</label></div>
                     <label class="CSR-label">Contents</label>
                 </td>
                 <td class="CSR-table-cell">
@@ -90,7 +90,7 @@
                                     <tr class="stationRow">
                                         <td><!-- object Name -->
                                             {{#if CSName}}
-                                            {{CSName}}
+                                            <label>{{structureName}}</label><br>{{CSName}}
                                             {{else}}
                                             {{structureName}}
                                             {{/if}}
