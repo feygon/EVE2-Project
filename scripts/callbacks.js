@@ -323,6 +323,26 @@ function linked_locations(res, req, mysql, context, complete) {
 	});
 };
 
+callbacks.select.allLocations =
+function allLocations(res, mysql, context, complete) {
+	var cbName = "callbacks.select.allLocations";
+	var sql = "";
+	sql += queries.select.allLocations;
+
+	mysql.pool.query(sql, function(error, results, fields) {
+		if(error) {
+			res.write("callbacks.select.linked_locations says: " 
+				+ JSON.stringify(error) + "\n---------------------");
+			res.end;
+		}
+		// console.log("setting context.linked_locations to results:" 
+		// 	+ JSON.stringify(results) + "\n---------------------");
+		context.allLocations = results;
+		// console.log("context set by linked_locations CB");
+		complete.complete(cbName);
+	});
+}
+
 // itemStructure_id, cargoSpace_id, quantity, packaged
 callbacks.insert.insert_object = 
 function insert_object(res, mysql, context, complete) {
@@ -401,7 +421,7 @@ function out_in_space(req, mysql, tag, sql, inserts, complete) {
 		sql.post = queries.procedure_call.docking;
 		inserts.post = [req.session.shipID, req.body.stationCSid];
 		req.session.shipNest = req.body.stationCSid;
-
+		tag.post = 'Dock';
 		sql.subPost = queries.select.station_name;
 		inserts.subPost = [req.body.stationCSid];
 		mysql.pool.query(
@@ -411,14 +431,11 @@ function out_in_space(req, mysql, tag, sql, inserts, complete) {
 					+ JSON.stringify(error) + "\n---------------------------");
 				res.end;
 			}
-			notDone();
-		});
-
-		function notDone(){
-			req.session.stationName = req.body.stationName;
-			tag.post = 'Dock';
+			console.log("---------------------------results----------\n"
+				+ JSON.stringify(results));
+			req.session.stationName = results.name;
 			done();
-		}
+		});
 	}
 	function done(){
 		complete(cbName);

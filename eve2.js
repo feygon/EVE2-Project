@@ -64,6 +64,7 @@ module.exports = (function() {
      *******************************/
     router.get('/', function(req, res) {
         var context = {};
+        context.jsscripts = ["constraints.js"];
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
         context.counter = req.session.count;
@@ -85,6 +86,7 @@ module.exports = (function() {
     ********************************/
     router.get('/player/', function(req, res) {
         var context = {};
+        context.jsscripts = ["constraints.js"];
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
         var mysql = req.app.get('mysql');
@@ -97,7 +99,7 @@ module.exports = (function() {
             progress.render(res, context); 
         }
     });
-
+    
     router.post('/player/', function(req, res) {
         var callerName = "player_post";
         var mysql = req.app.get('mysql');
@@ -106,6 +108,7 @@ module.exports = (function() {
         var sql = { };
         var inserts = { };
         var context = { };
+        context.jsscripts = ["constraints.js"];
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
 
@@ -164,16 +167,18 @@ module.exports = (function() {
         console.log("\n----main handler----\n")
         var callerName = "out_in_space";
         var context = {};
+        context.jsscripts = ["constraints.js"];
         var mysql = req.app.get('mysql');
         var renderString = 'out_in_space';
 
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
-        let progress = new HandlerProgress_Get(renderString, 3, ready, 0, null);
+        let progress = new HandlerProgress_Get(renderString, 4, ready, 0, null);
 
 	    /* callbacks go here. */
         callbacks.select.stations_in_space(res, req, mysql, context, progress);
         callbacks.select.linked_locations(res, req, mysql, context, progress);
+        callbacks.select.allLocations(res, mysql, context, progress);
         callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Ship", progress);
 
         function ready() {
@@ -182,6 +187,7 @@ module.exports = (function() {
             // console.log("Ready called.-----------------------------------");
             // console.log("Ready's context reads: " + JSON.stringify(context) 
             //     + "\n--------------final context--------------");
+            callbacks.pre.session.copySessionObjToContext(context, req.session);
             progress.render(res, context);
         }
     });
@@ -190,6 +196,7 @@ module.exports = (function() {
         var context = {};
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
+        context.jsscripts = ["constraints.js"];
         context.filter_by = req.params.by;
             var mysql = req.app.get('mysql');
         var renderString = 'space_station';
@@ -207,6 +214,7 @@ module.exports = (function() {
                 context.sessionAlert = req.session.alertMsg;
                 req.session.alertMsg = null;
             }
+            callbacks.pre.session.copySessionObjToContext(context, req.session);
             progress.render(res, context); 
         }
     });
@@ -215,19 +223,29 @@ module.exports = (function() {
         var context = {};
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session);
+        context.jsscripts = ["constraints.js"];
         var mysql = req.app.get('mysql');
         var renderString = 'space_station';
         let progress = new HandlerProgress_Get(renderString, 2, ready, 0, null);
+        var readyCount = 0;
 
         callbacks.select.all_players(res, mysql, context, progress);
         callbacks.monolithic.getCargo_Deep(res,req,mysql,context,"Station", progress);
 
         function ready() {
-            if (req.session.alertMsg) {
-                context.sessionAlert = req.session.alertMsg;
-                req.session.alertMsg = null;
+            readyCount++;
+            if (readyCount == 1){
+                console.log("\nResetting session.\n")
+                callbacks.session.setSession(req, res, req.session.playerID, mysql, ready);
             }
-            progress.render(res, context); 
+            if (readyCount == 2){
+                if (req.session.alertMsg) {
+                    context.sessionAlert = req.session.alertMsg;
+                    req.session.alertMsg = null;
+                }
+                callbacks.pre.session.copySessionObjToContext(context, req.session);
+                progress.render(res, context); 
+            }
         }
     });
 
@@ -238,6 +256,7 @@ module.exports = (function() {
         var context = {};
         context = callbacks.pre.session.copySessionObjToContext(
             context, req.session, callerName);
+        context.jsscripts = ["constraints.js"];
         var mysql = req.app.get('mysql');
         let progress = new HandlerProgress_Get(renderString, 5, ready, 0, null);
         // console.log("industry req.session reads" + JSON.stringify(req.session));
@@ -254,6 +273,7 @@ module.exports = (function() {
             req.session.alertMsg = null;
         }
         function ready() {
+            callbacks.pre.session.copySessionObjToContext(context, req.session);
             progress.render(res, context); 
         }
     });

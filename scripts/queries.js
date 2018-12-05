@@ -201,6 +201,8 @@ queries.select.linked_locations = "SELECT "
     + "INNER JOIN EVE2_Locations as desto ON wormhole.link_id = desto.id "
     + "ORDER BY desto.name";
 
+queries.select.allLocations = "SELECT name as locationName FROM EVE2_Locations ORDER BY name";
+
 queries.select.itemUse_list_orderbyq = "SELECT "
         + " structures.name, "
         + " itemUse.id, "

@@ -1,12 +1,15 @@
 <html>
+
 <div class="page">
     <div style="width:83%">
     <p style="color:darkred; font-size:24px;">
         Dear testers. Please note that this page contains:<br>
         A deletion from the objects entity, and an update to the cargo spaces entity: Undock.<br>
         A truly monolithic selection from MANY DIFFERENT TABLES: the below table, provided that you have some items in your cargo hold. Try using the player Zaphod to see this in action.<br>
-        A more modest selection of ships you currently have, that you are not flying. Again, try using Zaphod to see this in action.
+        A selection of ships you currently have, that you are not flying. Again, try using Zaphod to see this in action.
         Every page includes a check to the session details, against a selection to the database.<br>
+        To make more ships and items, go to Industry (top left link).<br>
+        Launching new space stations is under construction.
     </p>
     </div>
 <br>
@@ -55,9 +58,11 @@
 </div>
 
 {{#if filter_by}}
-<h2 style="color: red">Filtering view by {{filter_by}}.</h2><br>
+<br><h2 style="color: red">Filtering view by {{filter_by}}.</h2><br>
 {{/if}}
-{{#if sessionAlert}}<h3>Alert: {{sessionAlert}}</h3><br>{{/if}}
+{{#if sessionAlert}}
+<br><h3>Alert: {{sessionAlert}}</h3><br>
+{{/if}}
 <table class="StationView">
     <thead>
         <th class="ViewLabels"><label>{{session.playerName}}'s Station</label></th>
@@ -192,15 +197,20 @@
 
 <form class="sidebarForm" id="choose-ship" action="/eve2/space_station/" method="post">
     <label>Change <br>Piloting ship</label>
-    <select name="changeToShipID"> 
+    <select name="changeToShipID" id="Select_changeToShipID"> 
+        <option id="falseOption"></option>
         {{#each onboardCargoSpaces}}
             {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
             <option value={{CSid}}>{{name}}</option>
             {{/compare2customString}}
         {{/each}}
     </select>
-    <input type="submit" name="changeShip" value='Change'><br>
+    <input disabled="true" type="submit" name="changeShip" value='Change' id="button_changeToShipID"><br>
 </form><br>
 </div>
+
+<script>
+selectButton("Select_changeToShipID", "button_changeToShipID", "falseOption", document);
+</script>
 
 </html>

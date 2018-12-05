@@ -19,28 +19,34 @@
 <div class="auxiliaryFunctions">
     <h3>Chart A Wormhole</h3>
     <form id="wormhole" action="/eve2/out_in_space/" method="post">
-        <label>Wormhole Name:</label> <input type="text" name="name" value="Name"><br>
+        <label>Wormhole Name:</label> 
+        <input id="textBox_ChartAWormHole" type="text" name="name"><br>
         <label>Wormhole Security Status:</label> 
         <input type="number" step="0.1" min="-10.0" max = "10.0" name="Security" value="-10.0 - 10.0"><br>
 {{!-- Check entry against existing before attempting to create.
       Currently no limit on exits to/from systems. --}}
         <label style = "color:red">(Reviewer - This is an entity insert and two M-to-N inserts)</label>
-        <input type="submit" value="Chart" name="chartWormhole">
+        <input id="button_ChartAWormHole" disabled="true" type="submit" value="Chart" name="chartWormhole">
     </form>
 </div>
+<script>
+
+</script>
 <div class="auxiliaryFunctions">
     <h3>Annihilate A Wormhole</h3>
     <form id="annihilate-wormhole" action="/eve2/out_in_space/" method="post">
-        <label>Wormhole to:</label> <select name="wormhole_id">
+        <label>Wormhole to:</label> <select name="wormhole_id" id="select_annihilate">
 {{!-- Currently, people can annihilate the last wormhole out of a system. --}}
 {{!-- So this needs to be greyed out if there's only 1 exit. --}}
+            <option id="option_annihilate"></option>
             {{#each linked_locations}}
             <option value="{{id}}">{{name}}</option>
             {{/each}}
             </select>
         </select><br>
         <label style = "color:red">(Reviewer - This is a delete of two M-to-N relationship table records)</label>
-        <input type="submit" value="Annihilate" name="annihilate"><br>
+        <input disabled="true" type="submit" value="Annihilate" 
+               name="annihilate" id="button_annihilate"><br>
     </form>
 </div>
 <br>
@@ -54,84 +60,79 @@
         <tr class="top" style="border: 2px black double;">
             <td>Ship Location:</td>
             <td>{{session.locationName}} System, Security Status: Unknown</td>
-{{!-- Need context to contain selection of ship contents and capacity data. --}}
-            {{!-- {{#each cargoSpaceList}} --}}
-                {{!-- {{#if CSid == session.shipID}} --}}
-                {{!-- <td>Ship Capacity: {{capacity}}</td> --}}
-                {{!-- {{/if}} --}}
-            {{!-- {{/each}} --}}
-        {{#each this.onboardCargoSpaces}}
-        {{!-- put a table in the 2nd cell of the 1st row of each cargo space. --}} 
-            <tr class="cargoSpaceRow">
-                <td class="CSR-labelColumn">
-                    <div><label>{{scale}}: {{name}}</label></div>
-                    <label class="CSR-label">Contents</label>
-                </td>
-                <td class="CSR-table-cell">
-                    <table class="CSR-table">
-                        <thead>
-                            <th><label>Object Name</label>  </th>
-                            <th><label>Volume</label>       </th>
-                            <th><label>Type/Scale</label>   </th>
-                            <th><label>Quantity</label>     </th>
-                            <th><label>Packaged</label>     </th>
-                            <th><label>Operations</label>   </th>
-                        </thead>
-                        <tbody>
-                            {{#each ../onboardObjects}}
-                                {{#compare inside_CSid ../CSid}}
-                                <tr>
-                                    <td><!-- object Name -->
-                                        {{#if CSName}}
-                                        {{CSName}}
-                                        {{else}}
-                                        {{structureName}}
-                                        {{/if}}
-                                    </td>
-                                    <td id="target-{{objectID}}"><!-- Volume -->
-                                        {{#compare packaged 1 operator="=="}}
-                                            <script>
-                                                document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_packed}} * {{quantity}};
-                                            </script>
-                                        {{else}}
-                                            <script>
-                                                document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_unpacked}} * {{quantity}};
-                                            </script>
-                                        {{/compare}}
-                                    </td>
-                                    <td><!-- Type/Scale -->
-                                        {{#if CSid}}
-                                            {{type}}: {{scale}}
-                                        {{else}}
-                                            {{type}}
-                                        {{/if}}
-                                    </td>
-                                    <td><!-- Quantity -->
-                                        {{quantity}}
-                                    </td>
-                                    <td><!-- Packaged -->
-                                        {{#compare packaged 1}}
-                                        True
-                                        {{else}}
-                                        False
-                                        {{/compare}}
-                                    </td>
-                                    <td><!-- Operations-->
 
-                                        <form id="choose-item" action="/eve2/out_in_space/" method="post">
-                                            <input type="hidden" value={{objectID}} name="objectIDtoJettison">
-                                            <input class="operationsButton" type="submit" value="Jettison" name="jettison">
-                                        </form>
+    {{#each this.onboardCargoSpaces}}
+    {{!-- put a table in the 2nd cell of the 1st row of each cargo space. --}} 
+        <tr class="cargoSpaceRow">
+            <td class="CSR-labelColumn">
+                <div><label>{{scale}}: {{name}}</label></div>
+                <label class="CSR-label">Contents</label>
+            </td>
+            <td class="CSR-table-cell">
+                <table class="CSR-table">
+                    <thead>
+                        <th><label>Object Name</label>  </th>
+                        <th><label>Volume</label>       </th>
+                        <th><label>Type/Scale</label>   </th>
+                        <th><label>Quantity</label>     </th>
+                        <th><label>Packaged</label>     </th>
+                        <th><label>Operations</label>   </th>
+                    </thead>
+                    <tbody>
+                        {{#each ../onboardObjects}}
+                            {{#compare inside_CSid ../CSid}}
+                            <tr>
+                                <td><!-- object Name -->
+                                    {{#if CSName}}
+                                    {{CSName}}
+                                    {{else}}
+                                    {{structureName}}
+                                    {{/if}}
+                                </td>
+                                <td id="target-{{objectID}}"><!-- Volume -->
+                                    {{#compare packaged 1 operator="=="}}
+                                        <script>
+                                            document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_packed}} * {{quantity}};
+                                        </script>
+                                    {{else}}
+                                        <script>
+                                            document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_unpacked}} * {{quantity}};
+                                        </script>
+                                    {{/compare}}
+                                </td>
+                                <td><!-- Type/Scale -->
+                                    {{#if CSid}}
+                                        {{type}}: {{scale}}
+                                    {{else}}
+                                        {{type}}
+                                    {{/if}}
+                                </td>
+                                <td><!-- Quantity -->
+                                    {{quantity}}
+                                </td>
+                                <td><!-- Packaged -->
+                                    {{#compare packaged 1}}
+                                    True
+                                    {{else}}
+                                    False
+                                    {{/compare}}
+                                </td>
+                                <td><!-- Operations-->
 
-                                    </td>
-                                </tr>
-                                {{/compare}}{{!-- end compare inside_CSid --}}
-                            {{/each}}{{!-- end each ../onboardObjects --}}
-                        </tbody>
-                    </table> <!-- end CSR-table (Cargo Space Row table) -->
-                </td>
-            </tr>
-        {{/each}}{{!-- end each onboardCargoSpaces --}}
+                                    <form id="choose-item" action="/eve2/out_in_space/" method="post">
+                                        <input type="hidden" value={{objectID}} name="objectIDtoJettison">
+                                        <input class="operationsButton" type="submit" value="Jettison" name="jettison">
+                                    </form>
+
+                                </td>
+                            </tr>
+                            {{/compare}}{{!-- end compare inside_CSid --}}
+                        {{/each}}{{!-- end each ../onboardObjects --}}
+                    </tbody>
+                </table> <!-- end CSR-table (Cargo Space Row table) -->
+            </td>
+        </tr>
+    {{/each}}{{!-- end each onboardCargoSpaces --}}
     </tbody>
 </table> <!-- end table ShipView -->
 
@@ -148,30 +149,46 @@
 
 
 <div class="sidebarFormDiv">
+    {{#if stations_in_space}}
     <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
-    <label>Dock at Station</label> <select name="stationCSid"> 
-{{!--  --}}
+    <label>Dock at Station</label> <select name="stationCSid" id="select_dock"> 
+            <option id="option_dock"></option>
             {{#each stations_in_space}}
-            <option value="{{stationID}}">{{stationName}}</option>
+            <option value={{stationID}}>{{stationName}}</option>
             {{/each}}
         </select><br>
-    <input type="submit" value="Dock" name="dock"><br>
+    <input disabled="true" id="button_dock" type="submit" value="Dock" name="dock"><br>
     </form>
+    {{else}}
+    No stations in system
+    {{/if}}
 </div>
 
 <div class="sidebarFormDiv">
 
     <form class="sidebarForm" id="choose-location" action="/eve2/out_in_space/" method="post">
-        <label>Location</label> <select name="locationID"> 
+        <label>Location</label> <select id="select_travel" name="locationID"> 
 {{!-- There'll always be linked locations. No need for count-0-fading. --}}
+            <option id="option_travel"></option>
             {{#each linked_locations}}
-            <option value="{{id}}">{{name}}</option>
+            <option value={{id}}>{{name}}</option>
             {{/each}}
         </select><br>
-    <input type="submit" value="Travel" name="moveLocation">
+    <input id="button_travel" type="submit" value="Travel" name="moveLocation">
     </form>
 </div>
 
 </div>
+
+<script>
+var locations = new Array();
+{{#each allLocations}}
+locations["{{locationName}}"] = true;
+{{/each}}
+selectButton("select_annihilate", "button_annihilate", "option_annihilate", document);
+selectButton("select_dock", "button_dock", "option_dock", document);
+selectButton("select_travel", "button_travel", "option_travel", document);
+textBoxButton("textBox_ChartAWormHole", "button_ChartAWormHole", locations, document);
+</script>
 
 </html>

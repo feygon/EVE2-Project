@@ -488,7 +488,7 @@ BEGIN
     INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Good to here 4");
 
     INSERT IGNORE INTO EVE2_CargoSpace (player_id, itemUse_id, location_id, object_id, name)
-        VALUES (playerID, @IUID, @locID, packagingObjectID, "New Ship");
+        VALUES (playerID, @IUID, @locID, packagingObjectID, "New Cargo Space");
     INSERT INTO EVE2_SP_debug (report) VALUES ("SP_unpackageObject: Done");
 END //
 
@@ -1369,7 +1369,7 @@ CREATE TABLE EVE2_Players(
 CREATE TABLE EVE2_CargoSpace(
     id int(20) unique not null auto_increment,
     primary key (id),
-    name varchar(255) unique NOT NULL,
+    name varchar(255) NOT NULL,
     player_id int(20) not null,
     constraint FK_CS_player_id foreign key (player_id) 
     	references EVE2_Players(id)
