@@ -23,7 +23,8 @@ var queries = {
         "linked_locations": "",
         "itemUse_list_orderbyq":"", // name, id, pilotable, capacity, scale
         "session_player": "",
-        "stations_in_space": "" // stationID, stationName
+        "stations_in_space": "", // stationID, stationName
+        "station_name": ""
     }],
     "update": [
     {
@@ -238,6 +239,10 @@ queries.select.stations_in_space = "SELECT "
         + "ON station.itemUse_id = IU.id "
         + "AND IU.scale = 'Space Station'"
     + "ORDER BY stationName";
+
+queries.select.station_name = "SELECT "
+    + " name from EVE2_CargoSpace "
+    + " WHERE id = ?";
     
 queries.insert.insert_player = "CALL SP_newPlayerGetsPodInJita(?)";
 queries.insert.insert_location = "CALL SP_linkNewWormhole(?, ?, ?)"; // source, destoName, secStatus

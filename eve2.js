@@ -51,8 +51,8 @@ module.exports = (function() {
             };
 
             this.render = function(res, context) {
-                console.log(" Context at render time reads:\n" + JSON.stringify(context)
-                + "\n---------render context------------");
+                // console.log(" Context at render time reads:\n" + JSON.stringify(context)
+                // + "\n---------render context------------");
                 console.log("Rendering " + renderString + "\n--------------rendering----------------");
                 res.render(this.renderString, context);
             };
@@ -240,7 +240,7 @@ module.exports = (function() {
             context, req.session, callerName);
         var mysql = req.app.get('mysql');
         let progress = new HandlerProgress_Get(renderString, 5, ready, 0, null);
-        console.log("industry req.session reads" + JSON.stringify(req.session));
+        // console.log("industry req.session reads" + JSON.stringify(req.session));
 
         /* callbacks go here. */
         callbacks.select.item_structure_list(res, mysql, context, progress);
@@ -274,7 +274,7 @@ module.exports = (function() {
         var inserts = {};
         var context = {};
         context.session = req.session;
-        callbacks.post.out_in_space(req, tag, sql, inserts, complete);
+        callbacks.post.out_in_space(req, mysql, tag, sql, inserts, complete);
         // curious about tag left as "" and not {}. Will it work?
         
         function complete(cbName) {

@@ -109,8 +109,8 @@ function all_players(res, mysql, context, complete) {
 			res.write("callback.select.all_players returns: " + JSON.stringify(error));
 			res.end();
 		}
-		console.log("callbacks.select.all_players results: " + JSON.stringify(results)
-			+ "\n---------------results--------------");
+		// console.log("callbacks.select.all_players results: " + JSON.stringify(results)
+		// 	+ "\n---------------results--------------");
 		context.all_players = results;
 		complete.complete(cbName);
 	});
@@ -361,7 +361,7 @@ function del_object(res, mysql, context, complete) {
 };
 
 callbacks.post.out_in_space = 
-function out_in_space(req, tag, sql, inserts, complete) {
+function out_in_space(req, mysql, tag, sql, inserts, complete) {
 	var cbName = "callbacks.post.out_in_space";
 	console.log("callbacks.post.out_in_space receives session details:\n"
 		+ JSON.stringify(req.session) + "\n--------cb-p-ois-req.session--------")
@@ -401,8 +401,24 @@ function out_in_space(req, tag, sql, inserts, complete) {
 		sql.post = queries.procedure_call.docking;
 		inserts.post = [req.session.shipID, req.body.stationCSid];
 		req.session.shipNest = req.body.stationCSid;
-		tag.post = 'Dock';
-		done();
+
+		sql.subPost = queries.select.station_name;
+		inserts.subPost = [req.body.stationCSid];
+		mysql.pool.query(
+			sql.subPost, inserts.subPost, function(error, results, fields){
+			if(error) {
+				res.write("callbacks.delete.del_object returns: "
+					+ JSON.stringify(error) + "\n---------------------------");
+				res.end;
+			}
+			notDone();
+		});
+
+		function notDone(){
+			req.session.stationName = req.body.stationName;
+			tag.post = 'Dock';
+			done();
+		}
 	}
 	function done(){
 		complete(cbName);

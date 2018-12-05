@@ -110,8 +110,8 @@ function disgorge(res, mysql, context, caller, complete, filterOption){
                 + JSON.stringify(error));
             res.end();
         }
-        console.log("results1 are: " + JSON.stringify(results1) 
-            + "\n------dejavu 1-----");
+        // console.log("results1 are: " + JSON.stringify(results1) 
+        //     + "\n------dejavu 1-----");
         context.onboardCargoSpaces = results1;
         done();
     });
@@ -122,8 +122,8 @@ function disgorge(res, mysql, context, caller, complete, filterOption){
                 + JSON.stringify(error));
             res.end();
         }
-        console.log("results2 are: " + JSON.stringify(results2) 
-        + "\n------dejavu 2-----");
+        // console.log("results2 are: " + JSON.stringify(results2) 
+        // + "\n------dejavu 2-----");
         context.onboardObjects = results2;
         done();
     });
