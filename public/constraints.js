@@ -49,6 +49,7 @@ function textBoxButton(textBox, button, context, document) {
             }
         });
     }
+    
     if(tBox) {
         tBox.addEventListener("change", function (e) {
             var truthy = false;

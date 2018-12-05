@@ -148,35 +148,35 @@
     </div>
 
 
-<div class="sidebarFormDiv">
-    {{#if stations_in_space}}
-    <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
-    <label>Dock at Station</label> <select name="stationCSid" id="select_dock"> 
-            <option id="option_dock"></option>
-            {{#each stations_in_space}}
-            <option value={{stationID}}>{{stationName}}</option>
-            {{/each}}
-        </select><br>
-    <input disabled="true" id="button_dock" type="submit" value="Dock" name="dock"><br>
-    </form>
-    {{else}}
-    No stations in system
-    {{/if}}
-</div>
+    <div class="sidebarFormDiv">
+        {{#if stations_in_space}}
+        <form class="sidebarForm" id="choose-station" action="/eve2/out_in_space/" method="post">
+        <label>Dock at Station</label> <select name="stationCSid" id="select_dock"> 
+                <option id="option_dock"></option>
+                {{#each stations_in_space}}
+                <option value={{stationID}}>{{stationName}}</option>
+                {{/each}}
+            </select><br>
+        <input disabled="true" id="button_dock" type="submit" value="Dock" name="dock"><br>
+        </form>
+        {{else}}
+        No stations in system
+        {{/if}}
+    </div>
 
-<div class="sidebarFormDiv">
+    <div class="sidebarFormDiv">
 
-    <form class="sidebarForm" id="choose-location" action="/eve2/out_in_space/" method="post">
-        <label>Location</label> <select id="select_travel" name="locationID"> 
-{{!-- There'll always be linked locations. No need for count-0-fading. --}}
-            <option id="option_travel"></option>
-            {{#each linked_locations}}
-            <option value={{id}}>{{name}}</option>
-            {{/each}}
-        </select><br>
-    <input id="button_travel" disabled="true" type="submit" value="Travel" name="moveLocation">
-    </form>
-</div>
+        <form class="sidebarForm" id="choose-location" action="/eve2/out_in_space/" method="post">
+            <label>Location</label> <select id="select_travel" name="locationID"> 
+    {{!-- There'll always be linked locations. No need for count-0-fading. --}}
+                <option id="option_travel"></option>
+                {{#each linked_locations}}
+                <option value={{id}}>{{name}}</option>
+                {{/each}}
+            </select><br>
+        <input id="button_travel" disabled="true" type="submit" value="Travel" name="moveLocation">
+        </form>
+    </div>
 
 </div>
 
