@@ -534,7 +534,7 @@ function(res, req, mysql, tag, sql, inserts, complete) {
 	} else if (req.body['ChangeStationName']) {
 		sql.post = queries.update.change_CS_name;
 		tag.post = "moveObject";
-		inserts.post = [req.body.newStationName, req.session.stationCSid];
+		inserts.post = [req.body.newStationName, req.session.shipNest];
 		req.session.stationName = req.body.newStationName;
 		alertMsg = "Station name changed. Spiffy!";
 		done();
