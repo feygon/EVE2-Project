@@ -318,6 +318,20 @@ async function getUser(userId) {
 
 ---
 
+### **Summary Documents:**
+
+**Location:** All summary/completion documents go in `docs/summaries/`
+
+**Examples:**
+- Session summaries
+- Completion reports
+- Refactoring summaries
+- Audit reports
+
+**Why:** Keeps root directory clean while preserving documentation history
+
+---
+
 ## ? Testing Checklist
 
 ### **Before Creating/Updating Documentation:**
@@ -418,7 +432,7 @@ body {
 
 **ADHD-Friendly Resources:**
 - [ADHD-Friendly Documentation](https://adhd-friendly.com/)
-- [How to Write for People with ADHD](https://uxdesign.cc/how-to-write-for-people-with-adhd-7c5c5c5c5c5c)
+- [How to Write for People with ADHD](https://uxdesign.cc/how-to-write-for-people-with-adhd-7c5c5c5c5c5)
 
 ---
 
