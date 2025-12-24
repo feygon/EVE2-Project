@@ -83,6 +83,15 @@ app.get('/',(req,res)=> {
 	res.redirect(301, "https://www.realfeygon.com/resume") 
 });
 
+// Serve documentation folder as static (for markdown files)
+// This must come AFTER the /documentation route to avoid conflicts
+app.use('/docs', express.static('docs'));
+
+// Route to serve README.md file
+app.get('/README.md', (req, res) => {
+    res.sendFile(path.join(__dirname, 'README.md'));
+});
+
 app.use(function(req, res){
     res.status(404);
     res.render('404');
