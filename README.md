@@ -47,18 +47,16 @@ See [docs/setup/LOCAL_SETUP.md](docs/setup/LOCAL_SETUP.md) for detailed instruct
 RealFeygon/
 ??? main.js                      # Express server entry point
 ??? package.json                 # Dependencies and scripts
+??? dbcon.js                     # Production DB config (EVE2)
+??? dbcon_illusion.js            # Production DB config (Illusion)
+??? dbcon.local.js               # Local DB config (gitignored)
+??? dbcon_illusion.local.js      # Local DB config (gitignored)
 ?
 ??? .github/
 ?   ??? workflows/
 ?   ?   ??? deploy.yml          # CI/CD automation
 ?   ??? instructions/
 ?       ??? neuro-accessibility.md  # Accessibility guidelines
-?
-??? config/
-?   ??? dbcon.js                # Production DB config (EVE2)
-?   ??? dbcon_illusion.js       # Production DB config (Illusion)
-?   ??? dbcon.local.js          # Local DB config (gitignored)
-?   ??? dbcon_illusion.local.js # Local DB config (gitignored)
 ?
 ??? routes/
 ?   ??? resume.js               # Resume/portfolio module
