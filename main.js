@@ -67,11 +67,7 @@ app.set('queries', queries);
 app.use('/resume/', require('./resume.js'));
 app.use('/eve2/', require('./eve2.js'));
 app.use('/illusion/', require('./illusion.js'));
-
-// Documentation route - serve the HTML portal
-app.get('/documentation', (req, res) => {
-    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
-});
+app.use('/', require('./documentation.js'));  // Documentation routes
 
 // Site index route - serve the site map
 app.get('/index.html', (req, res) => {
@@ -81,15 +77,6 @@ app.get('/index.html', (req, res) => {
 // Root redirects to resume (default)
 app.get('/',(req,res)=> { 
 	res.redirect(301, "https://www.realfeygon.com/resume") 
-});
-
-// Serve documentation folder as static (for markdown files)
-// This must come AFTER the /documentation route to avoid conflicts
-app.use('/docs', express.static('docs'));
-
-// Route to serve README.md file
-app.get('/README.md', (req, res) => {
-    res.sendFile(path.join(__dirname, 'README.md'));
 });
 
 app.use(function(req, res){
@@ -132,6 +119,9 @@ main.js
 |-- Routes
 |   |
 |   |-- resume.js (Resume module)
-|   |-- eve2.js (Eve2 module)
+|   |-- eve2.js (EVE2 module)
+|   |-- illusion.js (Illusion spells module)
+|   |-- documentation.js (Documentation portal module)
+|   |-- index.html (Site navigation)
 |   |-- Errors (404, 500)
 */
