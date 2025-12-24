@@ -16,6 +16,14 @@ config.local.js
 .env.test
 .env.production
 
+# SSH Keys (NEVER commit these!)
+github-deploy-key
+github-deploy-key.pub
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
 # IDE
 .vscode/
 .idea/
