@@ -1,80 +1,146 @@
 # ?? Troubleshooting Guide
 
-## Common Issues and Solutions
+## ?? Table of Contents
 
-### ?? **Error: ECONNREFUSED (Cannot connect to database)**
+- [Quick Fixes (TL;DR)](#quick-fixes-tldr)
+- [Quick Diagnostic Checklist](#quick-diagnostic-checklist)
+- [Database Connection Issues](#database-connection-issues)
+- [Environment Variable Problems](#environment-variable-problems)
+- [Server and Port Issues](#server-and-port-issues)
+- [Diagnostic Commands](#diagnostic-commands)
+- [Production Issues](#production-issues)
+- [Related Documentation](#related-documentation)
 
-**Symptoms:**
+---
+
+## ? Quick Fixes (TL;DR)
+
+**Most common problems and solutions:**
+
+1. **Database won't connect?**
+   - Run: `.\start-local.ps1 3000`
+
+2. **Missing .env file?**
+   - Run: `.\setup-env.ps1`
+
+3. **Module not found errors?**
+   - Run: `npm install`
+
+4. **Port already in use?**
+   - Run: `.\start-local.ps1 3001`
+
+5. **Server won't start?**
+   - Kill processes: `Get-Process -Name "node" | Stop-Process -Force`
+   - Restart: `.\start-local.ps1 3000`
+
+---
+
+## ?? Quick Diagnostic Checklist
+
+**Before troubleshooting, check these:**
+
+- [ ] Is MariaDB running? ? `Get-Process -Name "mysqld"`
+- [ ] Does .env file exist? ? `Test-Path ".env"`
+- [ ] Are node_modules installed? ? `Test-Path "node_modules"`
+- [ ] Is port 3000 available? ? `netstat -ano | findstr :3000`
+
+**All checked?** ? See specific issues below
+
+---
+
+## ?? Database Connection Issues
+
+### ?? Error: ECONNREFUSED
+
+**You see this:**
 ```
 Error: connect ECONNREFUSED ::1:3306
 Error: connect ECONNREFUSED 127.0.0.1:3306
 ```
 
-**Cause:** MariaDB is not running
+**Why:** MariaDB is not running
 
 **Solutions:**
 
-#### **Quick Fix:**
+#### Quick Fix (Easiest):
 ```powershell
-# Start MariaDB manually
-Start-Process -FilePath "C:\Program Files\MariaDB 12.1\bin\mysqld.exe" -ArgumentStyle "--console" -WindowStyle Hidden
+.\start-local.ps1 3000
+```
+The script automatically starts MariaDB for you!
 
-# Wait a few seconds
+---
+
+#### Manual Start:
+```powershell
+Start-Process -FilePath "C:\Program Files\MariaDB 12.1\bin\mysqld.exe" -WindowStyle Hidden
 Start-Sleep -Seconds 3
-
-# Restart your app
 .\start-local.ps1 3000
 ```
 
-#### **Automatic Fix:**
-The updated `start-local.ps1` script now automatically starts MariaDB if it's not running!
+---
+
+#### Permanent Fix (Recommended):
+**Set up MariaDB as a Windows service:**
 
 ```powershell
-.\start-local.ps1 3000
-```
+# Run PowerShell as Administrator
 
-#### **Permanent Fix (Set up MariaDB as a Service):**
-```powershell
-# Run as Administrator
-# Install MariaDB as a Windows service
 & "C:\Program Files\MariaDB 12.1\bin\mysql_install_db.exe" --service=MariaDB
-
-# Start the service
 Start-Service MariaDB
-
-# Set it to start automatically
 Set-Service -Name MariaDB -StartupType Automatic
 ```
 
+Now MariaDB starts with Windows!
+
 ---
 
-### ?? **Missing .env File**
+### ??? Database Not Found
 
-**Symptoms:**
-- Database connection fails
-- Warning: ".env file not found"
+**You see this:**
+```
+Error: ER_BAD_DB_ERROR: Unknown database
+```
+
+**Why:** Database hasn't been created yet
 
 **Solution:**
-```powershell
-# Run the environment setup
-.\setup-env.ps1
 
-# OR create manually from template
-Copy-Item ".env.example" ".env"
-# Then edit .env with your actual credentials
+Run the setup script:
+```powershell
+.\setup-local.ps1
+```
+
+This creates both databases automatically.
+
+---
+
+**OR manually import schemas:**
+
+```powershell
+$env:Path += ";C:\Program Files\MariaDB 12.1\bin"
+
+mysql -u root realfey_realfey_eve2_project < "EVE2 DDQ.sql"
+mysql -u root realfey_illusion_spells_db < "illusions DDQ.sql"
 ```
 
 ---
 
-### ?? **Wrong Database Credentials**
+### ?? Wrong Database Credentials
 
-**Symptoms:**
+**You see:**
 - Access denied errors
 - Authentication failures
 
+**Why:** Credentials in .env don't match database
+
 **Solution:**
 
-Check your `.env` file has correct credentials:
+**Check your .env file:**
+```powershell
+Get-Content ".env"
+```
+
+**Should look like this:**
 ```env
 DB_HOST=localhost
 DB_USER=realfey_realfey_realfeyuser
@@ -89,29 +155,88 @@ DB_ILLUSION_NAME=realfey_illusion_spells_DB
 
 ---
 
-### ??? **Database Not Found**
+## ?? Environment Variable Problems
 
-**Symptoms:**
-```
-Error: ER_BAD_DB_ERROR: Unknown database
-```
+### ?? Missing .env File
+
+**You see:**
+- Database connection fails
+- Warning: ".env file not found"
 
 **Solution:**
-```powershell
-# Run the setup script to create databases
-.\setup-local.ps1
 
-# OR manually import schemas
-$env:Path += ";C:\Program Files\MariaDB 12.1\bin"
-Get-Content "EVE2 DDQ.sql" | mysql -u root realfey_realfey_eve2_project
-Get-Content "illusions DDQ.sql" | mysql -u root realfey_illusion_spells_db
+**Run the setup script:**
+```powershell
+.\setup-env.ps1
 ```
 
 ---
 
-### ?? **Missing node_modules**
+**OR create manually:**
+```powershell
+Copy-Item ".env.example" ".env"
+```
+Then edit .env with your credentials.
 
-**Symptoms:**
+---
+
+### ?? Environment Variables Not Loading
+
+**You see:**
+- process.env variables are undefined
+- Database uses wrong credentials
+
+**Solutions:**
+
+**1. Install dotenv:**
+```powershell
+npm install dotenv --save
+```
+
+---
+
+**2. Check .env exists:**
+```powershell
+Test-Path ".env"
+```
+
+---
+
+**3. Verify dotenv is loaded:**
+
+Check these files have this at the top:
+- `dbcon.js`
+- `dbcon_illusion.js`
+
+```javascript
+require('dotenv').config();
+```
+
+---
+
+**4. Check .env format:**
+
+**Correct:**
+```env
+DB_HOST=localhost
+DB_USER=myuser
+DB_PASSWORD=mypassword
+```
+
+**Wrong:**
+```env
+DB_HOST = localhost          ? (spaces around =)
+DB_USER="myuser"            ? (unnecessary quotes)
+DB_PASSWORD = "mypassword"  ? (both errors)
+```
+
+---
+
+## ??? Server and Port Issues
+
+### ?? Missing node_modules
+
+**You see:**
 ```
 Error: Cannot find module 'express'
 Error: Cannot find module 'dotenv'
@@ -122,186 +247,156 @@ Error: Cannot find module 'dotenv'
 npm install
 ```
 
+Wait for it to finish, then restart your server.
+
 ---
 
-### ?? **Port Already in Use**
+### ?? Port Already in Use
 
-**Symptoms:**
+**You see:**
 ```
 Error: EADDRINUSE: address already in use :::3000
 ```
 
-**Solution:**
+**Solutions:**
 
 **Option A: Use different port**
 ```powershell
 .\start-local.ps1 3001
 ```
 
-**Option B: Kill process using port**
-```powershell
-# Find what's using the port
-netstat -ano | findstr :3000
+---
 
-# Kill the process (replace XXXX with PID from above)
+**Option B: Kill the process**
+
+**Find what's using the port:**
+```powershell
+netstat -ano | findstr :3000
+```
+
+**Kill it (replace XXXX with PID from above):**
+```powershell
 taskkill /PID XXXX /F
+```
+
+**Restart your server:**
+```powershell
+.\start-local.ps1 3000
 ```
 
 ---
 
-### ?? **MariaDB Won't Start**
+### ?? Server Won't Restart
 
-**Symptoms:**
-- mysqld.exe process doesn't start
-- Error starting MariaDB
+**Solution:**
 
-**Troubleshooting Steps:**
+**Kill all Node and MariaDB processes:**
+```powershell
+Get-Process -Name "node" | Stop-Process -Force
+Get-Process -Name "mysqld" | Stop-Process -Force
+```
 
-1. **Check if MariaDB is installed:**
+**Start fresh:**
+```powershell
+.\start-local.ps1 3000
+```
+
+---
+
+### ?? MariaDB Won't Start
+
+**Troubleshooting steps:**
+
+**1. Check if MariaDB is installed:**
 ```powershell
 Test-Path "C:\Program Files\MariaDB 12.1"
 ```
 
-2. **Check if port 3306 is in use:**
+---
+
+**2. Check if port 3306 is in use:**
 ```powershell
 netstat -ano | findstr :3306
 ```
 
-3. **Try starting with error output:**
+---
+
+**3. Try starting with error output:**
 ```powershell
 & "C:\Program Files\MariaDB 12.1\bin\mysqld.exe" --console
 ```
+Look for error messages.
 
-4. **Check error log:**
+---
+
+**4. Check error log:**
 ```powershell
 Get-Content "C:\Program Files\MariaDB 12.1\data\*.err" -Tail 50
 ```
 
 ---
 
-### ?? **Environment Variables Not Loading**
+## ??? Diagnostic Commands
 
-**Symptoms:**
-- process.env variables are undefined
-- Database connection uses wrong credentials
-
-**Solutions:**
-
-1. **Make sure dotenv is installed:**
-```powershell
-npm install dotenv --save
-```
-
-2. **Check .env file exists:**
-```powershell
-Test-Path ".env"
-```
-
-3. **Verify dotenv is loaded in config files:**
-Check that `require('dotenv').config();` is at the top of:
-- `dbcon.js`
-- `dbcon_illusion.js`
-
-4. **Check .env file format:**
-- No spaces around `=`
-- No quotes around values (unless needed)
-- One variable per line
-
-Example:
-```env
-DB_HOST=localhost
-DB_USER=myuser
-DB_PASSWORD=mypassword
-```
-
----
-
-### ?? **Server Won't Restart**
-
-**Solution:**
-
-1. **Kill Node processes:**
-```powershell
-Get-Process -Name "node" | Stop-Process -Force
-```
-
-2. **Kill MariaDB processes:**
-```powershell
-Get-Process -Name "mysqld" | Stop-Process -Force
-```
-
-3. **Start fresh:**
-```powershell
-.\start-local.ps1 3000
-```
-
----
-
-### ?? **Routes Work Locally but Not in Production**
-
-**Common Issues:**
-
-1. **Environment variables not set in DirectAdmin**
-   - Check DIRECTADMIN_ENV_SETUP.md
-
-2. **Database credentials different on production**
-   - Verify production credentials match DirectAdmin database settings
-
-3. **Node.js app not restarted after changes**
-   - Restart app in DirectAdmin control panel
-
----
-
-## ??? **Diagnostic Commands**
+**Check if services are running:**
 
 ```powershell
-# Check if MariaDB is running
+# Check MariaDB
 Get-Process -Name "mysqld"
 
-# Check if Node is running
+# Check Node.js
 Get-Process -Name "node"
+```
 
-# Test MariaDB connection
+---
+
+**Test database connection:**
+
+```powershell
 $env:Path += ";C:\Program Files\MariaDB 12.1\bin"
 mysql -u root -e "SELECT 'Connected!' as Status;"
+```
 
-# Check databases exist
+---
+
+**Check databases exist:**
+
+```powershell
 mysql -u root -e "SHOW DATABASES;"
+```
 
-# Check .env file
+---
+
+**Check .env file:**
+
+```powershell
 Get-Content ".env"
+```
 
-# Check if dotenv is installed
+---
+
+**Check if dotenv is installed:**
+
+```powershell
 npm list dotenv
+```
 
-# Check what's using port 3000
+---
+
+**Check what's using a port:**
+
+```powershell
+# Port 3000
 netstat -ano | findstr :3000
 
-# Check what's using port 3306
+# Port 3306
 netstat -ano | findstr :3306
 ```
 
 ---
 
-## ?? **Still Having Issues?**
+**Check environment variables are loaded:**
 
-1. **Check all services are running:**
-```powershell
-Get-Process -Name "mysqld", "node"
-```
-
-2. **Restart everything:**
-```powershell
-# Stop all
-Get-Process -Name "node", "mysqld" | Stop-Process -Force
-
-# Start fresh
-.\start-local.ps1 3000
-```
-
-3. **Review logs in console output**
-
-4. **Check environment variables are loaded:**
 Add this temporarily to `main.js`:
 ```javascript
 console.log('DB_HOST:', process.env.DB_HOST);
@@ -310,16 +405,75 @@ console.log('DB_USER:', process.env.DB_USER);
 
 ---
 
-## ?? **Related Documentation**
+## ?? Production Issues
 
-- **QUICK_START.md** - Quick reference commands
-- **LOCAL_SETUP.md** - Detailed setup instructions
-- **DIRECTADMIN_ENV_SETUP.md** - Production deployment
-- **DATABASE_GUI_GUIDE.md** - Database management tools
+### Routes Work Locally but Not in Production
+
+**Common causes:**
+
+**1. Environment variables not set**
+- Go to DirectAdmin ? Node.js Setup
+- Add all environment variables
+- See: docs/setup/DIRECTADMIN_ENV_SETUP.md
 
 ---
 
-**Most Common Fix:** Just restart MariaDB! ??
+**2. Database credentials are different**
+- Verify production passwords in DirectAdmin
+- Check they match your environment variables
+
+---
+
+**3. App not restarted after changes**
+- Go to DirectAdmin ? Node.js Setup
+- Click "Restart"
+
+---
+
+## ?? Still Having Issues?
+
+**Try a complete restart:**
+
+```powershell
+# Stop everything
+Get-Process -Name "node", "mysqld" | Stop-Process -Force
+
+# Start fresh
+.\start-local.ps1 3000
+```
+
+---
+
+**Check the logs:**
+- Look at console output for error messages
+- Check Node.js logs in DirectAdmin (if production)
+
+---
+
+## ?? Related Documentation
+
+**Setup & Configuration:**
+- [Quick Start Guide](../../QUICK_START.md) - Daily commands
+- [Local Setup](../setup/LOCAL_SETUP.md) - Initial setup
+- [DirectAdmin Setup](../setup/DIRECTADMIN_ENV_SETUP.md) - Production config
+- [Database Tools](../setup/DATABASE_GUI.md) - Database management
+
+**Deployment:**
+- [Deployment Guide](../deployment/DEPLOYMENT_GUIDE.md) - Deploy to production
+
+---
+
+## ?? Pro Tip
+
+**Most problems are solved by:**
 ```powershell
 .\start-local.ps1 3000
 ```
+
+This script:
+- ? Checks if MariaDB is running
+- ? Starts it if needed
+- ? Loads environment variables
+- ? Starts your server
+
+**Keep it simple!** ??

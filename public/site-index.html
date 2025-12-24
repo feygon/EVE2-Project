@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealFeygon.com - Site Index</title>
+    <style>
+        /* Dyslexia-friendly typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #dcdcdc;
+            line-height: 1.8;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: #232323;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #66ccff 0%, #4488cc 100%);
+            padding: 60px 40px;
+            text-align: center;
+            color: #000;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 50px 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #66ccff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 3px solid #444;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 204, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .app-card:hover::before {
+            left: 100%;
+        }
+
+        .app-card:hover {
+            border-color: #66ccff;
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(102, 204, 255, 0.3);
+        }
+
+        .app-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .app-card h2 {
+            color: #66ccff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .app-card p {
+            color: #ccc;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .app-link {
+            display: inline-block;
+            background: #66ccff;
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .app-link:hover {
+            background: #82b1ff;
+            transform: scale(1.05);
+        }
+
+        .app-card.resume {
+            border-color: #4CAF50;
+        }
+
+        .app-card.resume:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .app-card.resume .app-link {
+            background: #4CAF50;
+        }
+
+        .app-card.resume .app-link:hover {
+            background: #66bb6a;
+        }
+
+        .app-card.eve2 {
+            border-color: #ff9800;
+        }
+
+        .app-card.eve2:hover {
+            border-color: #ff9800;
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
+        }
+
+        .app-card.eve2 .app-link {
+            background: #ff9800;
+        }
+
+        .app-card.eve2 .app-link:hover {
+            background: #ffa726;
+        }
+
+        .app-card.illusion {
+            border-color: #9c27b0;
+        }
+
+        .app-card.illusion:hover {
+            border-color: #9c27b0;
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.3);
+        }
+
+        .app-card.illusion .app-link {
+            background: #9c27b0;
+        }
+
+        .app-card.illusion .app-link:hover {
+            background: #ab47bc;
+        }
+
+        .app-card.docs {
+            border-color: #2196F3;
+        }
+
+        .app-card.docs:hover {
+            border-color: #2196F3;
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3);
+        }
+
+        .app-card.docs .app-link {
+            background: #2196F3;
+        }
+
+        .app-card.docs .app-link:hover {
+            background: #42a5f5;
+        }
+
+        footer {
+            background: #1a1a1a;
+            padding: 30px;
+            text-align: center;
+            color: #888;
+            border-top: 2px solid #444;
+        }
+
+        footer a {
+            color: #66ccff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2em;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-contrast: high) {
+            body {
+                background: #000;
+            }
+            .container {
+                background: #111;
+                border: 2px solid #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>?? RealFeygon.com</h1>
+            <p>Welcome to Feygon's Web Applications</p>
+        </header>
+
+        <div class="content">
+            <h2 class="section-title">Available Applications</h2>
+            
+            <div class="apps-grid">
+                <div class="app-card resume" onclick="window.location='/resume'">
+                    <span class="app-icon">??</span>
+                    <h2>Resume</h2>
+                    <p>Professional resume and portfolio showcasing skills, experience, and projects.</p>
+                    <a href="/resume" class="app-link">View Resume ?</a>
+                </div>
+
+                <div class="app-card eve2" onclick="window.location='/eve2'">
+                    <span class="app-icon">??</span>
+                    <h2>EVE Online Tools</h2>
+                    <p>Industry tools and utilities for EVE Online players. Manage blueprints, calculate costs, and more.</p>
+                    <a href="/eve2" class="app-link">Launch EVE2 ?</a>
+                </div>
+
+                <div class="app-card illusion" onclick="window.location='/illusion'">
+                    <span class="app-icon">?</span>
+                    <h2>Illusion Spells</h2>
+                    <p>Pathfinder 2e Remaster Illusion Spells database. Browse and search all illusion magic.</p>
+                    <a href="/illusion" class="app-link">View Spells ?</a>
+                </div>
+
+                <div class="app-card docs" onclick="window.location='/documentation'">
+                    <span class="app-icon">??</span>
+                    <h2>Documentation</h2>
+                    <p>Complete technical documentation for setup, deployment, and development of these applications.</p>
+                    <a href="/documentation" class="app-link">Browse Docs ?</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>RealFeygon.com</strong> - Portfolio & Web Applications</p>
+            <p>Created by Feygon Nickerson</p>
+            <p><a href="https://github.com/feygon/EVE2-Project">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // Number keys to access apps
+            if (e.key === '1') window.location = '/resume';
+            if (e.key === '2') window.location = '/eve2';
+            if (e.key === '3') window.location = '/illusion';
+            if (e.key === '4') window.location = '/documentation';
+        });
+
+        // Announce keyboard shortcuts for screen readers
+        console.log('Keyboard shortcuts: Press 1-4 to navigate to different apps');
+    </script>
+</body>
+</html>

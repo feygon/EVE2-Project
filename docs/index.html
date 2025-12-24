@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealFeygon.com - Documentation</title>
+    <style>
+        /* Dyslexia-friendly typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #dcdcdc;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #232323;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #66ccff 0%, #4488cc 100%);
+            padding: 40px;
+            text-align: center;
+            color: #000;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            padding: 30px;
+            background: #2a2a2a;
+            border-bottom: 2px solid #444;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #66ccff;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #dcdcdc;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #82b1ff;
+            box-shadow: 0 0 0 3px rgba(102, 204, 255, 0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .quick-start {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: #000;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .quick-start h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .quick-start-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-start-links a {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .quick-start-links a:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .doc-section {
+            margin-bottom: 50px;
+        }
+
+        .doc-section h2 {
+            font-size: 2em;
+            color: #66ccff;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #66ccff;
+        }
+
+        .doc-section .section-emoji {
+            font-size: 1.3em;
+            margin-right: 10px;
+        }
+
+        .doc-section p {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .doc-card {
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .doc-card:hover {
+            border-color: #66ccff;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 204, 255, 0.3);
+        }
+
+        .doc-card h3 {
+            color: #66ccff;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .doc-card .doc-description {
+            color: #ccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .doc-card .doc-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .doc-badge {
+            background: #66ccff;
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .doc-badge.setup { background: #4CAF50; }
+        .doc-badge.deployment { background: #ff9800; }
+        .doc-badge.git { background: #9c27b0; }
+        .doc-badge.dev { background: #f44336; }
+        .doc-badge.process { background: #00bcd4; }
+        .doc-badge.archive { background: #607d8b; }
+
+        .doc-link {
+            color: #82b1ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .doc-link:hover {
+            text-decoration: underline;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            border-left: 4px solid #66ccff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .task-card h4 {
+            color: #66ccff;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .task-card ol {
+            padding-left: 20px;
+            color: #ccc;
+        }
+
+        .task-card ol li {
+            margin: 8px 0;
+        }
+
+        footer {
+            background: #1a1a1a;
+            padding: 30px;
+            text-align: center;
+            color: #888;
+            border-top: 2px solid #444;
+        }
+
+        footer a {
+            color: #66ccff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Accessibility: High contrast mode support */
+        @media (prefers-contrast: high) {
+            body {
+                background: #000;
+            }
+            .container {
+                background: #111;
+                border: 2px solid #fff;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .doc-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-start-links {
+                flex-direction: column;
+            }
+        }
+
+        /* Search highlighting */
+        .highlight {
+            background: rgba(255, 255, 0, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>?? RealFeygon.com Documentation</h1>
+            <p>Complete guide to setup, deployment, and development</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="?? Search documentation... (e.g., 'deployment', 'database', 'troubleshooting')" aria-label="Search documentation">
+        </div>
+
+        <div class="content">
+            <!-- Quick Start Section -->
+            <div class="quick-start">
+                <h2>?? Quick Start</h2>
+                <p><strong>New to this project?</strong> Start with these essential documents:</p>
+                <div class="quick-start-links">
+                    <a href="../README.md">?? README - Project Overview</a>
+                    <a href="../QUICK_START.md">? Quick Start Guide</a>
+                </div>
+            </div>
+
+            <!-- Setup & Installation -->
+            <div class="doc-section" data-category="setup">
+                <h2><span class="section-emoji">??</span>Setup & Installation</h2>
+                <p><strong>Path:</strong> docs/setup/</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card" onclick="window.location='setup/LOCAL_SETUP.md'">
+                        <h3>Local Setup</h3>
+                        <p class="doc-description">Complete guide to setting up your local development environment with MariaDB and Node.js</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge setup">Setup</span>
+                            <a href="setup/LOCAL_SETUP.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='setup/DIRECTADMIN_ENV_SETUP.md'">
+                        <h3>DirectAdmin Environment Setup</h3>
+                        <p class="doc-description">Configure environment variables for production deployment in DirectAdmin</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge setup">Setup</span>
+                            <a href="setup/DIRECTADMIN_ENV_SETUP.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='setup/DATABASE_GUI.md'">
+                        <h3>Database GUI Tools</h3>
+                        <p class="doc-description">Comparison and setup guide for database management tools (HeidiSQL, phpMyAdmin, etc.)</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge setup">Setup</span>
+                            <a href="setup/DATABASE_GUI.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='setup/EMERGENCY_RECOVERY.md'">
+                        <h3>Emergency Recovery</h3>
+                        <p class="doc-description">Complete rebuild guide from scratch - recover from hosting loss or major failures</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge setup">Setup</span>
+                            <a href="setup/EMERGENCY_RECOVERY.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deployment -->
+            <div class="doc-section" data-category="deployment">
+                <h2><span class="section-emoji">??</span>Deployment</h2>
+                <p><strong>Path:</strong> docs/deployment/</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card" onclick="window.location='deployment/DEPLOYMENT_GUIDE.md'">
+                        <h3>Deployment Guide</h3>
+                        <p class="doc-description">Complete guide to deploying to production via SFTP, including setup and verification steps</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge deployment">Deployment</span>
+                            <a href="deployment/DEPLOYMENT_GUIDE.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='deployment/AWS_DEPLOYMENT.md'">
+                        <h3>AWS Deployment Guide</h3>
+                        <p class="doc-description">Step-by-step guide to deploy your application on AWS using Elastic Beanstalk</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge deployment">Deployment</span>
+                            <a href="deployment/AWS_DEPLOYMENT.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='deployment/DIGITALOCEAN_DEPLOYMENT.md'">
+                        <h3>DigitalOcean Deployment Guide</h3>
+                        <p class="doc-description">How to deploy your app on DigitalOcean using App Platform</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge deployment">Deployment</span>
+                            <a href="deployment/DIGITALOCEAN_DEPLOYMENT.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='deployment/VERCEL_DEPLOYMENT.md'">
+                        <h3>Vercel Deployment Guide</h3>
+                        <p class="doc-description">Guide to deploy your frontend on Vercel and connect with backend APIs</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge deployment">Deployment</span>
+                            <a href="deployment/VERCEL_DEPLOYMENT.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Development -->
+            <div class="doc-section" data-category="development">
+                <h2><span class="section-emoji">???</span>Development</h2>
+                <p><strong>Path:</strong> docs/development/</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card" onclick="window.location='development/DEV_ENV_SETUP.md'">
+                        <h3>Development Environment Setup</h3>
+                        <p class="doc-description">Set up your development environment with best practices for coding and testing</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge dev">Development</span>
+                            <a href="development/DEV_ENV_SETUP.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='development/CODING_GUIDELINES.md'">
+                        <h3>Coding Guidelines</h3>
+                        <p class="doc-description">Recommended coding standards and practices for consistent code quality</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge dev">Development</span>
+                            <a href="development/CODING_GUIDELINES.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='development/DEBUGGING_TIPS.md'">
+                        <h3>Debugging Tips</h3>
+                        <p class="doc-description">Common debugging techniques and how to use Chrome DevTools effectively</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge dev">Development</span>
+                            <a href="development/DEBUGGING_TIPS.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='development/API_DEVELOPMENT.md'">
+                        <h3>API Development</h3>
+                        <p class="doc-description">Guide to developing and testing APIs, including Postman setup</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge dev">Development</span>
+                            <a href="development/API_DEVELOPMENT.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="doc-section" data-category="troubleshooting">
+                <h2><span class="section-emoji">??</span>Troubleshooting</h2>
+                <p><strong>Path:</strong> docs/troubleshooting/</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card" onclick="window.location='troubleshooting/COMMON_ISSUES.md'">
+                        <h3>Common Issues</h3>
+                        <p class="doc-description">List of common issues and their fixes encountered during setup and development</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge process">Troubleshooting</span>
+                            <a href="troubleshooting/COMMON_ISSUES.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='troubleshooting/DEBUGGING_TIPS.md'">
+                        <h3>Advanced Debugging Tips</h3>
+                        <p class="doc-description">In-depth debugging tips and tricks for complex issues</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge process">Troubleshooting</span>
+                            <a href="troubleshooting/DEBUGGING_TIPS.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='troubleshooting/PERFORMANCE_ISSUES.md'">
+                        <h3>Performance Issues</h3>
+                        <p class="doc-description">How to identify and resolve common performance bottlenecks</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge process">Troubleshooting</span>
+                            <a href="troubleshooting/PERFORMANCE_ISSUES.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='troubleshooting/DEPLOYMENT_ISSUES.md'">
+                        <h3>Deployment Issues</h3>
+                        <p class="doc-description">Troubleshooting failed deployments and server errors</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge process">Troubleshooting</span>
+                            <a href="troubleshooting/DEPLOYMENT_ISSUES.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="doc-section" data-category="faq">
+                <h2><span class="section-emoji">?</span>FAQ</h2>
+                <p><strong>Path:</strong> docs/faq/</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card" onclick="window.location='faq/GENERAL_FAQ.md'">
+                        <h3>General FAQ</h3>
+                        <p class="doc-description">Frequently asked questions about the project, setup, and usage</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge faq">FAQ</span>
+                            <a href="faq/GENERAL_FAQ.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='faq/DEPLOYMENT_FAQ.md'">
+                        <h3>Deployment FAQ</h3>
+                        <p class="doc-description">Commonly asked questions about deployment processes and troubleshooting</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge faq">FAQ</span>
+                            <a href="faq/DEPLOYMENT_FAQ.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='faq/DEVELOPMENT_FAQ.md'">
+                        <h3>Development FAQ</h3>
+                        <p class="doc-description">Questions related to development setup, tools, and best practices</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge faq">FAQ</span>
+                            <a href="faq/DEVELOPMENT_FAQ.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+
+                    <div class="doc-card" onclick="window.location='faq/TROUBLESHOOTING_FAQ.md'">
+                        <h3>Troubleshooting FAQ</h3>
+                        <p class="doc-description">Help with common issues and errors encountered in setup and development</p>
+                        <div class="doc-meta">
+                            <span class="doc-badge faq">FAQ</span>
+                            <a href="faq/TROUBLESHOOTING_FAQ.md" class="doc-link">Read ?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Documentation Stats:</strong> 16 active documents + 4 archived</p>
+            <p>Last Updated: December 2025 | Maintained by Feygon Nickerson</p>
+            <p><a href="https://github.com/feygon/EVE2-Project">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            var query = this.value.toLowerCase();
+            var sections = document.querySelectorAll('.doc-section');
+            var cards = document.querySelectorAll('.doc-card');
+
+            // Hide all sections and cards initially
+            sections.forEach(function(section) {
+                section.classList.add('hidden');
+            });
+            cards.forEach(function(card) {
+                card.classList.add('hidden');
+            });
+
+            if (query) {
+                // Show sections and cards that match the query
+                sections.forEach(function(section) {
+                    if (section.querySelector('h2').innerText.toLowerCase().includes(query)) {
+                        section.classList.remove('hidden');
+                    }
+                });
+                cards.forEach(function(card) {
+                    if (card.innerText.toLowerCase().includes(query)) {
+                        card.classList.remove('hidden');
+                    }
+                });
+            } else {
+                // If query is empty, show all sections and cards
+                sections.forEach(function(section) {
+                    section.classList.remove('hidden');
+                });
+                cards.forEach(function(card) {
+                    card.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

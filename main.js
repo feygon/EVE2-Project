@@ -18,6 +18,7 @@ var mysqlIllusion = require('./dbcon_illusion.js');  // MySQL connection for ill
 var callbacks = require('./scripts/callbacks.js');  // callback functions
 var illusionCallbacks = require('./scripts/illusionCallbacks.js'); // Illusion-specific callbacks
 var queries = require('./scripts/queries.js'); // Importing SQL queries
+var path = require('path'); // Path module for serving static files
 
 // Setting up handlebars view engine
 var handlebars = require('express-handlebars').create({
@@ -66,6 +67,17 @@ app.use('/resume/', require('./resume.js'));
 app.use('/eve2/', require('./eve2.js'));
 app.use('/illusion/', require('./illusion.js'));
 
+// Documentation route - serve the HTML portal
+app.get('/documentation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
+});
+
+// Site index route - serve the site map
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'site-index.html'));
+});
+
+// Root redirects to resume (default)
 app.get('/',(req,res)=> { 
 	res.redirect(301, "https://www.realfeygon.com/resume") 
 });
