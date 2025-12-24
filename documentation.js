@@ -171,6 +171,7 @@ router.get('/documentation', (req, res) => {
     
     // Render Handlebars template
     res.render('documentation', {
+        layout: null,  // Use standalone template (no layout wrapper)
         docStructure: docStructure,
         categories: Object.keys(docStructure),
         totalDocs: totalDocs,
