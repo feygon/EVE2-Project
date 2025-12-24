@@ -117,13 +117,15 @@ router.get('/documentation', (req, res) => {
         }
     });
     
-    // Root level docs (process docs)
-    const rootDocs = ['PROJECT_IMPROVEMENT_PROCESS.md', 'PROCESS_QUICK_CARD.md', 'SESSION_SUMMARY.md', 'NEW_ROUTES_SUMMARY.md', 'CI_CD_READY.md'];
+    // Root level docs (dynamically discovered)
     const processFiles = [];
     
-    rootDocs.forEach(file => {
-        const filePath = path.join(docsDir, file);
-        if (fs.existsSync(filePath)) {
+    try {
+        const rootFiles = fs.readdirSync(docsDir)
+            .filter(file => file.endsWith('.md')); // Get all .md files in docs root
+        
+        rootFiles.forEach(file => {
+            const filePath = path.join(docsDir, file);
             try {
                 const content = fs.readFileSync(filePath, 'utf8');
                 const titleMatch = content.match(/^#\s+(.+)$/m);
@@ -132,9 +134,8 @@ router.get('/documentation', (req, res) => {
                 const lines = content.split('\n');
                 let description = 'Process documentation';
                 for (let line of lines) {
-                    const trimmed = line.trim();
-                    if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('---') && !trimmed.startsWith('**') && trimmed.length > 20) {
-                        description = trimmed.substring(0, 150);
+                    if (line.trim() && !line.startsWith('#') && !line.startsWith('---')) {
+                        description = line.substring(0, 150);
                         break;
                     }
                 }
@@ -149,9 +150,11 @@ router.get('/documentation', (req, res) => {
             } catch (err) {
                 console.error(`Error reading ${file}:`, err);
             }
-        }
-    });
-    
+        });
+    } catch (err) {
+        console.error('Error reading docs root directory:', err);
+    }
+
     if (processFiles.length > 0) {
         docStructure['process'] = {
             title: 'Process & Workflow',
@@ -283,13 +286,15 @@ router.get('/api/documentation', (req, res) => {
         }
     });
     
-    // Root level docs (process docs)
-    const rootDocs = ['PROJECT_IMPROVEMENT_PROCESS.md', 'PROCESS_QUICK_CARD.md', 'SESSION_SUMMARY.md', 'NEW_ROUTES_SUMMARY.md', 'CI_CD_READY.md'];
+    // Root level docs (dynamically discovered)
     const processFiles = [];
     
-    rootDocs.forEach(file => {
-        const filePath = path.join(docsDir, file);
-        if (fs.existsSync(filePath)) {
+    try {
+        const rootFiles = fs.readdirSync(docsDir)
+            .filter(file => file.endsWith('.md')); // Get all .md files in docs root
+        
+        rootFiles.forEach(file => {
+            const filePath = path.join(docsDir, file);
             try {
                 const content = fs.readFileSync(filePath, 'utf8');
                 const titleMatch = content.match(/^#\s+(.+)$/m);
@@ -314,9 +319,11 @@ router.get('/api/documentation', (req, res) => {
             } catch (err) {
                 console.error(`Error reading ${file}:`, err);
             }
-        }
-    });
-    
+        });
+    } catch (err) {
+        console.error('Error reading docs root directory:', err);
+    }
+
     if (processFiles.length > 0) {
         docStructure['process'] = {
             title: 'Process & Workflow',
