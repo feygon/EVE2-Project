@@ -1,0 +1,75 @@
+name: Deploy to DirectAdmin
+
+on:
+  push:
+    branches:
+      - main  # Deploy on push to main branch
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test --if-present
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy files via rsync
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='.vs' \
+            --exclude='.vscode' \
+            --exclude='*.log' \
+            --exclude='logs/' \
+            --exclude='tmp/' \
+            --exclude='.github' \
+            --exclude='github-deploy-key*' \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+      
+      - name: Install production dependencies
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && npm ci --production"
+      
+      - name: Restart Node.js application
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+            "touch ${{ secrets.DEPLOY_PATH }}/tmp/restart.txt || mkdir -p ${{ secrets.DEPLOY_PATH }}/tmp && touch ${{ secrets.DEPLOY_PATH }}/tmp/restart.txt"
+      
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Check your site at: https://realfeygon.com"
+      
+      - name: Cleanup SSH keys
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
