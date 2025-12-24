@@ -1,164 +1,371 @@
-# RealFeygon.com - Local Development Setup
+# RealFeygon.com - Full-Stack Web Application
 
-This repository contains a Node.js Express application with a MariaDB backend, currently hosted on GeniusMojo via DirectAdmin.
+A Node.js Express application with MariaDB backend, featuring multiple SPAs and automated CI/CD deployment.
 
-## ?? Quick Start (Local Development)
+**Live Site:** https://realfeygon.com
 
-### First Time Setup
+---
 
-1. **Run the automated setup script:**
-   ```powershell
-   .\setup-local.ps1
-   ```
-   This will:
-   - Check for Node.js and npm
-   - Help install MariaDB if needed
-   - Install npm dependencies
-   - Set up local databases
-   - Create local configuration files
-   - Create .gitignore for safety
+## ?? Table of Contents
 
-2. **Start the development server:**
-   ```powershell
-   .\start-local.ps1 3000
-   ```
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Application Routes](#application-routes)
+- [Databases](#databases)
+- [Configuration](#configuration)
+- [Development Workflow](#development-workflow)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Documentation](#documentation)
 
-3. **Open your browser to:**
-   - http://localhost:3000/resume
-   - http://localhost:3000/eve2
-   - http://localhost:3000/illusion
+---
 
-### Manual Setup
+## ? Quick Start
 
-If you prefer to set things up manually, see [LOCAL_SETUP.md](LOCAL_SETUP.md) for detailed instructions.
+### **Local Development (First Time):**
+
+```powershell
+# Automated setup
+.\setup-local.ps1
+
+# Start development server
+.\start-local.ps1 3000
+```
+
+**Visit:** http://localhost:3000
+
+---
+
+### **Manual Setup:**
+
+See [docs/setup/LOCAL_SETUP.md](docs/setup/LOCAL_SETUP.md) for detailed instructions.
+
+---
 
 ## ?? Project Structure
 
 ```
 RealFeygon/
-??? main.js                    # Main Express server
-??? dbcon.js                   # Production database config (EVE2)
-??? dbcon_illusion.js          # Production database config (Illusion Spells)
-??? dbcon.local.js             # Local database config (EVE2) - gitignored
-??? dbcon_illusion.local.js    # Local database config (Illusion) - gitignored
-??? package.json               # Node dependencies
-??? views/                     # Handlebars templates
-?   ??? layouts/
-?   ??? partials/
-?   ??? helpers/
-??? public/                    # Static assets
-??? scripts/                   # Callback and query modules
-??? resume.js                  # Resume module routes
-??? eve2.js                    # EVE2 module routes
-??? illusion.js                # Illusion spells module routes
-??? EVE2 DDQ.sql              # EVE2 database schema
-??? illusions DDQ.sql         # Illusion spells database schema
+??? main.js                      # Express server entry point
+??? package.json                 # Dependencies and scripts
+?
+??? .github/
+?   ??? workflows/
+?   ?   ??? deploy.yml          # CI/CD automation
+?   ??? instructions/
+?       ??? neuro-accessibility.md  # Accessibility guidelines
+?
+??? config/
+?   ??? dbcon.js                # Production DB config (EVE2)
+?   ??? dbcon_illusion.js       # Production DB config (Illusion)
+?   ??? dbcon.local.js          # Local DB config (gitignored)
+?   ??? dbcon_illusion.local.js # Local DB config (gitignored)
+?
+??? routes/
+?   ??? resume.js               # Resume/portfolio module
+?   ??? eve2.js                 # EVE Online inventory system
+?   ??? illusion.js             # Pathfinder 2E spells
+?
+??? scripts/
+?   ??? callbacks.js            # Database callback functions
+?   ??? illusionCallbacks.js    # Illusion-specific callbacks
+?   ??? queries.js              # SQL query definitions
+?   ??? illusionQueries.js      # Illusion SQL queries
+?   ??? monoCBs.js              # Monolithic callback handlers
+?   ??? monoQueries.js          # Complex queries
+?   ??? sql/
+?       ??? EVE2 DDQ.sql        # EVE2 database schema
+?       ??? illusions DDQ.sql   # Illusion database schema
+?
+??? views/
+?   ??? layouts/                # Handlebars layouts
+?   ??? partials/               # Reusable view components
+?   ??? helpers/                # Template helper functions
+?
+??? public/
+?   ??? static/                 # CSS, JS, images
+?   ??? site-index.html         # Site navigation page
+?
+??? docs/                       # Complete documentation
+    ??? index.html              # Documentation portal
+    ??? setup/                  # Installation guides
+    ??? deployment/             # Deployment guides
+    ??? git/                    # Git workflow
+    ??? development/            # Troubleshooting
 ```
 
-## ??? Databases
-
-### EVE2 Database (`realfey_realfey_eve2_project`)
-An EVE Online-inspired inventory/cargo system with:
-- Players, Ships, Cargo Spaces
-- Items, Objects, Locations
-- Complex stored procedures for game mechanics
-
-### Illusion Spells Database (`realfey_illusion_spells_DB`)
-Pathfinder 2E illusion spell catalog with:
-- Spells, Categories, Spell-Category relationships
-- Rich metadata (traits, actions, effects, etc.)
-- Views for easy querying
-
-## ?? Configuration
-
-### Production (GeniusMojo/DirectAdmin)
-- Uses `dbcon.js` and `dbcon_illusion.js`
-- Remote MariaDB connection
-- Port 80/443
-
-### Local Development
-- Uses `dbcon.local.js` and `dbcon_illusion.local.js` (gitignored)
-- localhost MariaDB connection
-- Port 3000 (or configurable)
-
-**?? IMPORTANT:** Never commit production database credentials to Git!
-
-## ?? Dependencies
-
-Main dependencies:
-- `express` - Web framework
-- `express-handlebars` - View engine
-- `express-session` - Session management
-- `body-parser` - Request body parsing
-- `mysql` - MySQL/MariaDB client
-- `forever` - Process manager
-
-See `package.json` for full list.
-
-## ??? Available Scripts
-
-### PowerShell Scripts
-- `setup-local.ps1` - Complete local environment setup
-- `start-local.ps1 [port]` - Start the development server
-
-### Manual Commands
-```powershell
-# Install dependencies
-npm install
-
-# Start server on port 80 (requires admin)
-node main.js
-
-# Start server on custom port
-node main.js 3000
-
-# Connect to local database
-mysql -u root -p
-
-# Import database schemas
-mysql -u realfey_realfey_realfeyuser -p realfey_realfey_eve2_project < "EVE2 DDQ.sql"
-mysql -u realfey_illusion_spells_DB -p realfey_illusion_spells_DB < "illusions DDQ.sql"
-```
+---
 
 ## ?? Application Routes
 
-- `/` - Redirects to `/resume`
-- `/resume/` - Resume/portfolio module
-- `/eve2/` - EVE Online inventory system
-- `/illusion/` - Pathfinder 2E illusion spells
+| Route | Description | Module |
+|-------|-------------|--------|
+| `/` | Redirects to `/resume` | main.js |
+| `/resume` | Professional resume/portfolio | resume.js |
+| `/eve2` | EVE Online-inspired inventory system | eve2.js |
+| `/illusion` | Pathfinder 2E illusion spells database | illusion.js |
+| `/documentation` | Technical documentation portal | main.js |
+| `/index.html` | Site navigation/index | main.js |
 
-## ?? Security Notes
+---
 
-- Production credentials are in `dbcon.js` and `dbcon_illusion.js`
-- Local development credentials should be in `*.local.js` files (gitignored)
-- Session secret is hardcoded - consider using environment variables
-- Update passwords before deploying!
+## ??? Databases
+
+### **EVE2 Database (`realfey_realfey_eve2_project`)**
+
+Complex game mechanics system featuring:
+- Players, Ships, Cargo Spaces
+- Items, Objects, Locations
+- Nested container system
+- Stored procedures for game logic
+
+**Schema:** `scripts/sql/EVE2 DDQ.sql`
+
+---
+
+### **Illusion Spells Database (`realfey_illusion_spells_DB`)**
+
+Pathfinder 2E Remaster spell catalog:
+- 200+ illusion spells
+- Categories and relationships
+- Rich metadata (traits, actions, effects)
+- Optimized views for querying
+
+**Schema:** `scripts/sql/illusions DDQ.sql`
+
+---
+
+## ?? Configuration
+
+### **Environment Variables:**
+
+Create `.env` file for local development:
+
+```env
+# Database - EVE2
+DB_HOST=localhost
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_NAME=realfey_realfey_eve2_project
+
+# Database - Illusion
+DB_ILLUSION_HOST=localhost
+DB_ILLUSION_USER=your_username
+DB_ILLUSION_PASSWORD=your_password
+DB_ILLUSION_NAME=realfey_illusion_spells_DB
+
+# Session
+SESSION_SECRET=your_secret_here
+NODE_ENV=development
+PORT=3000
+```
+
+**Production:** Set environment variables in DirectAdmin Node.js Selector.
+
+---
+
+### **Local vs Production:**
+
+| Environment | Config Files | Port | Database |
+|-------------|-------------|------|----------|
+| **Local** | `*.local.js` (gitignored) | 3000 | localhost |
+| **Production** | `dbcon.js`, `dbcon_illusion.js` | 80/443 | Remote MariaDB |
+
+---
 
 ## ?? Development Workflow
 
-1. Make changes locally
-2. Test on `http://localhost:3000`
-3. Commit changes (config files are gitignored)
-4. Deploy to GeniusMojo production
-5. Update production database if schema changed
+### **1. Make Changes Locally:**
+
+```powershell
+# Start server
+.\start-local.ps1 3000
+
+# Make changes
+# Test at http://localhost:3000
+```
+
+---
+
+### **2. Commit to Git:**
+
+```powershell
+git add .
+git commit -m "Your message"
+git push origin main
+```
+
+---
+
+### **3. Automatic Deployment:**
+
+GitHub Actions automatically:
+- ? Runs tests
+- ? Deploys to DirectAdmin
+- ? Installs dependencies
+- ? Restarts Node.js app
+
+**No manual SFTP needed!**
+
+---
+
+## ?? CI/CD Pipeline
+
+### **Automated Deployment:**
+
+Every push to `main` branch triggers:
+
+1. **Build & Test** - npm install and test
+2. **Deploy via rsync** - Upload changed files only
+3. **Install Dependencies** - Production npm ci
+4. **Restart App** - Touch restart file
+
+**Monitoring:** https://github.com/feygon/EVE2-Project/actions
+
+---
+
+### **Manual Deployment:**
+
+Trigger from GitHub UI:
+1. Go to Actions tab
+2. Select "Deploy to DirectAdmin"
+3. Click "Run workflow"
+
+---
+
+### **Setup CI/CD:**
+
+See [docs/deployment/CI_CD_SETUP.md](docs/deployment/CI_CD_SETUP.md) for complete setup guide.
+
+**Quick setup:** 15 minutes
+
+---
+
+## ?? Documentation
+
+### **Complete Docs Portal:**
+
+**Local:** `docs/index.html`  
+**Production:** https://realfeygon.com/documentation
+
+**Features:**
+- ?? Live search (Ctrl+K)
+- ? Dyslexia-friendly design
+- ?? Mobile responsive
+- ?? Keyboard accessible
+
+---
+
+### **Key Documents:**
+
+| Document | Purpose |
+|----------|---------|
+| [QUICK_START.md](QUICK_START.md) | Daily reference |
+| [docs/setup/LOCAL_SETUP.md](docs/setup/LOCAL_SETUP.md) | Complete setup guide |
+| [docs/deployment/DEPLOYMENT_GUIDE.md](docs/deployment/DEPLOYMENT_GUIDE.md) | Production deployment |
+| [docs/deployment/CI_CD_SETUP.md](docs/deployment/CI_CD_SETUP.md) | Automated deployment |
+| [docs/development/TROUBLESHOOTING.md](docs/development/TROUBLESHOOTING.md) | Common issues |
+
+---
+
+## ??? Available Scripts
+
+### **PowerShell:**
+```powershell
+.\setup-local.ps1           # Complete environment setup
+.\start-local.ps1 [port]    # Start development server
+```
+
+### **NPM:**
+```powershell
+npm install                 # Install dependencies
+npm start                   # Start server (port 80)
+npm test                    # Run tests
+```
+
+### **Database:**
+```powershell
+# Import schemas
+mysql -u username -p dbname < "scripts\sql\EVE2 DDQ.sql"
+mysql -u username -p dbname < "scripts\sql\illusions DDQ.sql"
+```
+
+---
+
+## ?? Security
+
+### **Protected Files (.gitignore):**
+- `.env` - Environment variables
+- `*.local.js` - Local database configs
+- `github-deploy-key*` - SSH keys
+- `.vs/` - IDE files
+
+### **Best Practices:**
+- ? Environment variables for secrets
+- ? SSH key authentication
+- ? No hardcoded credentials
+- ? Session secrets from environment
+
+---
+
+## ?? Tech Stack
+
+**Backend:**
+- Node.js + Express.js
+- MariaDB/MySQL
+- express-session
+
+**Frontend:**
+- Handlebars templating
+- Vanilla JavaScript
+- Responsive CSS
+
+**DevOps:**
+- GitHub Actions CI/CD
+- DirectAdmin hosting
+- SFTP deployment
+
+---
+
+## ?? Testing
+
+```powershell
+# Run tests
+npm test
+
+# Local testing
+.\start-local.ps1 3000
+# Visit: http://localhost:3000
+```
+
+---
 
 ## ?? Troubleshooting
 
-### "Cannot connect to database"
-- Check if MariaDB service is running: `Get-Service MariaDB`
-- Verify credentials in config files
-- Ensure databases exist: `SHOW DATABASES;`
+### **Common Issues:**
 
-### "Port 80 already in use"
-- Use a different port: `node main.js 3000`
-- Or find what's using port 80: `netstat -ano | findstr :80`
+**"Cannot connect to database"**
+```powershell
+# Check MariaDB service
+Get-Service MariaDB
 
-### "Module not found"
-- Run `npm install` to install dependencies
+# Verify credentials in .env
+```
 
-### "Access denied for user"
-- Check username/password in `dbcon.local.js`
-- Verify user was created: `SELECT User FROM mysql.user;`
+**"Port already in use"**
+```powershell
+# Use different port
+.\start-local.ps1 3000
+```
+
+**"Module not found"**
+```powershell
+# Install dependencies
+npm install
+```
+
+**More help:** [docs/development/TROUBLESHOOTING.md](docs/development/TROUBLESHOOTING.md)
+
+---
 
 ## ?? Additional Resources
 
@@ -166,11 +373,48 @@ mysql -u realfey_illusion_spells_DB -p realfey_illusion_spells_DB < "illusions D
 - [Express.js Guide](https://expressjs.com/)
 - [MariaDB Documentation](https://mariadb.com/kb/)
 - [Handlebars Documentation](https://handlebarsjs.com/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+
+---
+
+## ? Accessibility
+
+This project follows neuro-accessibility guidelines for dyslexia and ADHD:
+
+- Short paragraphs (2-3 lines max)
+- Visual markers (emojis)
+- Clear structure (TOC, TL;DR)
+- Dyslexia-friendly fonts
+- High contrast design
+
+**Guidelines:** [.github/instructions/neuro-accessibility.md](.github/instructions/neuro-accessibility.md)
+
+---
 
 ## ?? Author
 
-Feygon Nickerson
+**Feygon Nickerson**
+
+- GitHub: [@feygon](https://github.com/feygon)
+- Website: https://realfeygon.com
+
+---
 
 ## ?? License
 
-MIT
+MIT License - See LICENSE file for details
+
+---
+
+## ?? Quick Links
+
+- **Live Site:** https://realfeygon.com
+- **Documentation:** https://realfeygon.com/documentation
+- **Site Index:** https://realfeygon.com/index.html
+- **GitHub Repo:** https://github.com/feygon/EVE2-Project
+- **CI/CD Status:** https://github.com/feygon/EVE2-Project/actions
+
+---
+
+**Last Updated:** December 2025  
+**Status:** Active Development
