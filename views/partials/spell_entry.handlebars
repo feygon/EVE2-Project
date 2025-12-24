@@ -1,0 +1,31 @@
+<div class="spell-link-container">
+    <a href="{{this.archiveURL}}" 
+       class="spell-link"
+       data-rank="{{this.rank}}"
+       data-traits="{{this.traits}}"
+       data-summary="{{this.summary}}"
+       data-heighten="{{this.heighten}}"
+       data-actions="{{this.actions}}"
+       data-spoilers="{{this.spoilers}}"
+       data-source="{{this.source}}"
+       data-properties="Rank {{this.rank}}{{#if this.spellRange}}, Range: {{this.spellRange}}{{/if}}{{#if this.spellTarget}}, Target: {{this.spellTarget}}{{/if}}{{#if this.area}}, Area: {{this.area}}{{/if}}{{#if this.duration}}, Duration: {{this.duration}}{{/if}}{{#if this.defense}}, Defense: {{this.defense}}{{/if}}">
+        
+        {{this.spellName}}
+    </a>
+
+    {{!-- Inline Traits (Plain Span) --}}
+    <span class="inline-traits">({{this.traits}})</span>
+
+    {{!-- Green Tag: Core Stats --}}
+    <span class="inline-green-tag">
+        Rank {{this.rank}} {{#if this.spellRange}} | {{this.spellRange}}{{/if}} {{#if this.spellTarget}} | {{this.spellTarget}}{{/if}}
+        {{#if this.area}} | {{this.area}}{{/if}}
+        {{#if this.duration}} | {{this.duration}}{{/if}}
+        {{#if this.defense}} | {{this.defense}}{{/if}}
+    </span>
+
+    {{!-- Cyan Tag: Heightened --}}
+    {{#if this.heighten}}
+        <span class="inline-cyan-tag">Heighten: {{this.heighten}}</span>
+    {{/if}}
+</div>

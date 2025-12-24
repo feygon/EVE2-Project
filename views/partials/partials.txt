@@ -1,0 +1,63 @@
+For more information on partials, go here:
+https://handlebarsjs.com/partials.html
+Of particular interest: lookup keyword under dynamic partials, and partial blocks.
+
+https://www.youtube.com/watch?v=02J5A3r-Bdk -- partials tutorial
+
+Partial template improves GP non-redundancy.
+Cut out repeated code, and insert comment.
+script call to partials id, with html code.
+register partial template in javascript (same place you register routes)
+
+back in index.html, (main.handlebars?), add in partial, e.g.: {{> partialName}} -- use the name we gave the partial when we registered it (possibly camelCasePartial vs. #id-dash-delimited-partial)
+
+Still had to include the script on both pages. So we didn't solve our redundancy problem, did we? Maybe even complicated it more. Buuuuut...
+
+we can use the same template twice on the same page.
+
+Use server side code to include that chunk of code in a separate file.
+In .net world, could renderpage.
+In phpworld, <?php include?>, etc.
+Just go get it with server-side code.
+What if there's no server?
+
+One thing we can do in javascript is ajax it in. (hack!)
+
+copy script into new file -- save & call new html file, save to views/partials folder
+leave partial call
+
+ajax in character details partial.
+$.ajax("./character-details-partial.html").done(function(charDetailsPartial)) {
+	@("body").append(charDetailsPartial);
+});
+
+move registerpartial after page.
+
+This doesn't append it to rendering in the body! I appends the partial SCRIPT code that you've registered onto the page.
+
+{{this}} in a {{#each}} {{/each}} block accesses each array entry in the root of a context, if it has no key attribute. Such as: 
+var bla = {
+	"bow" [
+		"wow",
+		"bark",
+		"bam"
+	]
+}, which references 'wow' and 'bar' as string array cells instead of properties
+
+instead of:
+var bla = {
+	"bow": [
+		{
+			"name": "wow",
+			"sound": "ruff"
+		},
+		{
+			"name": "waroo",
+			"sound": "arf"
+		},
+		{
+			"name": "takeA",
+			"sound": "splat"
+		}
+	]
+}, which would be dereferenced by its inner properties like name and sound.

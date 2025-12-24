@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deceiver's Blade</title>
+<style>
+    /* AON-inspired Dark Mode Styling */
+    body {
+        font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background-color: #1a1a1a; /* Very dark background */
+        color: #dcdcdc; /* Light text */
+        line-height: 1.6;
+        margin: 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #232323; /* Darker container background */
+        padding: 20px 30px;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    }
+
+    h1, h2, h3, h4 {
+        font-weight: 700;
+        color: #dcdcdc; /* Light text for headers */
+        border-bottom: 2px solid #444; /* Darker border */
+        padding-bottom: 5px;
+        margin-top: 20px;
+    }
+
+    a {
+        color: #58a6ff; /* A slightly brighter blue better for dark mode */
+        text-decoration: underline;
+    }
+
+    /* Maintain color even after clicking */
+    a:visited {
+        color: #58a6ff;
+    }
+
+    a:hover {
+        color: #82b1ff;
+    }
+
+    /* Inline tag styling - kept separate from the link style */
+    .inline-traits {
+        font-size: 0.85em;
+        color: #aaa;
+        margin-left: 8px;
+        font-style: italic;
+    }
+
+    /* Spell List Specifics */
+    .spell-list-category {
+        margin-bottom: 20px;
+        border-left: 4px solid #66ccff; /* Category color */
+        padding-left: 10px;
+    }
+
+    summary {
+        cursor: pointer;
+        list-style: none; /* Removes default triangle/disclosure indicator */
+        padding: 5px 0;
+        outline: none;
+        user-select: none;
+        position: relative;
+        display: flex; /* Use flexbox to keep items inline */
+        align-items: center; /* Vertically center items */
+        flex-wrap: nowrap; /* Prevent wrapping */
+    }
+
+    /* Force strong and count-tag to stay inline */
+    summary strong {
+        display: inline;
+        margin: 0; /* Remove any margin */
+        padding: 0; /* Remove any padding */
+        font-size: 1.1em; /* Make it slightly larger but not heading-sized */
+        font-weight: 700; /* Bold */
+        line-height: 1.6; /* Match body line height */
+    }
+
+    /* Custom disclosure indicator for details summary */
+    summary::before {
+        content: '►';
+        color: #66ccff;
+        margin-right: 8px;
+        display: inline-block;
+        transition: transform 0.2s;
+        font-size: 10px;
+        transform-origin: center;
+        line-height: 1.6;
+        vertical-align: middle;
+        flex-shrink: 0; /* Don't allow arrow to shrink */
+    }
+
+    details[open] > summary::before {
+        content: '▼';
+        transform: rotate(0deg);
+    }
+
+    .count-tag {
+        background-color: #444;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        font-weight: 600;
+        margin-left: 10px;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0; /* Don't allow tag to shrink */
+    }
+
+    .spell-entry {
+        margin: 5px 0;
+        padding-left: 20px; /* Indent the spell entries */
+    }
+
+    .spell-entry a {
+        display: inline-block; /* Make the whole line clickable/hoverable */
+        padding: 2px 0;
+    }
+    
+    /* Tooltip Styling */
+    #spell-tooltip {
+        position: fixed;
+        background-color: #333; /* Dark background */
+        color: #dcdcdc; /* Light text */
+        border: 1px solid #66ccff;
+        padding: 10px;
+        border-radius: 4px;
+        pointer-events: none; /* Crucial: allows clicking through the tooltip */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+        max-width: 300px;
+        z-index: 1000;
+        font-size: 0.9em;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    #tooltip-title {
+        font-weight: 700;
+        color: #66ccff;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #444;
+        padding-bottom: 3px;
+    }
+    
+    .green-tag {
+        color: #66ff66; /* Bright green */
+        font-weight: 600;
+        display: block;
+    }
+    
+    .inline-green-tag {
+        font-size: 0.85em;
+        color: #8fce00; 
+        margin-left: 8px;
+        font-style: italic;
+    }
+
+    .inline-cyan-tag {
+        font-size: 0.85em;
+        color: #00e5ff;
+        margin-left: 5px;
+        font-style: italic;
+    }
+
+    .cyan-tag {
+        color: #00ffff; /* Bright cyan */
+        font-weight: 600;
+        display: block;
+    }
+
+    .category-tags-nav {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #444;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-tag {
+        background-color: #333;
+        color: #66ccff !important; /* Blue for interactivity */
+        padding: 5px 12px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        text-decoration: none !important;
+        font-size: 0.85em;
+        font-weight: 600;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .nav-tag:hover {
+        background-color: #444;
+        border-color: #66ccff;
+        color: #82b1ff !important;
+    }
+
+    /* Smooth scrolling when clicking tags */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Hide the description by default */
+    .category-description {
+        display: none;
+        margin: 10px 0;
+        padding: 10px;
+        border-left: 3px solid #66ccff;
+        background: rgba(102, 204, 255, 0.05);
+        font-style: italic;
+        color: #ccc;
+    }
+
+    /* Show the description only when the parent <details> is open */
+    details[open] .category-description {
+        display: block;
+    }
+
+    /* Tooltip specific styling (ensure it doesn't conflict) */
+    #spell-tooltip {
+        max-width: 300px;
+        line-height: 1.4;
+    }
+
+    /* Mid-page header styling */
+    .mid-page-header {
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Deceiver's Blade Illusion Spells</h1>
+    <div class="category-tags-nav">
+        {{#each categories}}
+            <a href="#cat-{{this.categoryId}}" class="nav-tag">{{this.categoryName}}</a>
+        {{/each}}
+    </div>
+    <p>Arcane & Occult Illusion Spells by category</p>
+
+    {{!-- Use category_block partial for each category --}}
+    {{#each categories}}
+        {{> category_block}}
+        
+        {{!-- This handles your specific requirement for a mid-page header --}}
+        {{#if (eq @index 6)}}
+            <h2 class="mid-page-header">Subjective Categorizations</h2>
+        {{/if}}
+    {{/each}}
+</div>
+
+<div id="spell-tooltip">
+    <div id="tooltip-title"></div>
+    <div id="tooltip-content"></div>
+</div>
+
+<script>
+    // --- 1. TOOLTIP LOGIC ---
+    const tooltip = document.getElementById('spell-tooltip');
+    const title = document.getElementById('tooltip-title');
+    const content = document.getElementById('tooltip-content');
+
+    // Function to show tooltip
+    function showTooltip(e, header, body) {
+        title.innerText = header;
+        content.innerHTML = body;
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+    }
+
+    document.querySelectorAll('.spell-link').forEach(link => {
+        link.addEventListener('mouseenter', (e) => {
+            title.innerText = e.target.innerText;
+            content.innerHTML = `
+                <span class="cyan-tag">Rank ${e.target.dataset.rank}</span>
+                <span class="green-tag">${e.target.dataset.traits}</span>
+                <p>${e.target.dataset.summary}</p>
+            `;
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
+        });
+
+        link.addEventListener('mousemove', (e) => {
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+        });
+
+        link.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+        });
+    });
+
+    // --- 2. QUICK LINK AUTO-EXPAND LOGIC ---
+    document.querySelectorAll('.nav-tag').forEach(tag => {
+        tag.addEventListener('click', (e) => {
+            const targetId = tag.getAttribute('href'); // Gets the #cat-ID
+            const detailsElement = document.querySelector(targetId + ' details');
+            if (detailsElement) {
+                detailsElement.open = true; // Automatically expands the collapsed section
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

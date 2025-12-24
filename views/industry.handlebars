@@ -1,0 +1,112 @@
+<html>
+<div class="page">
+
+    <div style="width:83%">
+    <p style="color:darkred; font-size:24px;">
+        Dear testers. Please note that this page contains:<br>
+        An insertion to the item structures entity: Invent<br>
+        An insertion to the item use entity: Design<br>
+        An insertion to the objects entity: Produce<br>
+        Several selections to tables, to populate the selection inputs.<br>
+        Every page includes a check to the session details, against a selection to the database.<br>
+    </p>
+    </div>
+<br>
+<h1>Industry Page</h1><br>
+
+<div>
+    <label>Current Items</label>
+    <select name="CurrentItems">
+{{!-- There'll always be an item structure type. No need for 0-count fading --}}
+        {{#each item_structure_list}}
+        <option>{{name}}, type: {{type}}, vol: {{vol_packed}}{{#compare vol_packed vol_unpacked operator="!="}}, unpacked: {{vol_unpacked}}{{/compare}}</option>
+        {{/each}}
+    </select>
+</div>
+<div>
+    <label>Current Item Uses</label>
+    <select name="CurrentUses">
+        {{!--  --}}
+    {{#each itemUse_list_orderbyqq}}
+    <option>{{name}}, capacity: {{capacity}}m3, scale: {{scale}}</option>
+    {{/each}}
+    </select>
+</div><br>
+
+<form id="inventstructure" action="/eve2/industry/" method="post">
+    
+    <h2>Invent Item </h2>
+    <label>Item Name </label><input id="textBox_inventItem" type="text" name="name"><br>
+    <label>Packaged Volume </label><input type="number" step="0.01" min="0" name="packaged" value="0"><br>
+    <label>Unpackaged Volume </label><input type="number" step="0.01" min="0" name="unpackaged" value="0"><br>
+    <label>Item Structure Type </label><select name="type"> 
+{{!-- There'll always be an item structure type. No need for 0-count fading --}}
+        {{#each item_structure_types}}
+            <option value="{{type}}">{{type}}</option>
+        {{/each}}
+    </select><br>
+    <p style = "color:red">
+        (Reviewer - This is an insert to the item structures entity.<br>
+        There are plans to add item uses for charges and materials, but as yet, <br>
+        the only application-level implementation is for containers:
+        as ships, space stations, and boxes)</p>
+    <input disabled="true" id="button_inventItem" type="submit" value="Invent" name="invent">
+</form>
+<br>
+
+<form id="designuse" action="/eve2/industry/" method="post">
+    <h2>Design a use for an item</h2> <br>
+    <label>Based on item </label><select name="fromitemname">
+{{!--  --}}
+    {{#each useless_item_structures}}
+        <option value="{{id}}">{{name}} {{#compare type "Container"}}(Container Structure){{/compare}}</option>
+    {{/each}}
+
+    </select><br>
+    <label>Capacity </label><input type="number" step="0.01" min="0" name="capacity" value="0"><br>
+    <label>Scale of use </label><select name="scale"> 
+{{!-- There'll always be an option available. No need for 0-count fading --}}
+        {{#each item_use_scales}}
+            <option value="{{scale}}">{{scale}}</option>
+        {{/each}}
+    </select><p style ="color:red" class="inlineWithSelect"> (Bay scale doesn't do anything yet.)</p><br>
+
+    <label style = "color:red">(Reviewer - This is an insert to the item uses entity.)</label>
+    <input type="submit" value="Design" name="design">
+</form><br>
+<br>
+<form id="choose-item" action="/eve2/industry/" method="post">
+<h2>Get an inventory item</h2>
+    <label>Item </label><select name="id"> 
+{{!--  --}}
+        {{#each item_structure_list}}
+            <option value="{{id}}" {{#if scale}}class="bold-option"{{/if}}>
+                {{name}} ({{#if scale}}{{scale}}{{else}}{{type}}{{/if}})
+            </option>
+        {{/each}}
+    </select><br>
+    <label>Quantity</label><input type="number" min="0" name="quantity" value="1"><br>
+<label style = "color:red">(Reviewer - This is an insert to the Objects entity.)</label>
+<input type="submit" value="Produce" name="produce">
+</form>
+
+<br>
+{{#if sessionAlert}}<h3>Alert: {{sessionAlert}}</h3>{{/if}}
+
+</div>
+
+<div id="sidebar">
+<a href="/eve2/space_station/">Go back to Space Station</a><br>
+
+</div>
+
+<script>
+var items = new Array();
+{{#each item_structure_list}}
+items["{{name}}"] = true;
+{{/each}}
+textBoxButton("textBox_inventItem", "button_inventItem", items, document);
+</script>
+
+
+</html>

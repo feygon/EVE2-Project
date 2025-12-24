@@ -1,0 +1,248 @@
+<html>
+
+<div class="page">
+    <div style="width:83%">
+    <p style="color:darkred; font-size:24px;">
+        <!-- Dear testers. Please note that this page contains:<br> -->
+        <!-- A deletion from the objects entity, and an update to the cargo spaces entity: Undock.<br> -->
+        <!-- A truly monolithic selection from MANY DIFFERENT TABLES: the below table, provided that you have some items in your cargo hold. Try using the player Zaphod to see this in action.<br> -->
+        <!-- A selection of ships you currently have, that you are not flying. Again, try using Zaphod to see this in action. -->
+        <!-- Every page includes a check to the session details, against a selection to the database.<br> -->
+        <!-- To make more ships and items, go to Industry (top left link).<br> -->
+        <!-- Launching new space stations is under construction. -->
+    </p>
+    
+    </div>
+
+
+<br>
+<h1>Space Station {{session.stationName}}</h1><br>
+
+<br/>
+<br>
+<div>
+    <form id="rename-station" action="/eve2/space_station/" method="post">
+        <label>Rename this station:</label>
+        <input type="text" name="newStationName"><br>
+        <label></label><input type="submit" value="Submit" name="ChangeStationName">
+    </form>
+</div>
+<br>
+
+<h3>Ships and Containers:</h3>
+
+<div>
+    <form id="sort-container" action="/eve2/space_station/" method="post">
+        <label>Filter structures by type:</label>
+        <select name="typeFilter"> 
+            {{!-- <option value="None">None</option> --}}
+            <option value="Charge">Charge</option>
+            <option value="Container">Container</option>
+            <option value="Material">Material</option>
+            <option value="Module">Module</option>
+            <option value="Satellite">Satellite</option>
+        </select>
+        <br><label></label><input type="submit" name="select_type_filter" value="Filter all cargo spaces by scale">
+    </form>
+</div>
+<div>
+    <form id="sort-container" action="/eve2/space_station/" method="post">
+        <br>
+        <label>Filter cargo spaces by scale:</label>
+            <select name="scaleFilter">
+                {{!-- <option value="None">None</option> --}}
+                <option value="Bay">Bay</option>
+                <option value="Box">Box</option>
+                <option value="Ship">Ship</option>
+            </select>
+        <br>
+        <label></label><input type="submit" name="select_scale_filter" value="Filter all cargo spaces by scale">
+    </form>
+</div>
+
+{{#if filter_by}}
+<br><h2 style="color: red">Filtering view by {{filter_by}}.</h2><br>
+{{/if}}
+{{#if sessionAlert}}
+<br><h3>Alert: {{sessionAlert}}</h3><br>
+{{/if}}
+
+
+
+<table class="StationView">
+    <thead>
+        <th class="ViewLabels"><label>{{session.playerName}}'s Station</label></th>
+        <th class="ViewData"><h2>{{session.stationName}}</h2></th>
+    </thead>
+    <tbody>
+        
+        <tr class="top" style="border: 2px black double;">
+            <td>Ship Location:</td>
+            <td>{{session.locationName}} System, Security Status: Unknown</td>
+
+            {{#each this.onboardCargoSpaces}}
+            <tr class="cargoSpaceRow">
+                <td class="CSR-labelColumn">
+                    <div><label>{{scale}}:<br> {{name}}</label></div>
+                    <label class="CSR-label">Contents</label>
+                </td>
+                <td class="CSR-table-cell">
+                    <table class="CSR-table">
+                        <thead>
+                            <th><label>Object Name</label>  </th>
+                            <th><label>Volume</label>       </th>
+                            <th><label>Type/Scale</label>   </th>
+                            <th><label>Quantity</label>     </th>
+                            <th><label>Packaged</label>     </th>
+                            <th><label>Operations</label>   </th>
+                        </thead>
+                        <tbody>
+                            {{#each ../onboardObjects}}
+                                {{#compare inside_CSid ../CSid}}
+                                    <tr class="stationRow">
+                                        <td><!-- object Name -->
+                                            {{#if CSName}}
+                                            <label>{{structureName}}</label><br>{{CSName}}
+                                            {{else}}
+                                            {{structureName}}
+                                            {{/if}}
+                                        </td>
+                                        <td id="target-{{objectID}}"><!-- Volume -->
+                                            {{#compare packaged 1 operator="=="}}
+                                                <script>
+                                                    document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_packed}} * {{quantity}};
+                                                </script>
+                                            {{else}}
+                                                <script>
+                                                    document.getElementById("target-" + {{objectID}}).innerHTML = {{vol_unpacked}} * {{quantity}};
+                                                </script>
+                                            {{/compare}}
+                                        </td>
+                                        <td><!-- Type/Scale -->
+                                            {{#if CSid}}
+                                                {{type}}: {{scale}}
+                                            {{else}}
+                                                {{type}}
+                                            {{/if}}
+                                        </td>
+                                        <td><!-- Quantity -->
+                                            {{quantity}}
+                                        </td>
+                                        <td><!-- Packaged -->
+                                            {{#compare packaged 1}}
+                                            True
+                                            {{else}}
+                                            False
+                                            {{/compare}}
+                                        </td>
+                                        <td><!-- Operations-->
+{{!--  Depth Offset 41 --}}
+{{#compare CSid ../../session.shipID}}
+    Cannot Repackage, move, or trash a piloted ship. You must first move to another ship.
+{{else}}
+    {{#if CSid}}
+        <div class="operationsForm">
+            <form id="rename-CS" action="/eve2/space_station/" method="post">
+                <input type="hidden" name="changeCSname_CSid" value={{CSid}}>
+                <input type="text" name="newCSname" value="(Rename this Cargo Space)"><br>
+                <input class="operationsButton" type="submit" value="Submit" name="ChangeCSName">
+            </form>
+        </div>
+    {{/if}}
+    <div class="operationsForm">
+        <form id="packaging-item" action="/eve2/space_station/" method="post">
+            <input type="hidden" value="{{objectID}}" name="packagingObjectID">
+            {{#compare packaged 1}}
+                <input class="operationsButton" type="submit" name="unpackageObject" value="Unpackage">
+            {{else}}
+                <input class="operationsButton" id="badButton" type="submit" name="repackageObject" value="Repackage">
+            {{/compare}}
+        </form>
+    </div>
+    <div class="operationsForm">
+
+        <!-- <p> -->
+            <!-- The {{structureName}}{{objectID}} can be placed in a cargo space.<br> -->
+            <!-- Including itself, the {{../name}} contains the following cargo spaces:</p><p> -->
+        <!-- </p> -->
+
+        <!-- <div class="StationView"> -->
+        <!-- {{#each ../../onboardCargoSpaces}} -->
+        <!-- <p> -->
+            <!-- Space {{CSid}} -- {{name}} -- inside Space {{../../CSid}}, {{../../name}} -->
+        <!-- </p> -->
+        <!-- {{/each}} -->
+        <!-- </div> -->
+
+        <!-- {{#and true true}} -->
+        <!-- Yes. -->
+        <!-- <br> -->
+        <!-- {{else}} -->
+        <!-- No. -->
+        <!-- <br> -->
+        <!-- {{/and}} -->
+
+
+        <form id="move-item-{{objectID}}" action="/eve2/space_station" method="post">
+            <select name="CStoMoveObjectTo">
+                {{#each ../../onboardCargoSpaces}}
+                    {{#compare ../objectID ObjID operator="!="}}
+                    <option value="{{CSid}}">{{name}}</option>
+                    {{/compare}}
+                {{/each}}
+            </select>
+            <input type="hidden" value={{objectID}} name="moveObjectID">
+            <input class="operationsButton" type="submit" name="moveObject" value='Move'>
+        </form>
+    </div> <!-- end operationsForm moveObject -->
+
+    <div class="operationsForm">
+        <form id="choose-item" action="/eve2/space_station/" method="post">
+            <input type="hidden" value={{objectID}} name="trashObjectID">
+            <input class="operationsButton" id="badButton" type="submit" value="Trash" name="deleteObject">
+        </form>
+    </div><!-- end operationsForm null -->
+{{/compare}}
+{{!--  End Depth Offset 41 --}}
+                                        </td>
+                                    </tr>
+                                {{/compare}}{{!-- end compare inside_CSid --}}
+                            {{/each}}{{!-- end each ../onboardObjects --}}
+                        </tbody>
+                    </table> <!-- end CSR-table (Cargo Space Row table) -->
+                </td>
+            </tr>
+        {{/each}}{{!-- end each onboardCargoSpaces --}}
+    </tbody>
+</table> <!-- end table ShipView -->
+
+<br/>
+<br/>
+
+<br>
+</div> <!-- end page -->
+<div id="sidebar">
+
+<a href="/eve2/industry/">Industry</a><br>
+
+<a href="/eve2/out_in_space/undock">undock</a><br>
+
+<form class="sidebarForm" id="choose-ship" action="/eve2/space_station/" method="post">
+    <label>Change <br>Piloting ship</label>
+    <select name="changeToShipID" id="Select_changeToShipID"> 
+        <option id="falseOption"></option>
+        {{#each onboardCargoSpaces}}
+            {{#compare2customString scale "Ship" CSid ../session.shipID "!=" operator="=="}}
+            <option value={{CSid}}>{{name}}</option>
+            {{/compare2customString}}
+        {{/each}}
+    </select>
+    <input disabled="true" type="submit" name="changeShip" value='Change' id="button_changeToShipID"><br>
+</form><br>
+</div>
+
+<script>
+selectButton("Select_changeToShipID", "button_changeToShipID", "falseOption", document);
+</script>
+
+</html>

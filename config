@@ -1,0 +1,9 @@
+Host server06.hostwhitelabel.com
+  User realfey
+  HostName server06.hostwhitelabel.com
+  Port 27493
+
+Host ftp.realfeygon.com
+  User realfey
+  HostName ftp.realfeygon.com
+  Port 27493

@@ -1,0 +1,15 @@
+        {{#each all_players}}
+        <tr>
+            <td style="width:25%">
+                <form action="/eve2/player/" method="post" >
+                    <label>{{playerName}}</label>
+                    <input type="hidden" value={{playerID}} name="playerID">
+                    <input type="submit" class="midTableButton" value="Use player" name="UsePlayer" class="inlineButton">
+                    <input type="submit" id="badButton" class="midTableButton" value="Delete player" name="DeletePlayer" class="inlineButton">
+                    
+                </form>
+            </td> 
+            <td>{{shipName}}</td>
+            <td>{{locationName}}{{#if stationName}}, in {{stationName}}{{/if}}</td>
+        </tr> 
+        {{/each}}
