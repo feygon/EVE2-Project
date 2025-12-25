@@ -27,18 +27,18 @@ NODE_ENV=production
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=realfey_realfey_realfeyuser
-DB_PASSWORD=SuperSecretPasswordCabaret1!
+DB_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
 DB_NAME=realfey_realfey_eve2_project
 
 # Illusion Spells Database
 DB_ILLUSION_HOST=localhost
 DB_ILLUSION_PORT=3306
 DB_ILLUSION_USER=realfey_illusion_spells_DB
-DB_ILLUSION_PASSWORD=SuperSecretPasswordCabaret1!
+DB_ILLUSION_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
 DB_ILLUSION_NAME=realfey_illusion_spells_DB
 
 # Session Secret
-SESSION_SECRET=5up3r53cr3tPa55wordR3allyIt5Lik3Th3B35tPa55word3v3r
+SESSION_SECRET=[YOUR_PRODUCTION_SESSION_SECRET]
 
 # Server Port
 PORT=80

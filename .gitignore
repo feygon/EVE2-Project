@@ -54,8 +54,9 @@ database_backups/
 sessions/
 
 # Setup/cleanup files (not needed in repo after first setup)
-NEXT_STEPS.md
-SETUP_SUMMARY.md
+# Only ignore these in the root directory, not in subdirectories like docs/archive/
+/NEXT_STEPS.md
+/SETUP_SUMMARY.md
 install-phpmyadmin.ps1
 
 # HeidiSQL or other database GUI portable installations

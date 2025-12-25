@@ -1,4 +1,4 @@
-# ? Security Verification - READY FOR COMMIT
+# ?? Security Verification - READY FOR COMMIT
 
 ## ?? **Security Status: ALL CLEAR**
 
@@ -46,9 +46,9 @@ All sensitive data has been migrated to environment variables and is safe to com
 
 **Production (DirectAdmin - Already set by you):**
 ```bash
-? SESSION_SECRET=5up3r53cr3tPa55wordR3allyIt5Lik3Th3B35tPa55word3v3r
-? DB_PASSWORD=SuperSecretPasswordCabaret1!
-? DB_ILLUSION_PASSWORD=SuperSecretPasswordCabaret1!
+? SESSION_SECRET=[YOUR_PRODUCTION_SESSION_SECRET]
+? DB_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
+? DB_ILLUSION_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
 ```
 
 ---
@@ -91,11 +91,11 @@ app.use(session({
 
 ### **dbcon.js & dbcon_illusion.js:**
 ```javascript
-// BEFORE:
+// BEFORE (EXAMPLE - NOT ACTUAL CODE):
 var pool = mysql.createPool({
   host: 'localhost',
   user: 'realfey_realfey_realfeyuser',
-  password: 'SuperSecretPasswordCabaret1!', // ? Hardcoded
+  password: '[HARDCODED_PASSWORD_WAS_HERE]', // ? Hardcoded (REMOVED)
   ...
 });
 
@@ -162,21 +162,21 @@ Get-Content dbcon_illusion.js | Select-String "process.env.DB_ILLUSION_PASSWORD"
 
 ## ?? **Environment Variables Needed in Production:**
 
-You've already set these in DirectAdmin ?
+You need to set these in DirectAdmin:
 
 ```bash
 NODE_ENV=production
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=realfey_realfey_realfeyuser
-DB_PASSWORD=SuperSecretPasswordCabaret1!
+DB_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
 DB_NAME=realfey_realfey_eve2_project
 DB_ILLUSION_HOST=localhost
 DB_ILLUSION_PORT=3306
 DB_ILLUSION_USER=realfey_illusion_spells_DB
-DB_ILLUSION_PASSWORD=SuperSecretPasswordCabaret1!
+DB_ILLUSION_PASSWORD=[YOUR_PRODUCTION_DB_PASSWORD]
 DB_ILLUSION_NAME=realfey_illusion_spells_DB
-SESSION_SECRET=5up3r53cr3tPa55wordR3allyIt5Lik3Th3B35tPa55word3v3r
+SESSION_SECRET=[YOUR_PRODUCTION_SESSION_SECRET]
 PORT=80
 ```
 
