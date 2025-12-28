@@ -43,9 +43,10 @@ This document contains permanent instructions for creating accessible documentat
 - Multi-step instructions
 - Technical explanations
 - Troubleshooting guides
+- **Major sections in long documents (>60 lines)**
 
 ```markdown
-## ? TL;DR
+## ?? TL;DR
 
 Quick summary in 3-5 bullet points:
 - Key point 1
@@ -54,6 +55,24 @@ Quick summary in 3-5 bullet points:
 ```
 
 **Why:** Provides quick overview before diving into details. Essential for ADHD.
+
+**Pattern for Long Documents:**
+- Add TL;DR at start of each major section (H2 level)
+- Place immediately after section heading, before subsections
+- Use bullet points for scannable format
+- Keep to 3-5 items maximum
+
+**Example Structure:**
+```markdown
+## ?? Major Section Title
+
+**?? TL;DR:** Brief overview of what this section covers.
+Key points in bullet format if needed.
+
+### Subsection 1
+
+Detailed content here...
+```
 
 ---
 
@@ -338,6 +357,7 @@ async function getUser(userId) {
 
 - [ ] Document > 60 lines? ? Add TOC
 - [ ] Complex process? ? Add TL;DR
+- [ ] Document has major sections (H2)? ? Add TL;DR per section
 - [ ] All paragraphs ? 3 lines?
 - [ ] Visual breaks (`---`) between sections?
 - [ ] Emojis used as visual markers?
@@ -363,6 +383,13 @@ async function getUser(userId) {
 
 ---
 
+### **While performing step-by-step procedures:**
+
+- [ ] Provide a summary of anticipated Steps before starting.
+- [ ] Use numbered lists for steps.
+- [ ] If changing steps based on findings, clearly indicate the change, and continue.
+
+---
 ## ?? Quick Reference
 
 ### **Documentation Template:**
@@ -373,12 +400,14 @@ async function getUser(userId) {
 ## ?? Table of Contents
 [If > 60 lines]
 
-## ? TL;DR
-[If complex]
+## ?? TL;DR
+[If complex - overall summary]
 
 ---
 
 ## ?? Section 1
+
+**?? TL;DR:** Brief overview of this section's content.
 
 **Short intro.**
 
@@ -397,81 +426,9 @@ code here
 
 ## ?? Section 2
 
+**?? TL;DR:** What this section covers in one sentence.
+
 [Continue...]
 ```
 
 ---
-
-### **HTML/CSS Template:**
-
-```css
-body {
-    font-family: 'Open Sans', Arial, sans-serif;
-    font-size: 1.2em;
-    line-height: 1.8;
-    color: #dcdcdc;
-    background: #1a1a1a;
-}
-
-/* High contrast support */
-@media (prefers-contrast: high) {
-    body {
-        color: #ffffff;
-        background: #000000;
-    }
-}
-```
-
----
-
-## ?? Additional Resources
-
-**Dyslexia-Friendly Resources:**
-- [British Dyslexia Association - Style Guide](https://www.bdadyslexia.org.uk/advice/employers/creating-a-dyslexia-friendly-workplace/dyslexia-friendly-style-guide)
-- [WebAIM - Cognitive Disabilities](https://webaim.org/articles/cognitive/)
-
-**ADHD-Friendly Resources:**
-- [ADHD-Friendly Documentation](https://adhd-friendly.com/)
-- [How to Write for People with ADHD](https://uxdesign.cc/how-to-write-for-people-with-adhd-7c5c5c5c5c5)
-
----
-
-## ?? Remember
-
-**The goal is to make content:**
-- **Scannable** - Users can quickly find what they need
-- **Digestible** - Information in small, manageable chunks
-- **Navigable** - Clear structure with multiple entry points
-- **Accessible** - Works for everyone, regardless of ability
-
-**When in doubt, ask:**
-- "Can I scan this quickly?"
-- "Is each section focused on one idea?"
-- "Could someone with ADHD follow this?"
-- "Could someone with dyslexia read this easily?"
-
----
-
-## ? Enforcement
-
-**These guidelines are REQUIRED for:**
-- All markdown documentation
-- All HTML/CSS interfaces
-- All README files
-- All user-facing content
-- All code comments (when substantive)
-
-**Review process:**
-- Check accessibility before commits
-- Run through testing checklist
-- If unsure, refer to examples in this repo
-
----
-
-**Last Updated:** December 2025  
-**Maintained By:** Feygon Nickerson  
-**Status:** ACTIVE - Apply to all new content
-
----
-
-**Questions?** See `docs/ACCESSIBILITY_AUDIT.md` for examples and detailed explanations.

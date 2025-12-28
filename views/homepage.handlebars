@@ -28,4 +28,102 @@ Navigation Count Since Last Session Change: {{counter}}
 
 </div>
 <div id="sidebar"></div>
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Welcome to RealFeygon.com</h1>
+        <p class="lead text-muted">Choose a project to explore</p>
+    </div>
+
+    <div class="row g-4">
+        {{!-- Resume }}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-tie fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Resume</h5>
+                    <p class="card-text">Professional resume and portfolio</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="/resume" class="btn btn-primary w-100">
+                        View Resume <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{!-- EVE2 }}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-database fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">EVE2 Database</h5>
+                    <p class="card-text">EVE Online corporation management system</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="/eve2" class="btn btn-success w-100">
+                        Open EVE2 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Illusion Spells }}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-magic fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Illusion Spells</h5>
+                    <p class="card-text">Pathfinder 2e illusion spell comparison tool</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="/illusion" class="btn btn-info w-100">
+                        Browse Spells <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Animal Comparison }}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-paw fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Summon Animal</h5>
+                    <p class="card-text">Pathfinder 2e animal creature comparison</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="/animals" class="btn btn-warning w-100">
+                        Compare Animals <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <hr class="my-4">
+            <h3>Documentation</h3>
+            <p class="text-muted">Explore project documentation and developer notes</p>
+            <a href="/docs" class="btn btn-outline-secondary">
+                <i class="fas fa-book"></i> View Documentation
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+    }
+    .card-footer {
+        border-top: none;
+    }
+</style>
 </html>

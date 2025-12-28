@@ -187,3 +187,24 @@ exports.formatGreen = function (spell, categoryName) {
 exports.eq = function(lvalue, rvalue) {
     return lvalue === rvalue;
 };
+
+// Generate a range of numbers for iteration
+exports.range = function(start, end) {
+    const result = [];
+    for (let i = start; i <= end; i++) {
+        result.push(i);
+    }
+    return result;
+};
+
+// Check if value exists (for conditional rendering)
+exports.or = function(...args) {
+    // Remove the options object (last argument)
+    const options = args.pop();
+    return args.some(arg => !!arg);
+};
+
+// JSON stringify helper for passing data to JavaScript
+exports.json = function(context) {
+    return JSON.stringify(context);
+};
