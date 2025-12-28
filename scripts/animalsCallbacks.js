@@ -123,7 +123,11 @@ const animalsCallbacks = {
      */
     getAnimalsPage: async function(res, context, complete) {
         try {
+            console.log('[Animals] Loading animals data...');
+            console.log('[Animals] Data path:', ANIMALS_DATA_PATH);
+            
             const data = await this.loadAnimalsData();
+            console.log('[Animals] Data loaded successfully, animals count:', data.animals?.length);
             
             // Get unique traits for filtering
             const allTraits = new Set();
@@ -132,15 +136,18 @@ const animalsCallbacks = {
             }
             
             // Get level range from all animal versions
-            const levels = data.animals.flatMap(a => {
+            const levels = data.animals.map(a => {
                 const versions = [a.versions.normal.level];
                 if (a.versions.weak) versions.push(a.versions.weak.level);
                 versions.push(a.versions.elite.level);
                 return versions;
-            });
+            }).reduce((acc, val) => acc.concat(val), []); // Flatten the array (Node 10 compatible)
             
             const minLevel = Math.min(...levels);
             const maxLevel = Math.max(...levels);
+            
+            console.log('[Animals] Level range:', minLevel, '-', maxLevel);
+            console.log('[Animals] Traits count:', allTraits.size);
             
             // Populate context for template
             context.metadata = data.metadata;
@@ -152,7 +159,8 @@ const animalsCallbacks = {
             complete();
             
         } catch (error) {
-            console.error('Error in getAnimalsPage:', error);
+            console.error('[Animals] ERROR in getAnimalsPage:', error);
+            console.error('[Animals] Error stack:', error.stack);
             res.status(500).send('Failed to load animal data. Please try again later.');
         }
     },
