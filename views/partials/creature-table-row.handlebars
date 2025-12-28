@@ -1,0 +1,25 @@
+{{!-- Creature Table Row Partial - Reusable row for table view --}}
+<tr data-animal-id="{{id}}">
+    <td>
+        <a href="{{url}}" target="_blank">{{name}}</a>
+    </td>
+    <td>{{baseLevel}}</td>
+    <td>{{versions.normal.hp}}</td>
+    <td>{{versions.normal.ac}}</td>
+    <td>{{versions.normal.size}}</td>
+    <td>
+        {{versions.normal.speed.land}}
+        {{#if versions.normal.speed.fly}}, fly {{versions.normal.speed.fly}}{{/if}}
+        {{#if versions.normal.speed.swim}}, swim {{versions.normal.speed.swim}}{{/if}}
+    </td>
+    <td>
+        {{#each versions.normal.traits}}
+        <span class="badge bg-secondary me-1 mb-1">{{this}}</span>
+        {{/each}}
+    </td>
+    <td>
+        <button class="btn btn-sm btn-outline-primary" onclick="showAnimalDetail('{{id}}', 'normal')">
+            <i class="fas fa-eye"></i>
+        </button>
+    </td>
+</tr>
