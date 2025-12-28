@@ -61,14 +61,14 @@ jobs:
           ssh -i ~/.ssh/deploy_key \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
-            "cd ${{ secrets.DEPLOY_PATH }} && npm ci --production"
+            "source ~/.nvm/nvm.sh && cd ${{ secrets.DEPLOY_PATH }} && npm ci --production"
       
       - name: Restart Node.js application
         run: |
           ssh -i ~/.ssh/deploy_key \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
-            "touch ${{ secrets.DEPLOY_PATH }}/tmp/restart.txt || mkdir -p ${{ secrets.DEPLOY_PATH }}/tmp && touch ${{ secrets.DEPLOY_PATH }}/tmp/restart.txt"
+            "cd ${{ secrets.DEPLOY_PATH }} && touch tmp/restart.txt || (mkdir -p tmp && touch tmp/restart.txt)"
       
       - name: Verify deployment
         run: |
