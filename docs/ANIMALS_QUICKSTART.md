@@ -1,0 +1,223 @@
+# ?? Summon Animal Comparison Tool - Quick Start
+
+Complete system for scraping, storing, and comparing animal creatures from Archives of Nethys for use with the Pathfinder 2e Summon Animal spell.
+
+## ?? What This Does
+
+The **Summon Animal** spell lets you summon any animal of a given level, including:
+- **Normal** animals at that level
+- **Weak** versions of level+1 animals (adjusted down)
+- **Elite** versions of level-1 animals (adjusted up)
+
+This tool scrapes all animals and their variations, then provides an interactive comparison interface.
+
+## ?? Quick Start (3 Steps)
+
+### Step 1: Install Dependencies
+
+```bash
+cd Extras
+npm install
+```
+
+### Step 2: Scrape the Data
+
+**Option A: Test Run (First 5 Animals)**
+```bash
+npm run test
+```
+
+**Option B: Full Scrape (All Animals)**
+```bash
+npm run scrape
+```
+
+?? **Estimated Time:** 
+- Test: ~30 seconds
+- Full: 5-10 minutes for ~100 animals
+
+### Step 3: View the Comparison Tool
+
+```bash
+# Open in your default browser
+start animal-comparison.html
+
+# Or manually open Extras/animal-comparison.html
+```
+
+## ?? Files Explained
+
+| File | Purpose |
+|------|---------|
+| `scrape-animals.js` | Web scraper that fetches animal data from 2e.aonprd.com |
+| `animals-data.json` | Output file with all animal data (created by scraper) |
+| `animal-comparison.html` | Interactive comparison viewer (open in browser) |
+| `package.json` | Node.js dependencies |
+| `README-SCRAPER.md` | Detailed documentation |
+
+## ?? Using the Comparison Tool
+
+Once you open `animal-comparison.html`:
+
+### Filters Available:
+
+1. **Spell Level** - Show only animals summonable at that spell level
+2. **Size** - Filter by creature size (Tiny, Small, Medium, Large, etc.)
+3. **Min Speed** - Show only animals with at least X feet movement
+4. **Search Name** - Find specific animals by name
+5. **Sort By** - Order by Level, Name, HP, AC, or Speed
+
+### Example Use Cases:
+
+**"What animals can I summon at level 3?"**
+- Set "Spell Level" to 3
+- See all Level 3 Normal animals
+- See all Level 4 Weak animals (-1 level adjustment)
+- See all Level 2 Elite animals (+1 level adjustment)
+
+**"What's the fastest level 3 animal?"**
+- Set "Spell Level" to 3
+- Set "Sort By" to Speed
+- Top result is your answer!
+
+**"Which level 2 animal has the most HP?"**
+- Set "Spell Level" to 2
+- Set "Sort By" to HP
+- Compare the tankiest options
+
+**"Show me all Large flying animals"**
+- Set "Size" to Large
+- Check each creature's speed stats for "fly"
+
+## ?? Data Structure
+
+The scraper outputs JSON in this format:
+
+```json
+{
+  "id": "3175",
+  "name": "Giant Scorpion",
+  "baseLevel": 3,
+  "versions": {
+    "normal": { /* Level 3 stats */ },
+    "weak": { /* Level 2 stats */ },
+    "elite": { /* Level 4 stats */ }
+  }
+}
+```
+
+Each version includes:
+- Level, Size, Traits
+- Perception, Senses, Skills
+- Attributes (Str, Dex, Con, Int, Wis, Cha)
+- Defenses (AC, Saves, HP)
+- Speed (land, fly, swim, climb, burrow)
+- Attacks (bonus, damage, traits)
+- Special Abilities
+- Source book
+
+## ?? Customization
+
+### Modify the Scraper
+
+Edit `scrape-animals.js` to:
+- Change rate limiting (currently 1 second between requests)
+- Add more data fields
+- Filter which animals to scrape
+- Adjust parsing logic
+
+### Customize the Viewer
+
+Edit `animal-comparison.html` to:
+- Change the styling/colors
+- Add more filters (e.g., by special abilities)
+- Modify the sorting options
+- Add export functionality
+- Create printable character sheets
+
+## ?? Troubleshooting
+
+### "Error loading data"
+- Make sure you ran the scraper first: `npm run scrape`
+- Check that `animals-data.json` exists in the Extras folder
+- Verify the JSON file isn't empty or corrupted
+
+### "No animals found in trait table"
+- The Archives of Nethys website might be down
+- Your internet connection might be interrupted
+- The site structure may have changed (parser needs updating)
+
+### Scraper is slow
+- This is intentional! We use 1-second delays to be respectful to the server
+- Don't remove rate limiting - it helps prevent overloading the site
+- Use `npm run test` for quick testing with just 5 animals
+
+### Missing data in cards
+- Some creatures may have incomplete data on the source site
+- Parser might need adjustment for edge cases
+- Check the `animals-data.json` file to see what data was captured
+
+## ?? Integration Ideas
+
+### Add to Your Main Site
+
+1. **Copy `animal-comparison.html` to your public folder**
+   ```bash
+   copy animal-comparison.html ..\public\summon-animal.html
+   ```
+
+2. **Add route in Express** (in `main.js`):
+   ```javascript
+   app.get('/summon-animal', (req, res) => {
+       res.sendFile(path.join(__dirname, 'public', 'summon-animal.html'));
+   });
+   ```
+
+3. **Add to navigation** (in `views/layouts/main.handlebars`):
+   ```html
+   <a href="/summon-animal">Summon Animal Tool</a>
+   ```
+
+### Advanced Features to Add
+
+- **Save Favorite Animals** - Store selections in localStorage
+- **Compare Side-by-Side** - Select 2-3 animals for direct comparison
+- **Print Character Sheets** - Format for printing at the table
+- **Export to PDF** - Generate summoner reference sheets
+- **Add Images** - Display creature art from the site
+- **Encounter Builder** - Build encounters with multiple summons
+
+## ?? Resources
+
+- **Archives of Nethys**: https://2e.aonprd.com/
+- **Summon Animal Spell**: https://2e.aonprd.com/Spells.aspx?ID=1694
+- **Pathfinder 2e Rules**: https://2e.aonprd.com/Rules.aspx
+
+## ?? Legal & Ethics
+
+- **Respectful Scraping**: 1-second delays between requests
+- **Personal Use**: For your own gaming reference
+- **Attribution**: Data from Archives of Nethys / Paizo Publishing
+- **No Abuse**: Don't run the scraper excessively
+
+## ?? Contributing
+
+Want to improve the tool?
+
+1. **Better Parsing**: Update regex patterns in `scrape-animals.js`
+2. **More Filters**: Add new filter options in `animal-comparison.html`
+3. **Better Styling**: Improve the CSS for the comparison cards
+4. **Bug Fixes**: Report issues or submit improvements
+
+## ?? Next Steps
+
+After using the basic tool:
+
+1. **Customize for your campaign** - Add house rules, custom animals
+2. **Create summoner character sheets** - Pre-select favorites by level
+3. **Build encounter references** - Organize by terrain, theme, etc.
+4. **Share with your group** - Deploy to your campaign website
+
+---
+
+**Happy Summoning!** ??????

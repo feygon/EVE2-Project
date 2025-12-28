@@ -1,0 +1,16 @@
+# Extras folder - Only track the data file
+# Ignore all development/scraper files
+
+# Keep these files
+!animals-data.json
+!.gitignore
+
+# Ignore everything else
+*.html
+*.csv
+*.js
+*.json
+!animals-data.json
+*.md
+package*.json
+node_modules/
