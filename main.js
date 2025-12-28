@@ -61,12 +61,14 @@ app.set('hbs', handlebars);
 // Importing and setting up callbacks
 app.set('callbacks', callbacks);
 app.set('illusionCallbacks', illusionCallbacks);
+app.set('animalsCallbacks', require('./scripts/animalsCallbacks'));
 app.set('queries', queries);
 
 // Set a route for each module
 app.use('/resume/', require('./resume.js'));
 app.use('/eve2/', require('./eve2.js'));
 app.use('/illusion/', require('./illusion.js'));
+app.use('/animals/', require('./animals.js'));  // Animal comparison tool
 app.use('/', require('./documentation.js'));  // Documentation routes
 
 // Site index route - serve the site map
