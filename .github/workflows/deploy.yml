@@ -43,7 +43,6 @@ jobs:
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
-            --exclude='node_modules' \
             --exclude='.git' \
             --exclude='.env' \
             --exclude='.env.*' \
@@ -54,14 +53,15 @@ jobs:
             --exclude='tmp/' \
             --exclude='.github' \
             --exclude='github-deploy-key*' \
-            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+            ./ ${{ secrets.SSH_USERNAME}}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
       
-      - name: Install production dependencies
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
-            "source ~/.nvm/nvm.sh && cd ${{ secrets.DEPLOY_PATH }} && npm ci --production"
+      # DirectAdmin handles node_modules, skip manual npm install
+      # - name: Install production dependencies
+      #   run: |
+      #     ssh -i ~/.ssh/deploy_key \
+      #       -p ${{ secrets.SSH_PORT }} \
+      #       ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+      #       "source ~/.nvm/nvm.sh && cd ${{ secrets.DEPLOY_PATH }} && npm ci --production"
       
       - name: Restart Node.js application
         run: |
