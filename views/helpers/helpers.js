@@ -190,8 +190,17 @@ exports.eq = function(lvalue, rvalue) {
 
 // Generate a range of numbers for iteration
 exports.range = function(start, end) {
+    // Handle if called as inline helper (no options parameter)
+    // or as block helper (with options parameter)
+    if (typeof start === 'undefined' || typeof end === 'undefined') {
+        return [];
+    }
+    
     const result = [];
-    for (let i = start; i <= end; i++) {
+    const startNum = parseInt(start, 10);
+    const endNum = parseInt(end, 10);
+    
+    for (let i = startNum; i <= endNum; i++) {
         result.push(i);
     }
     return result;
