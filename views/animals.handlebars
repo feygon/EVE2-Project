@@ -122,9 +122,9 @@
     </div>
 
     <div class="row">
-        {{!-- Filter Panel }}
+        {{!-- Filter Panel --}}
         <div class="col-lg-3 mb-4">
-            {{> filter-panel 
+            {{> filter-panel
                 levelLabel="Summon at Spell Level"
                 levelHelp="Shows normal, weak, and elite versions at this level"
                 minLevel=minLevel
@@ -135,7 +135,7 @@
             }}
         </div>
 
-        {{!-- Results Panel }}
+        {{!-- Results Panel --}}
         <div class="col-lg-9">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -150,7 +150,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {{!-- Loading Spinner }}
+                    {{!-- Loading Spinner --}}
                     <div id="loadingSpinner" class="text-center py-5" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -158,14 +158,14 @@
                         <p class="mt-2 text-muted">Loading animals...</p>
                     </div>
 
-                    {{!-- Results Container (Cards View) }}
+                    {{!-- Results Container (Cards View) --}}
                     <div id="resultsContainer" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
                         {{#each animals}}
                             {{> creature-card}}
                         {{/each}}
                     </div>
 
-                    {{!-- Results Container (Table View) }}
+                    {{!-- Results Container (Table View) --}}
                     <div id="tableContainer" class="table-responsive" style="display: none;">
                         <table class="table table-striped table-hover" id="animalsTable">
                             <thead class="table-dark">
@@ -193,7 +193,7 @@
     </div>
 </div>
 
-{{!-- Animal Detail Modal }}
+{{!-- Animal Detail Modal --}}
 {{> creature-detail-modal}}
 
 <!-- Bootstrap JS -->
