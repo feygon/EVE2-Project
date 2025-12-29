@@ -1,4 +1,18 @@
+---
+title: "CI/CD Setup Guide - GitHub to DirectAdmin"
+version: v2.0.0
+created: 2024-12-24
+updated: 2025-12-29
+status: current
+category: deployment
+tags: [cicd, github-actions, directadmin, automation, deployment]
+---
+
 # ?? CI/CD Setup Guide - GitHub to DirectAdmin
+
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 ## ?? Table of Contents
 
@@ -12,7 +26,7 @@
 
 ---
 
-## ? TL;DR
+## ?? TL;DR
 
 **Automated deployment from GitHub to DirectAdmin:**
 
@@ -55,6 +69,8 @@ GitHub Push ? GitHub Actions ? SFTP Upload ? DirectAdmin ? App Restart
 
 ## ?? Setup Steps
 
+**?? TL;DR:** Generate SSH key, add to server, test connection, add GitHub secrets, create workflow, test deployment.
+
 ### **Step 1: Generate SSH Key for Deployment**
 
 **On your local machine:**
@@ -71,6 +87,8 @@ ssh-keygen -t ed25519 -C "github-actions@realfeygon.com" -f github-deploy-key
 ---
 
 ### **Step 2: Add Public Key to DirectAdmin Server**
+
+**?? TL;DR:** Upload public key to server via DirectAdmin panel or SSH manually.
 
 **Option A: Via DirectAdmin (Easier)**
 
@@ -99,6 +117,8 @@ chmod 600 ~/.ssh/authorized_keys
 
 ### **Step 3: Test SSH Connection**
 
+**?? TL;DR:** Verify SSH key works before adding to GitHub.
+
 ```powershell
 # Test the key works
 ssh -i github-deploy-key your-username@realfeygon.com "echo 'Connection successful!'"
@@ -109,6 +129,8 @@ ssh -i github-deploy-key your-username@realfeygon.com "echo 'Connection successf
 ---
 
 ### **Step 4: Add Secrets to GitHub**
+
+**?? TL;DR:** Store private key and server details in GitHub repository secrets.
 
 **Go to GitHub repository:**
 
@@ -128,6 +150,8 @@ ssh -i github-deploy-key your-username@realfeygon.com "echo 'Connection successf
 ---
 
 ### **Step 5: Create GitHub Actions Workflow**
+
+**?? TL;DR:** Create YAML workflow file that runs on push - checks out code, uploads via rsync, restarts app.
 
 **Create file:** `.github/workflows/deploy.yml`
 
@@ -201,6 +225,8 @@ jobs:
 
 ### **Step 6: Create Deployment Documentation**
 
+**?? TL;DR:** Update .gitignore to never commit SSH keys.
+
 **Update `.gitignore`:**
 
 ```gitignore
@@ -214,6 +240,8 @@ github-deploy-key.pub
 ---
 
 ## ?? DirectAdmin Configuration
+
+**?? TL;DR:** Set environment variables in DirectAdmin panel, configure auto-restart on file changes.
 
 ### **Environment Variables in DirectAdmin**
 
@@ -266,6 +294,8 @@ chmod +x restart-app.sh
 
 ## ?? Testing
 
+**?? TL;DR:** Test manual workflow trigger, test push to main, verify production site updates.
+
 ### **Test 1: Manual Workflow Trigger**
 
 1. Go to GitHub ? Actions tab
@@ -308,6 +338,8 @@ https://realfeygon.com/illusion
 ---
 
 ## ?? Troubleshooting
+
+**?? TL;DR:** Common issues - SSH connection fails, site doesn't update, npm ci fails, rsync fails.
 
 ### **Issue: SSH Connection Failed**
 
@@ -374,6 +406,8 @@ Some files should NOT be deployed:
 
 ## ?? Monitoring
 
+**?? TL;DR:** View deployment logs in GitHub Actions tab, check server logs via SSH.
+
 ### **View Deployment Logs**
 
 **In GitHub:**
@@ -393,6 +427,8 @@ tail -f /home/realfey/eve2/deploy.log
 ---
 
 ## ?? Best Practices
+
+**?? TL;DR:** Use branch strategy for production/staging, add notifications, plan rollback strategy.
 
 ### **Branch Strategy**
 
@@ -463,6 +499,8 @@ touch eve2/tmp/restart.txt
 
 ## ? Verification Checklist
 
+**?? TL;DR:** 11-step checklist to verify CI/CD is fully working.
+
 **After setup:**
 
 - [ ] SSH key generated
@@ -498,7 +536,7 @@ touch eve2/tmp/restart.txt
 
 ---
 
-**Created:** December 2025  
+**Created:** December 2024  
 **Maintained By:** Feygon Nickerson  
 **Status:** READY TO IMPLEMENT
 

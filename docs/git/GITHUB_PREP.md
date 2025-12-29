@@ -1,20 +1,69 @@
+---
+title: "GitHub Preparation Guide"
+version: v2.0.0
+created: 2024-12-24
+updated: 2025-12-29
+status: current
+category: git
+tags: [github, git, commit, push, workflow]
+---
+
 # ?? GitHub Preparation - Ready to Commit
 
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
+
+## ?? **Table of Contents**
+
+- [TL;DR](#tldr)
+- [Status](#status-ready-for-commit)
+- [What Changed in This Session](#what-changed-in-this-session)
+- [Files to Commit](#files-to-commit)
+- [Commit Message Template](#commit-message-template)
+- [Push Instructions](#push-instructions)
+- [Verification Steps](#verification-steps)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## ?? **TL;DR**
+
+**?? Status:** All changes ready to commit and push to GitHub.
+
+**What's new:**
+- Local development scripts (setup, start, db-tools, cleanup)
+- Environment variables migration (.env usage)
+- Security improvements (no hardcoded passwords)
+- Documentation organization
+
+**Next steps:**
+1. Review changes: `git status`
+2. Stage files: `git add .`
+3. Commit: `git commit -m "message"`
+4. Push: `git push origin main`
+
+---
+
 ## ? **Status: READY FOR COMMIT**
+
+**?? TL;DR:** All files modified, tested, and ready to push to GitHub repository.
 
 All changes have been made and are ready to be pushed to GitHub!
 
 ---
 
-## ?? **What Changed in This Session:**
+## ?? **What Changed in This Session**
 
-### **1. Local Development Setup** ?
+**?? TL;DR:** Added automation scripts, migrated to .env, improved security, organized documentation.
+
+### **1. Local Development Setup** ???
 - Created `setup-local.ps1` - Automated MariaDB + database setup
 - Created `start-local.ps1` - Start server with MariaDB check
 - Created `db-tools.ps1` - Database backup/restore
 - Created `cleanup.ps1` - Remove setup clutter
 
-### **2. Environment Variables Migration** ?
+### **2. Environment Variables Migration** ??
 - Updated `dbcon.js` - Now uses `process.env` variables
 - Updated `dbcon_illusion.js` - Now uses `process.env` variables
 - Updated `main.js` - Added `cache: false` for development
@@ -22,14 +71,7 @@ All changes have been made and are ready to be pushed to GitHub!
 - Created `.env.example` - Template for others
 - Created `.env.production` - Production template (gitignored)
 
-### **3. Illusion Page Fixes** ?
-- Fixed `views/illusions.handlebars` - Uses partials structure
-- Fixed `views/partials/category_block.handlebars` - Changed `<h2>` to `<strong>`
-- Updated `views/partials/spell_entry.handlebars` - Shows all spell fields
-- Fixed CSS flexbox layout for category headers
-- Removed duplicate `.hbs` files
-
-### **4. Documentation** ?
+### **3. Documentation Organization** ??
 - `README.md` - Updated project overview
 - `LOCAL_SETUP.md` - Detailed local setup instructions
 - `QUICK_START.md` - Quick reference card
@@ -43,79 +85,99 @@ All changes have been made and are ready to be pushed to GitHub!
 
 ---
 
-## ?? **Pre-Commit Checklist:**
+## ?? **Files to Commit**
 
-### **? Security Check:**
-```powershell
-# Verify sensitive files are gitignored
-git status
+**?? TL;DR:** New scripts, modified database configs, updated docs, .gitignore changes.
 
-# Should NOT see:
-# ? .env
-# ? .env.production
-# ? *.local.js
-# ? .vscode/ (SSH keys)
-# ? node_modules/
+### **? Application Files:**
+```
+? main.js                          - Server with env vars
+? illusion.js                      - Illusion routes
+? eve2.js                          - EVE2 routes
+? resume.js                        - Resume routes
+? dbcon.js                         - DB config (env vars)
+? dbcon_illusion.js                - DB config (env vars)
+? package.json                     - Dependencies list
 ```
 
-### **? Test Locally:**
-```powershell
-# Make sure everything works
-.\start-local.ps1 3000
-
-# Test these URLs:
-# http://localhost:3000/resume
-# http://localhost:3000/eve2
-# http://localhost:3000/illusion ?
+### **? Views:**
+```
+? views/illusions.handlebars       - Updated template
+? views/partials/category_block.handlebars - Fixed layout
+? views/partials/spell_entry.handlebars    - All fields
+? views/layouts/                   - Layout templates
 ```
 
-### **? Check .gitignore:**
+### **? Scripts & Tools:**
+```
+? scripts/illusionCallbacks.js    - Illusion logic
+? scripts/queries.js               - SQL queries
+? setup-local.ps1                  - Setup automation
+? start-local.ps1                  - Start script
+? db-tools.ps1                     - Backup/restore
+? cleanup.ps1                      - Cleanup script
+```
 
-Your `.gitignore` should include:
-```gitignore
-# Dependencies
-node_modules/
-npm-debug.log
+### **? Documentation:**
+```
+? README.md                        - Project overview
+? LOCAL_SETUP.md                   - Setup guide
+? QUICK_START.md                   - Quick reference
+? TROUBLESHOOTING.md               - Problem solving
+? DATABASE_GUI_GUIDE.md            - Database tools
+? DIRECTADMIN_ENV_SETUP.md         - Production setup
+? GITHUB_SYNC_GUIDE.md             - Git workflow
+? GIT_QUICK_REFERENCE.md           - Git commands
+? DEPLOYMENT_GUIDE.md              - SFTP deployment
+? ENV_MIGRATION_COMPLETE.md        - Env vars guide
+```
 
-# Local config files
-*.local.js
-dbcon.local.js
-dbcon_illusion.local.js
+### **? Configuration:**
+```
+? .gitignore                       - Git ignore rules
+? .env.example                     - Env var template
+```
 
-# Environment variables
-.env
-.env.local
-.env.production
-
-# IDE + SSH Keys
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Temporary files
-temp_*.sql
-*.tmp
-
-# Database backups
-*.sql.bak
-backup/
-database_backups/
-
-# Cleanup docs
-NEXT_STEPS.md
-SETUP_SUMMARY.md
-install-phpmyadmin.ps1
+### **? NOT Being Committed (gitignored):**
+```
+? .env                             - Local secrets
+? .env.production                  - Production secrets
+? *.local.js                       - Local configs
+? .vscode/                         - SSH keys + IDE
+? node_modules/                    - Dependencies
+? database_backups/                - Local backups
 ```
 
 ---
 
-## ?? **Git Commit Commands:**
+## ?? **Commit Message Template**
+
+**?? TL;DR:** Use semantic commit format - type(scope): description for clear history.
+
+```
+git commit -m "type(scope): subject
+
+body: optional detailed description
+
+footer: optional references, issues, etc."
+```
+
+### **Example:**
+```
+git commit -m "feat(tests): add unit tests for database functions
+
+- Added tests for dbcon.js
+- Tested environment variable loading
+- Ensure no sensitive data is exposed in tests
+
+Refs: #42, #56"
+```
+
+---
+
+## ?? **Push Instructions**
+
+**?? TL;DR:** Review changes, stage files, commit with message, push to main, verify on GitHub.
 
 ### **1. Check Status**
 ```powershell
@@ -206,104 +268,9 @@ git push
 
 ---
 
-## ?? **Files Being Committed:**
+## ? **Verification Steps**
 
-### **? Application Files:**
-```
-? main.js                          - Server with env vars
-? illusion.js                      - Illusion routes
-? eve2.js                          - EVE2 routes
-? resume.js                        - Resume routes
-? dbcon.js                         - DB config (env vars)
-? dbcon_illusion.js                - DB config (env vars)
-? package.json                     - Dependencies list
-```
-
-### **? Views:**
-```
-? views/illusions.handlebars       - Updated template
-? views/partials/category_block.handlebars - Fixed layout
-? views/partials/spell_entry.handlebars    - All fields
-? views/layouts/                   - Layout templates
-```
-
-### **? Scripts & Tools:**
-```
-? scripts/illusionCallbacks.js    - Illusion logic
-? scripts/queries.js               - SQL queries
-? setup-local.ps1                  - Setup automation
-? start-local.ps1                  - Start script
-? db-tools.ps1                     - Backup/restore
-? cleanup.ps1                      - Cleanup script
-```
-
-### **? Documentation:**
-```
-? README.md                        - Project overview
-? LOCAL_SETUP.md                   - Setup guide
-? QUICK_START.md                   - Quick reference
-? TROUBLESHOOTING.md               - Problem solving
-? DATABASE_GUI_GUIDE.md            - Database tools
-? DIRECTADMIN_ENV_SETUP.md         - Production setup
-? GITHUB_SYNC_GUIDE.md             - Git workflow
-? GIT_QUICK_REFERENCE.md           - Git commands
-? DEPLOYMENT_GUIDE.md              - SFTP deployment
-? ENV_MIGRATION_COMPLETE.md        - Env vars guide
-```
-
-### **? Configuration:**
-```
-? .gitignore                       - Git ignore rules
-? .env.example                     - Env var template
-```
-
-### **? NOT Being Committed (gitignored):**
-```
-? .env                             - Local secrets
-? .env.production                  - Production secrets
-? *.local.js                       - Local configs
-? .vscode/                         - SSH keys + IDE
-? node_modules/                    - Dependencies
-? database_backups/                - Local backups
-```
-
----
-
-## ?? **Security Verification:**
-
-### **Run This Command:**
-```powershell
-# Check for accidentally staged secrets
-git diff --cached | Select-String -Pattern "password|secret|ppk|ssh" -Context 1
-
-# Should NOT find production passwords in:
-# - dbcon.js (should use process.env)
-# - dbcon_illusion.js (should use process.env)
-# - main.js (session secret should use process.env or be generic)
-```
-
-### **Verify These Files Use Environment Variables:**
-
-**dbcon.js:**
-```javascript
-password: process.env.DB_PASSWORD,  ?
-```
-
-**dbcon_illusion.js:**
-```javascript
-password: process.env.DB_ILLUSION_PASSWORD,  ?
-```
-
-**main.js:**
-```javascript
-// Session secret - this one can stay hardcoded in code
-// OR migrate to env var
-secret: process.env.SESSION_SECRET || '5up3r53cr3tPa55wordR3allyIt5Lik3Th3B35tPa55word3v3r'
-```
-
----
-
-## ?? **After Pushing to GitHub:**
+**?? TL;DR:** Check GitHub shows changes, clone to new location and test, verify no secrets committed.
 
 ### **1. Verify on GitHub.com**
 - Go to: https://github.com/feygon/EVE2-Project
@@ -331,84 +298,50 @@ Add a badge to show last updated:
 
 ---
 
-## ?? **Next Steps After GitHub Push:**
+## ?? **Troubleshooting**
 
-1. ? **GitHub pushed successfully**
-2. ?? **Review DEPLOYMENT_GUIDE.md** for production deployment
-3. ?? **Set environment variables in DirectAdmin**
-4. ?? **Deploy to production via SFTP**
-5. ?? **Test production site**
-6. ? **Done!**
+**?? TL;DR:** Common issues - merge conflicts, push rejected, authentication fails, large files blocked.
 
----
-
-## ?? **If Something Goes Wrong:**
-
-### **Accidentally Committed Secrets:**
-
+### **1. Merge Conflicts:**
+- Resolve conflicts in files (marked with `<<<<<<<`, `=======`, `>>>>>>>`)
+- After editing, stage the resolved files:
 ```powershell
-# Remove file from Git but keep locally
-git rm --cached .env
-git commit -m "Remove accidentally committed .env file"
-git push
-
-# Or revert entire commit
-git reset --soft HEAD~1  # Keeps changes
-git reset --hard HEAD~1  # Discards changes (careful!)
+git add <file>
+```
+- Commit the merge:
+```powershell
+git commit -m "Resolve merge conflict in <file>"
 ```
 
-### **Forgot to Add .gitignore:**
-
+### **2. Push Rejected (non-fast-forward):**
+- This happens if the remote branch has new commits.
+- Fetch and merge the latest changes:
 ```powershell
-# Add .gitignore
-echo ".env" >> .gitignore
-echo "*.local.js" >> .gitignore
-# etc...
-
-# Remove tracked files
-git rm --cached .env
-git rm --cached *.local.js
-
-# Commit
-git add .gitignore
-git commit -m "Add .gitignore and remove secrets"
+git pull --rebase origin main
+```
+- Resolve any conflicts, then push:
+```powershell
 git push
 ```
 
----
-
-## ?? **Related Files:**
-
-- **DEPLOYMENT_GUIDE.md** - How to deploy to production
-- **GITHUB_SYNC_GUIDE.md** - Detailed Git workflow
-- **GIT_QUICK_REFERENCE.md** - Quick Git commands
-- **.gitignore** - Files to exclude from Git
-
----
-
-## ? **You're Ready!**
-
-Run these commands to commit:
-
+### **3. Authentication Issues:**
+- Ensure correct SSH key is used (check `~/.ssh/config`)
+- If using HTTPS, ensure correct username/password or token.
+- For cached credentials, update or clear them:
 ```powershell
-# 1. Final test
-.\start-local.ps1 3000
-# Test http://localhost:3000/illusion
-
-# 2. Check status
-git status
-
-# 3. Stage all changes
-git add .
-
-# 4. Commit
-git commit -m "Complete local dev setup and fix illusion page"
-
-# 5. Push
-git push -u origin main
-
-# 6. Verify on GitHub
-# Visit: https://github.com/feygon/EVE2-Project
+git credential-cache exit
 ```
 
-**After GitHub push, proceed to DEPLOYMENT_GUIDE.md for production deployment!** ??
+### **4. Large Files Blocked:**
+- If files exceed GitHub's limit (100MB), use Git LFS for large files.
+- Install Git LFS and track the large files:
+```powershell
+git lfs install
+git lfs track "*.psd"  # Example for PSD files
+```
+
+---
+
+**Last Updated:** December 29, 2025  
+**Maintained By:** Feygon Nickerson  
+**Ready to push!** ??

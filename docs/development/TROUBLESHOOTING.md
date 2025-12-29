@@ -1,4 +1,18 @@
+---
+title: "Troubleshooting Guide"
+version: v2.0.0
+created: 2024-12-22
+updated: 2025-12-29
+status: current
+category: development
+tags: [troubleshooting, debugging, errors, fixes]
+---
+
 # ?? Troubleshooting Guide
+
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 ## ?? Table of Contents
 
@@ -13,9 +27,9 @@
 
 ---
 
-## ? Quick Fixes (TL;DR)
+## ?? Quick Fixes (TL;DR)
 
-**Most common problems and solutions:**
+**?? TL;DR:** Most issues are database connection, missing .env, wrong port, or stale cache.
 
 1. **Database won't connect?**
    - Run: `.\start-local.ps1 3000`
@@ -35,7 +49,9 @@
 
 ---
 
-## ?? Quick Diagnostic Checklist
+## ? Quick Diagnostic Checklist
+
+**?? TL;DR:** Run through this 10-step checklist before deep debugging.
 
 **Before troubleshooting, check these:**
 
@@ -48,7 +64,9 @@
 
 ---
 
-## ?? Database Connection Issues
+## ??? Database Connection Issues
+
+**?? TL;DR:** Check .env file exists, credentials are correct, MySQL is running, firewall allows connection.
 
 ### ?? Error: ECONNREFUSED
 
@@ -157,6 +175,8 @@ DB_ILLUSION_NAME=realfey_illusion_spells_DB
 
 ## ?? Environment Variable Problems
 
+**?? TL;DR:** Verify .env file exists, is loaded by dotenv, has all required variables, no typos.
+
 ### ?? Missing .env File
 
 **You see:**
@@ -232,7 +252,9 @@ DB_PASSWORD = "mypassword"  ? (both errors)
 
 ---
 
-## ??? Server and Port Issues
+## ?? Server and Port Issues
+
+**?? TL;DR:** Check port not in use, firewall allows it, correct port in browser, server actually started.
 
 ### ?? Missing node_modules
 
@@ -338,6 +360,8 @@ Get-Content "C:\Program Files\MariaDB 12.1\data\*.err" -Tail 50
 
 ## ??? Diagnostic Commands
 
+**?? TL;DR:** PowerShell commands to check processes, ports, files, and database connections.
+
 **Check if services are running:**
 
 ```powershell
@@ -407,6 +431,8 @@ console.log('DB_USER:', process.env.DB_USER);
 
 ## ?? Production Issues
 
+**?? TL;DR:** Production problems usually environment variables, file permissions, or Node version mismatch.
+
 ### Routes Work Locally but Not in Production
 
 **Common causes:**
@@ -430,50 +456,13 @@ console.log('DB_USER:', process.env.DB_USER);
 
 ---
 
-## ?? Still Having Issues?
-
-**Try a complete restart:**
-
-```powershell
-# Stop everything
-Get-Process -Name "node", "mysqld" | Stop-Process -Force
-
-# Start fresh
-.\start-local.ps1 3000
-```
-
----
-
-**Check the logs:**
-- Look at console output for error messages
-- Check Node.js logs in DirectAdmin (if production)
-
----
-
 ## ?? Related Documentation
 
-**Setup & Configuration:**
-- [Quick Start Guide](../../QUICK_START.md) - Daily commands
-- [Local Setup](../setup/LOCAL_SETUP.md) - Initial setup
-- [DirectAdmin Setup](../setup/DIRECTADMIN_ENV_SETUP.md) - Production config
-- [Database Tools](../setup/DATABASE_GUI.md) - Database management
-
-**Deployment:**
-- [Deployment Guide](../deployment/DEPLOYMENT_GUIDE.md) - Deploy to production
+- [LOCAL_SETUP.md](../setup/LOCAL_SETUP.md) - Initial setup guide
+- [EMERGENCY_RECOVERY.md](../setup/EMERGENCY_RECOVERY.md) - Disaster recovery
+- [CI_CD_SETUP.md](../deployment/CI_CD_SETUP.md) - Deployment guide
 
 ---
 
-## ?? Pro Tip
-
-**Most problems are solved by:**
-```powershell
-.\start-local.ps1 3000
-```
-
-This script:
-- ? Checks if MariaDB is running
-- ? Starts it if needed
-- ? Loads environment variables
-- ? Starts your server
-
-**Keep it simple!** ??
+**Last Updated:** December 29, 2025  
+**Maintained By:** Feygon Nickerson
