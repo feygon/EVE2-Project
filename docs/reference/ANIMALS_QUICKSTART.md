@@ -14,9 +14,39 @@ tags: [animals, quickstart, guide]
 **Last Updated:** December 29, 2025  
 **Status:** ?? Current
 
-Complete system for scraping, storing, and comparing animal creatures from Archives of Nethys for use with the Pathfinder 2e Summon Animal spell.
+## ?? **Table of Contents**
 
-## ?? What This Does
+- [TL;DR](#tldr)
+- [What This Does](#-what-this-does)
+- [Quick Start](#-quick-start-3-steps)
+- [Files Explained](#-files-explained)
+- [Using the Comparison Tool](#-using-the-comparison-tool)
+- [Data Structure](#-data-structure)
+- [Customization](#-customization)
+- [Troubleshooting](#-troubleshooting)
+- [Integration Ideas](#-integration-ideas)
+- [Resources](#-resources)
+- [Legal & Ethics](#-legal--ethics)
+- [Contributing](#-contributing)
+- [Next Steps](#-next-steps)
+
+---
+
+## ?? **TL;DR**
+
+**?? What it is:** Web scraper + comparison tool for Pathfinder 2e Summon Animal spell.
+
+**Quick start:** `npm install` ? `npm run scrape` ? open `animal-comparison.html`
+
+**Features:** Filter by level/size/speed, sort by stats, color-coded cards, all offline after scraping.
+
+**Time:** 5-10 minutes to scrape, instant filtering after.
+
+---
+
+## ?? **What This Does**
+
+**?? TL;DR:** Scrapes all animals from Archives of Nethys, creates Normal/Weak/Elite versions, provides filterable comparison interface.
 
 The **Summon Animal** spell lets you summon any animal of a given level, including:
 - **Normal** animals at that level
@@ -25,7 +55,9 @@ The **Summon Animal** spell lets you summon any animal of a given level, includi
 
 This tool scrapes all animals and their variations, then provides an interactive comparison interface.
 
-## ?? Quick Start (3 Steps)
+## ?? **Quick Start (3 Steps)**
+
+**?? TL;DR:** Install deps, run scraper, open HTML file - ready to filter and compare.
 
 ### Step 1: Install Dependencies
 
@@ -59,7 +91,9 @@ start animal-comparison.html
 # Or manually open Extras/animal-comparison.html
 ```
 
-## ?? Files Explained
+## ?? **Files Explained**
+
+**?? TL;DR:** Scraper script, comparison HTML, verification tool, data JSON, documentation.
 
 | File | Purpose |
 |------|---------|
@@ -69,7 +103,9 @@ start animal-comparison.html
 | `package.json` | Node.js dependencies |
 | `README-SCRAPER.md` | Detailed documentation |
 
-## ?? Using the Comparison Tool
+## ?? **Using the Comparison Tool**
+
+**?? TL;DR:** Open HTML, use filters for level/size/speed, sort by various stats, click to expand details.
 
 Once you open `animal-comparison.html`:
 
@@ -103,7 +139,9 @@ Once you open `animal-comparison.html`:
 - Set "Size" to Large
 - Check each creature's speed stats for "fly"
 
-## ??? Data Structure
+## ?? **Data Structure**
+
+**?? TL;DR:** JSON format with metadata, animals array, trait index - comprehensive stat tracking.
 
 The scraper outputs JSON in this format:
 
@@ -130,7 +168,9 @@ Each version includes:
 - Special Abilities
 - Source book
 
-## ?? Customization
+## ?? **Customization**
+
+**?? TL;DR:** Easy CSS changes, add filters, modify layout - or go advanced with database/backend.
 
 ### Modify the Scraper
 
@@ -149,7 +189,9 @@ Edit `animal-comparison.html` to:
 - Add export functionality
 - Create printable character sheets
 
-## ?? Troubleshooting
+## ?? **Troubleshooting**
+
+**?? TL;DR:** Common issues - no data file (run scraper), parsing errors (site changed), slow scraping (be patient).
 
 ### "Error loading data"
 - Make sure you ran the scraper first: `npm run scrape`
@@ -171,7 +213,9 @@ Edit `animal-comparison.html` to:
 - Parser might need adjustment for edge cases
 - Check the `animals-data.json` file to see what data was captured
 
-## ?? Integration Ideas
+## ?? **Integration Ideas**
+
+**?? TL;DR:** Add to existing site, create character sheets, build encounter tools.
 
 ### Add to Your Main Site
 
@@ -201,20 +245,26 @@ Edit `animal-comparison.html` to:
 - **Add Images** - Display creature art from the site
 - **Encounter Builder** - Build encounters with multiple summons
 
-## ?? Resources
+## ?? **Resources**
+
+**?? TL;DR:** Data from Archives of Nethys, Pathfinder 2e by Paizo, tool built for community.
 
 - **Archives of Nethys**: https://2e.aonprd.com/
 - **Summon Animal Spell**: https://2e.aonprd.com/Spells.aspx?ID=1694
 - **Pathfinder 2e Rules**: https://2e.aonprd.com/Rules.aspx
 
-## ?? Legal & Ethics
+## ?? **Legal & Ethics**
+
+**?? TL;DR:** Respectful scraping (1-sec delays), attribute data source, personal/educational use only.
 
 - **Respectful Scraping**: 1-second delays between requests
 - **Personal Use**: For your own gaming reference
 - **Attribution**: Data from Archives of Nethys / Paizo Publishing
 - **No Abuse**: Don't run the scraper excessively
 
-## ?? Contributing
+## ?? **Contributing**
+
+**?? TL;DR:** Report bugs, suggest features, improve parsing, share use cases.
 
 Want to improve the tool?
 
@@ -223,7 +273,9 @@ Want to improve the tool?
 3. **Better Styling**: Improve the CSS for the comparison cards
 4. **Bug Fixes**: Report issues or submit improvements
 
-## ?? Next Steps
+## ?? **Next Steps**
+
+**?? TL;DR:** Run scraper, explore comparison tool, customize for your campaign, integrate with your site.
 
 After using the basic tool:
 
