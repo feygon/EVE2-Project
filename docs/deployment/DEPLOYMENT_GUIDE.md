@@ -1,4 +1,18 @@
+---
+title: "Production Deployment Guide"
+version: v2.0.0
+created: 2024-12-24
+updated: 2025-12-29
+status: current
+category: deployment
+tags: [deployment, production, directadmin, sftp]
+---
+
 # ?? Production Deployment Guide
+
+**Version:** v2.0.0 (CI/CD pipeline)  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 ## ?? **SFTP Credentials (DO NOT COMMIT)**
 
@@ -217,7 +231,7 @@ Visit these URLs:
 
 ---
 
-## ?? **Verification Checklist:**
+## ? **Verification Checklist:**
 
 After deployment, verify:
 

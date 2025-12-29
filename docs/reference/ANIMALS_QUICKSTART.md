@@ -1,4 +1,18 @@
+---
+title: "Animals Tool Quick Start Guide"
+version: v2.1.0
+created: 2025-12-26
+updated: 2025-12-29
+status: current
+category: reference
+tags: [animals, quickstart, guide]
+---
+
 # ?? Summon Animal Comparison Tool - Quick Start
+
+**Version:** v2.1.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 Complete system for scraping, storing, and comparing animal creatures from Archives of Nethys for use with the Pathfinder 2e Summon Animal spell.
 
@@ -89,7 +103,7 @@ Once you open `animal-comparison.html`:
 - Set "Size" to Large
 - Check each creature's speed stats for "fly"
 
-## ?? Data Structure
+## ??? Data Structure
 
 The scraper outputs JSON in this format:
 
@@ -220,4 +234,4 @@ After using the basic tool:
 
 ---
 
-**Happy Summoning!** ??????
+**Happy Summoning!** ????

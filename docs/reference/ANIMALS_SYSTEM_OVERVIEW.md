@@ -1,4 +1,18 @@
+---
+title: "Animals Tool System Overview"
+version: v2.1.0
+created: 2025-12-26
+updated: 2025-12-29
+status: current
+category: reference
+tags: [animals, architecture, system-overview]
+---
+
 # ?? Summon Animal Tool - Complete System
+
+**Version:** v2.1.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 A complete web scraping and comparison system for Pathfinder 2e's Summon Animal spell, built to help players and GMs quickly compare and select animal summons.
 
@@ -167,7 +181,7 @@ app.get('/data/animals-data.json', (req, res) => {
 - Plan themed encounters (all aquatic, all flying, etc.)
 - Create challenge ratings
 
-## ?? Performance
+## ? Performance
 
 ### Scraping
 - **Time:** ~5-10 minutes for full scrape (~100 animals)
@@ -181,7 +195,7 @@ app.get('/data/animals-data.json', (req, res) => {
 - **Browser Support:** All modern browsers
 - **Mobile:** Responsive design works on phones
 
-## ??? Ethics & Legal
+## ?? Ethics & Legal
 
 ### Respectful Scraping
 - ? 1-second delays between requests
@@ -236,7 +250,7 @@ app.get('/data/animals-data.json', (req, res) => {
 - [ ] Add custom creatures support
 - [ ] Create mobile app version
 
-## ?? Technical Details
+## ??? Technical Details
 
 ### Stack
 - **Node.js** - Runtime for scraper

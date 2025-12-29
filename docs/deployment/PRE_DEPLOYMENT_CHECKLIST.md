@@ -1,8 +1,22 @@
+---
+title: "Pre-Deployment Checklist"
+version: v2.0.0
+created: 2024-12-24
+updated: 2025-12-29
+status: current
+category: deployment
+tags: [deployment, checklist, validation]
+---
+
 # ? Pre-Deployment Checklist
+
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
 ## ?? **Complete This Before Deploying**
 
-### **1. Local Testing** ?
+### **1. Local Testing** ??
 ```powershell
 # Start the server
 .\start-local.ps1 3000
@@ -18,7 +32,7 @@
   - [ ] Tooltips work on hover
   - [ ] All 74 spells display correctly
 
-### **2. Security Check** ?
+### **2. Security Check** ??
 ```powershell
 # Verify these are gitignored
 git status | Select-String -Pattern ".env|.local.js|.vscode|node_modules"
@@ -31,7 +45,7 @@ git status | Select-String -Pattern ".env|.local.js|.vscode|node_modules"
 - [ ] `.vscode/` folder is NOT in git status
 - [ ] `node_modules/` is NOT in git status
 
-### **3. Code Review** ?
+### **3. Code Review** ??
 
 **Check these files use environment variables:**
 
@@ -45,7 +59,7 @@ Get-Content dbcon_illusion.js | Select-String "process.env"
 - [ ] `dbcon_illusion.js` uses `process.env.DB_ILLUSION_PASSWORD`
 - [ ] No production passwords in code files
 
-### **4. File Structure** ?
+### **4. File Structure** ??
 
 **Verify partials are using correct extensions:**
 ```powershell
@@ -57,7 +71,7 @@ Should show:
 - [ ] `spell_entry.handlebars` (not .hbs)
 - [ ] No duplicate `.hbs` files
 
-### **5. GitHub Preparation** ?
+### **5. GitHub Preparation** ????
 
 ```powershell
 # Check what will be committed
@@ -73,7 +87,7 @@ git diff
 - [ ] `.gitignore` is updated and staged
 - [ ] Setup scripts are staged
 
-### **6. Commit Message Ready** ?
+### **6. Commit Message Ready** ??
 
 Use this commit message:
 ```
@@ -254,7 +268,7 @@ If deployment fails:
 
 ---
 
-## ? **Success Criteria:**
+## ?? **Success Criteria:**
 
 Deployment is successful when:
 - ? All routes work without errors
@@ -275,7 +289,7 @@ Deployment is successful when:
 
 ---
 
-## ?? **Ready to Deploy?**
+## ? **Ready to Deploy?**
 
 Complete this checklist, then:
 
