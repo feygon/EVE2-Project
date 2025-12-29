@@ -1,20 +1,44 @@
----
-title: "Production Deployment Guide"
-version: v2.0.0
-created: 2024-12-24
-updated: 2025-12-29
-status: current
-category: deployment
-tags: [deployment, production, directadmin, sftp]
----
-
 # ?? Production Deployment Guide
 
 **Version:** v2.0.0 (CI/CD pipeline)  
 **Last Updated:** December 29, 2025  
 **Status:** ?? Current
 
+## ?? **Table of Contents**
+
+- [TL;DR](#tldr)
+- [SFTP Credentials](#-sftp-credentials-do-not-commit)
+- [Before Deployment](#-important-before-deployment)
+- [What Will Be Deployed](#-what-will-be-deployed)
+- [Deployment Methods](#-deployment-methods)
+- [Post-Deployment Steps](#-post-deployment-steps)
+- [Verification Checklist](#-verification-checklist)
+- [Troubleshooting](#-troubleshooting)
+- [Deployment History](#-deployment-history)
+- [Security Notes](#-security-notes)
+- [Related Documentation](#-related-documentation)
+- [Quick Deploy Commands](#-quick-deploy-commands)
+
+---
+
+## ?? **TL;DR**
+
+**?? Quick Deploy Process:**
+1. Set environment variables in DirectAdmin
+2. Upload files via SFTP (exclude node_modules, .env)
+3. SSH to server, run `npm install`
+4. Restart Node.js app in DirectAdmin
+5. Test all routes (/, /resume, /eve2, /illusion)
+
+**Methods:** VS Code SFTP extension (easiest), WinSCP, or command line
+
+**Time:** 15-30 minutes
+
+---
+
 ## ?? **SFTP Credentials (DO NOT COMMIT)**
+
+**?? TL;DR:** Use these credentials for SFTP uploads - private key is in .vscode folder, never commit it.
 
 ### **Connection Details:**
 ```
@@ -29,6 +53,8 @@ Private Key: .vscode/rsa-key-20251219OpenSSH.ppk
 ---
 
 ## ?? **IMPORTANT: Before Deployment**
+
+**?? TL;DR:** Set production environment variables in DirectAdmin first - includes DB credentials, session secret, NODE_ENV=production.
 
 ### **1. Environment Variables Setup**
 
@@ -62,7 +88,9 @@ See **DIRECTADMIN_ENV_SETUP.md** for detailed instructions.
 
 ---
 
-## ?? **What Will Be Deployed:**
+## ?? **What Will Be Deployed**
+
+**?? TL;DR:** Upload all source files except node_modules, .env, .vscode - dependencies installed on server.
 
 ### **? Files to Upload:**
 ```
@@ -98,7 +126,9 @@ See **DIRECTADMIN_ENV_SETUP.md** for detailed instructions.
 
 ---
 
-## ?? **Deployment Methods:**
+## ?? **Deployment Methods**
+
+**?? TL;DR:** Three options - VS Code SFTP (recommended), manual SFTP client, or command line rsync/scp.
 
 ### **Option 1: Using VS Code SFTP Extension** (Recommended)
 
@@ -168,7 +198,9 @@ rsync -avz -e "ssh -i .vscode/rsa-key-20251219OpenSSH.ppk -p 27493" --exclude 'n
 
 ---
 
-## ?? **Post-Deployment Steps:**
+## ?? **Post-Deployment Steps**
+
+**?? TL;DR:** SSH to server, npm install, verify env vars, restart app, test all routes.
 
 ### **1. SSH into Server**
 
@@ -231,7 +263,9 @@ Visit these URLs:
 
 ---
 
-## ? **Verification Checklist:**
+## ? **Verification Checklist**
+
+**?? TL;DR:** Check all routes work, no errors in console or logs, partials render correctly, database connects.
 
 After deployment, verify:
 
@@ -250,7 +284,9 @@ After deployment, verify:
 
 ---
 
-## ?? **Troubleshooting:**
+## ?? **Troubleshooting**
+
+**?? TL;DR:** Common issues - database connection fails (check env vars), templates not updating (restart app), old version showing (clear cache).
 
 ### **Issue: Database Connection Fails**
 ```bash
@@ -285,7 +321,9 @@ node --version
 
 ---
 
-## ?? **Deployment History:**
+## ?? **Deployment History**
+
+**?? TL;DR:** Track major changes and deployment dates for rollback reference.
 
 | Date | Changes | Files Modified |
 |------|---------|----------------|
@@ -296,7 +334,9 @@ node --version
 
 ---
 
-## ?? **Security Notes:**
+## ?? **Security Notes**
+
+**?? TL;DR:** Never commit SSH keys, .env files, or passwords - use environment variables, rotate keys periodically.
 
 1. **Never commit `.ppk` files to Git** ? (already in .gitignore)
 2. **Never commit production passwords** ? (using env vars)
@@ -306,7 +346,7 @@ node --version
 
 ---
 
-## ?? **Related Documentation:**
+## ?? **Related Documentation**
 
 - **DIRECTADMIN_ENV_SETUP.md** - Environment variable setup
 - **GITHUB_SYNC_GUIDE.md** - Git workflow
@@ -315,7 +355,9 @@ node --version
 
 ---
 
-## ?? **Quick Deploy Commands:**
+## ? **Quick Deploy Commands**
+
+**?? TL;DR:** Test local ? commit to Git ? upload via SFTP ? SSH to server ? npm install ? restart ? test production.
 
 ```powershell
 # 1. Test locally first
@@ -330,7 +372,7 @@ git push
 # Right-click project folder ? "Upload Folder"
 
 # 4. SSH into server
-ssh -i ".vscode\rsa-key-20251219OpenSSH.ppk" -p 27493 realfey@server06.hostwhitelabel.com
+ssh -i ".vscode-rsa-key-20251219OpenSSH.ppk" -p 27493 realfey@server06.hostwhitelabel.com
 
 # 5. Run deployment commands
 cd /home/realfey/eve2
