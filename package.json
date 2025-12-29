@@ -12,9 +12,20 @@
     "forever": "^1.0.0",
     "mysql": "^2.17.1"
   },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "request": "^2.88.2",
+    "sinon": "^11.1.2",
+    "supertest": "^6.1.6"
+  },
   "scripts": {
-    "test": "echo \"No tests specified - skipping\"",
-    "start": "node main.js"
+    "start": "node main.js",
+    "test": "mocha --timeout 5000",
+    "test:unit": "mocha test/unit/**/*.test.js",
+    "test:integration": "mocha test/integration/**/*.test.js --timeout 10000",
+    "test:coverage": "nyc --reporter=html --reporter=text mocha"
   },
   "author": "Feygon",
   "license": "MIT"
