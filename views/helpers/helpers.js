@@ -76,7 +76,7 @@ exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
     }
 
     if (!operators[operator]) {
-        throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator1);
+        throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator);
     }
 
     // arrayed inputs must always use the same comparison operator.
@@ -110,7 +110,7 @@ exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, oper
     }
 
     if (!operators[operator]) {
-        throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator1);
+        throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator);
     }
 
     // arrayed inputs must always use the same comparison operator.
@@ -123,19 +123,6 @@ exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, oper
     } else {
         return options.inverse(this);
     }
-};
-
-exports.multiply = function(lvalue, rvalue){
-    if(arguments.length != 3){
-        throw new Error("Handlebars Helper ' multiply' needs 2 parameters.");
-    }
-    if (!isNumber(lvalue)) {
-        throw new TypeError('expected lvalue to be a number');
-      }
-      if (!isNumber(rvalue)) {
-        throw new TypeError('expected rvalue to be a number');
-      }
-    return template(lvalue * rvalue);
 };
 
 // Handle illusion page methods
