@@ -14,7 +14,38 @@ tags: [deployment, checklist, validation]
 **Last Updated:** December 29, 2025  
 **Status:** ?? Current
 
+## ?? **Table of Contents**
+
+- [TL;DR](#tldr)
+- [Complete This Before Deploying](#-complete-this-before-deploying)
+- [GitHub Commit Steps](#-github-commit-steps)
+- [Production Deployment Steps](#-production-deployment-steps)
+- [Production Testing](#-production-testing)
+- [Rollback Plan](#-rollback-plan-if-needed)
+- [Success Criteria](#-success-criteria)
+- [Support Resources](#-support-resources)
+
+---
+
+## ?? **TL;DR**
+
+**?? Before deploying, verify:**
+1. All routes work locally
+2. No secrets in Git
+3. Environment variables ready
+4. GitHub committed and pushed
+5. SFTP credentials ready
+6. Know rollback procedure
+
+**Process:** Test local ? secure code ? commit ? deploy ? test production
+
+**Time:** 30-45 minutes
+
+---
+
 ## ?? **Complete This Before Deploying**
+
+**?? TL;DR:** Test locally, verify security, check code, validate file structure, prepare GitHub commit.
 
 ### **1. Local Testing** ??
 ```powershell
@@ -33,6 +64,9 @@ tags: [deployment, checklist, validation]
   - [ ] All 74 spells display correctly
 
 ### **2. Security Check** ??
+
+**?? TL;DR:** Verify .env, passwords, SSH keys not in git status.
+
 ```powershell
 # Verify these are gitignored
 git status | Select-String -Pattern ".env|.local.js|.vscode|node_modules"
@@ -47,7 +81,7 @@ git status | Select-String -Pattern ".env|.local.js|.vscode|node_modules"
 
 ### **3. Code Review** ??
 
-**Check these files use environment variables:**
+**?? TL;DR:** Confirm all DB configs use process.env, no hardcoded passwords.
 
 ```powershell
 # Should see process.env, not hardcoded passwords
@@ -61,7 +95,8 @@ Get-Content dbcon_illusion.js | Select-String "process.env"
 
 ### **4. File Structure** ??
 
-**Verify partials are using correct extensions:**
+**?? TL;DR:** Check partials have .handlebars extension, no duplicates.
+
 ```powershell
 Get-ChildItem views\partials | Select-Object Name
 ```
@@ -71,7 +106,9 @@ Should show:
 - [ ] `spell_entry.handlebars` (not .hbs)
 - [ ] No duplicate `.hbs` files
 
-### **5. GitHub Preparation** ????
+### **5. GitHub Preparation** ??
+
+**?? TL;DR:** Review changes with git status and git diff before committing.
 
 ```powershell
 # Check what will be committed
@@ -88,6 +125,8 @@ git diff
 - [ ] Setup scripts are staged
 
 ### **6. Commit Message Ready** ??
+
+**?? TL;DR:** Use semantic commit format describing major changes, technical details, and security improvements.
 
 Use this commit message:
 ```
@@ -115,7 +154,9 @@ Security:
 
 ---
 
-## ?? **GitHub Commit Steps:**
+## ?? **GitHub Commit Steps**
+
+**?? TL;DR:** Stage all, verify, commit with message, push to main, verify on GitHub.
 
 ```powershell
 # 1. Stage all changes
@@ -137,7 +178,9 @@ git push -u origin main
 
 ---
 
-## ?? **Production Deployment Steps:**
+## ?? **Production Deployment Steps**
+
+**?? TL;DR:** Set DirectAdmin env vars, upload via SFTP (exclude node_modules/.env), SSH to server, npm install, restart app.
 
 ### **Before Deploying:**
 
@@ -222,7 +265,9 @@ npm install
 
 ---
 
-## ?? **Production Testing:**
+## ?? **Production Testing**
+
+**?? TL;DR:** Test all routes, verify illusion page layout, check database connection, no console errors.
 
 Visit these URLs:
 - [ ] https://realfeygon.com/resume
@@ -241,7 +286,9 @@ Visit these URLs:
 
 ---
 
-## ?? **Rollback Plan (If Needed):**
+## ?? **Rollback Plan (If Needed)**
+
+**?? TL;DR:** Revert git, check logs, fix common issues (env vars, DB creds, app restart, cache).
 
 If deployment fails:
 
@@ -268,7 +315,9 @@ If deployment fails:
 
 ---
 
-## ?? **Success Criteria:**
+## ?? **Success Criteria**
+
+**?? TL;DR:** Deployment succeeds when all routes work, new layout shows, DB connects, no errors.
 
 Deployment is successful when:
 - ? All routes work without errors
@@ -280,7 +329,7 @@ Deployment is successful when:
 
 ---
 
-## ?? **Support Resources:**
+## ?? **Support Resources**
 
 - **DEPLOYMENT_GUIDE.md** - Detailed deployment steps
 - **TROUBLESHOOTING.md** - Common issues
@@ -289,12 +338,12 @@ Deployment is successful when:
 
 ---
 
-## ? **Ready to Deploy?**
+## ?? **Ready to Deploy?**
 
 Complete this checklist, then:
 
 1. ? **Commit to GitHub** (see GITHUB_PREP.md)
-2. ? **Review deployment guide** (DEPLOYMENT_GUIDE.md)
+2. ?? **Review deployment guide** (DEPLOYMENT_GUIDE.md)
 3. ?? **Deploy to production**
 4. ?? **Test production site**
 5. ?? **Celebrate!**
