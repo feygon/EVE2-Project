@@ -1,6 +1,42 @@
+---
+title: "Documentation Options - HTML Portal vs GitHub Wiki"
+version: v2.0.0
+created: 2024-12-24
+updated: 2025-12-29
+status: current
+category: development
+tags: [documentation, portal, wiki, reference]
+---
+
 # ?? Documentation Options - HTML Portal vs GitHub Wiki
 
-## ? **What I Created:**
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
+
+## ?? **Table of Contents**
+
+- [TL;DR](#tldr)
+- [What I Created](#-what-i-created)
+- [Option 2: GitHub Wiki](#-option-2-github-wiki-alternative)
+- [Recommendation: Use Both](#-recommendation-use-both)
+- [Comparison](#-comparison)
+- [Deployment Options](#-deployment-options)
+- [Setting Up GitHub Wiki](#-setting-up-github-wiki)
+
+---
+
+## ?? **TL;DR**
+
+**?? Two documentation options:**
+1. **HTML Portal** (recommended) - Beautiful, searchable, dyslexia-friendly
+2. **GitHub Wiki** (alternative) - Built-in GitHub, good for collaboration
+
+**Use both:** HTML for daily use, Wiki for team collaboration.
+
+---
+
+## ?? **What I Created:**
 
 ### **Option 1: HTML Documentation Portal** (RECOMMENDED)
 **File:** `docs/index.html`
@@ -40,6 +76,8 @@ Web: https://realfeygon.com/docs/index.html (after deployment)
 
 GitHub provides a built-in wiki for every repository.
 
+**?? TL;DR:** GitHub's built-in wiki - easy setup, version controlled, good for teams.
+
 ### **How to Enable:**
 
 1. **Go to your repo:** https://github.com/feygon/EVE2-Project
@@ -66,6 +104,8 @@ GitHub provides a built-in wiki for every repository.
 
 ## ?? **Recommendation: Use Both!**
 
+**?? TL;DR:** HTML portal for primary docs, Wiki for team collaboration and external visibility.
+
 ### **Best Approach:**
 
 **1. HTML Portal (Primary):**
@@ -83,6 +123,8 @@ GitHub provides a built-in wiki for every repository.
 
 ## ?? **Comparison:**
 
+**?? TL;DR:** HTML portal wins for UX and accessibility, Wiki wins for collaboration and visibility.
+
 | Feature | HTML Portal | GitHub Wiki |
 |---------|-------------|-------------|
 | **Accessibility** | ? Fully customized | ?? Limited |
@@ -99,6 +141,8 @@ GitHub provides a built-in wiki for every repository.
 ---
 
 ## ?? **Deployment Options:**
+
+**?? TL;DR:** Three options - upload to website, use GitHub Pages, or both HTML portal + Wiki.
 
 ### **Option A: Serve HTML from Your Site**
 
@@ -154,6 +198,8 @@ https://feygon.github.io/EVE2-Project/
 ---
 
 ## ?? **Setting Up GitHub Wiki:**
+
+**?? TL;DR:** Enable in repo settings, clone wiki repo, add markdown files, push to GitHub.
 
 ### **1. Enable Wiki:**
 ```
