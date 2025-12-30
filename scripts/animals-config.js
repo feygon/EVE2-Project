@@ -3,6 +3,9 @@
  */
 
 module.exports = {
+    // External References
+    AONPRD_BASE_URL: 'https://2e.aonprd.com',
+    
     // Data file paths
     DATA_PATH: 'Extras/animals-data.json',
     

@@ -370,9 +370,45 @@
 
 ## ?? Known Issues to Address
 
-### **? Recently Fixed:**
+### **?? Recently Fixed:**
 1. ? `multiply` helper - **REMOVED** (dead code from legacy schema refactor)
 2. ? `compare2same` and `compare2customString` - **FIXED** typo in error messages (`operator1` ? `operator`)
+
+### **?? Active Bugs (Acceptance Testing Failures):**
+1. ? **Animal URL Domain Prefix Error** - **FIXED & TESTED**
+   - **Issue:** Animal name hyperlinks used wrong domain
+   - **Expected:** `https://2e.aonprd.com/Monsters.aspx?ID=2359`
+   - **Root Cause:** 
+     1. Relative URLs in JSON data were being resolved by browser to current domain
+     2. Route handler (`animals.js`) was not passing config value to template
+   - **Fix Applied:** 
+     - Added `AONPRD_BASE_URL` constant to `scripts/animals-config.js`
+     - Updated `animalsCallbacks.getAnimalsPage()` to set `context.aonprdBaseUrl`
+     - Updated `animals.js` router to use spread operator (`...context`)
+     - Modified `views/partials/creature-card.handlebars` to use `{{@root.aonprdBaseUrl}}{{url}}`
+     - Modified `views/partials/creature-table-row.handlebars` to use `{{@root.aonprdBaseUrl}}{{url}}`
+   - **Date Fixed:** 2025-12-29
+   - **Date Tested:** 2025-12-29
+   - **Status:** ? Verified working in localhost:3000
+
+2. ? **Animal Detail Modal Not Opening** - **FIXED & TESTED**
+   - **Issue:** Clicking elite/normal/weak buttons produced `showAnimalDetail is not defined` error
+   - **Expected:** Modal opens showing creature details
+   - **Root Cause:** JavaScript file path incorrect (`/js/animals-ui.js` instead of `/static/js/animals-ui.js`)
+   - **Fix Applied:**
+     - Updated `views/animals.handlebars` script src to `/static/js/animals-ui.js`
+     - Fixed modal URL construction in `public/js/animals-ui.js` to use AONPRD base URL
+   - **Date Fixed:** 2025-12-29
+   - **Date Tested:** 2025-12-29
+   - **Status:** ? Verified working in localhost:3000
+
+### **Code Quality Improvements:**
+1. ? **Router Context Passing Pattern** - **IMPROVED**
+   - **Before:** Manual property picking (verbose, error-prone)
+   - **After:** Spread operator (`...context`) - cleaner, maintainable
+   - **Files:** `animals.js`
+   - **Benefit:** New properties automatically pass through without router changes
+   - **Date:** 2025-12-29
 
 ### **Technical Debt:**
 1. ?? EVE2 callbacks need refactoring before comprehensive testing

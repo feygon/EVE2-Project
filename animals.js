@@ -21,11 +21,7 @@ router.get('/', function(req, res) {
         res.render('animals', {
             layout: null,
             title: 'Summon Animal - Creature Comparison',
-            metadata: context.metadata,
-            animals: context.animals,
-            traits: context.traits,
-            minLevel: context.minLevel,
-            maxLevel: context.maxLevel
+            ...context  // Spread entire context
         });
     }
 });

@@ -267,6 +267,9 @@ class AnimalsUI {
      * @returns {string} HTML content
      */
     buildModalContent(animal, data) {
+        // Get the AONPRD base URL from the page (set by server in template context)
+        const aonprdBaseUrl = document.querySelector('.animal-card a')?.href.split('/Monsters')[0] || 'https://2e.aonprd.com';
+        
         return `
             <div class="row">
                 <div class="col-md-6">
@@ -337,7 +340,7 @@ class AnimalsUI {
             <div class="mt-3">
                 <h6>Source</h6>
                 <p>${data.source}</p>
-                <a href="${animal.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <a href="${aonprdBaseUrl}${data.url}" target="_blank" class="btn btn-sm btn-outline-primary">
                     View on Archives of Nethys <i class="fas fa-external-link-alt"></i>
                 </a>
             </div>

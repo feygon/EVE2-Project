@@ -1,7 +1,7 @@
 {{!-- Creature Table Row Partial - Reusable row for table view --}}
 <tr data-animal-id="{{id}}">
     <td>
-        <a href="{{url}}" target="_blank">{{name}}</a>
+        <a href="{{@root.aonprdBaseUrl}}{{url}}" target="_blank">{{name}}</a>
     </td>
     <td>{{baseLevel}}</td>
     <td>{{versions.normal.hp}}</td>

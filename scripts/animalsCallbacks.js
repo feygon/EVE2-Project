@@ -155,6 +155,7 @@ const animalsCallbacks = {
             context.traits = Array.from(allTraits).sort();
             context.minLevel = minLevel;
             context.maxLevel = maxLevel;
+            context.aonprdBaseUrl = config.AONPRD_BASE_URL;
             
             complete();
             
