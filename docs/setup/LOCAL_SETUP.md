@@ -1,13 +1,69 @@
-# Local Development Environment Setup
+---
+title: "Local Development Setup Guide"
+version: v2.0.0
+created: 2024-12-22
+updated: 2025-12-29
+status: current
+category: setup
+tags: [local-setup, mariadb, development, installation]
+---
 
-This guide will help you set up a local test environment for realfeygon.com
+# ??? Local Development Setup Guide
 
-## Prerequisites
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
 
-- Node.js v24.12.0 ? (Already installed)
-- npm 11.6.2 ? (Already installed)
+## ?? **Table of Contents**
 
-## Step 1: Install MariaDB
+- [TL;DR](#tldr)
+- [Prerequisites](#prerequisites)
+- [Step 1: Install MariaDB](#step-1-install-mariadb)
+- [Step 2: Install Node Dependencies](#step-2-install-node-dependencies)
+- [Step 3: Set Up Local Databases](#step-3-set-up-local-databases)
+- [Step 4: Create Local Database Configuration](#step-4-create-local-database-configuration)
+- [Step 5: Import Database Schemas](#step-5-import-database-schemas)
+- [Step 6: Update Database Credentials](#step-6-update-database-credentials)
+- [Step 7: Start the Application](#step-7-start-the-application)
+- [Troubleshooting](#troubleshooting)
+- [Useful Commands](#useful-commands)
+
+---
+
+## ?? **TL;DR**
+
+**?? Quick setup:** Install MariaDB ? create databases ? create .env file ? import schemas ? start app.
+
+**Prerequisites:** Node.js 14+, MariaDB/MySQL, Git
+
+**Time:** 20-30 minutes first time, 2 minutes after automation scripts
+
+**Automation:** Use `setup-local.ps1` and `start-local.ps1` scripts for one-command setup.
+
+---
+
+## ?? **Prerequisites**
+
+**?? TL;DR:** Need Node.js 14+, MariaDB/MySQL, and Git installed before starting.
+
+- **Node.js:** Download and install from [Node.js official website](https://nodejs.org/). 14.x or later is required.
+- **MariaDB/MySQL:** Install using package manager or download from [MariaDB downloads](https://mariadb.org/download/).
+- **Git:** Install from [Git official website](https://git-scm.com/downloads).
+
+Verify installations:
+
+```powershell
+node --version
+npm --version
+mysql --version
+git --version
+```
+
+---
+
+## ??? **Step 1: Install MariaDB**
+
+**?? TL;DR:** Download MariaDB, install with default settings, remember root password.
 
 ### Option A: Using Winget (Recommended for Windows)
 ```powershell
@@ -28,14 +84,22 @@ winget install MariaDB.Server
 choco install mariadb
 ```
 
-## Step 2: Install Node Dependencies
+---
+
+## ?? **Step 2: Install Node Dependencies**
+
+**?? TL;DR:** Run `npm install` in project directory to install all dependencies.
 
 ```powershell
 cd D:\Repos\RealFeygon
 npm install
 ```
 
-## Step 3: Set Up Local Databases
+---
+
+## ??? **Step 3: Set Up Local Databases**
+
+**?? TL;DR:** Create two databases - eve2_project and illusion_spells with appropriate users.
 
 After MariaDB is installed, open a command prompt and connect:
 
@@ -63,7 +127,11 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-## Step 4: Create Local Database Configuration
+---
+
+## ?? **Step 4: Create Local Database Configuration**
+
+**?? TL;DR:** Create .env file with database credentials for local development.
 
 Copy your database config files and create local versions:
 
@@ -71,7 +139,11 @@ Copy your database config files and create local versions:
 # You'll need to manually create these or use the setup script
 ```
 
-## Step 5: Import Database Schemas
+---
+
+## ?? **Step 5: Import Database Schemas**
+
+**?? TL;DR:** Import SQL dumps to populate databases with tables and data.
 
 **PowerShell (Recommended):**
 ```powershell
@@ -88,13 +160,21 @@ mysql -u realfey_realfey_realfeyuser -p realfey_realfey_eve2_project < "EVE2 DDQ
 mysql -u realfey_illusion_spells_DB -p realfey_illusion_spells_DB < "illusions DDQ.sql"
 ```
 
-## Step 6: Update Database Credentials
+---
+
+## ?? **Step 6: Update Database Credentials**
+
+**?? TL;DR:** Verify .env file has correct passwords matching what you set in MariaDB.
 
 **IMPORTANT:** Update your local config files with the passwords you set:
 - `dbcon.js` - Update password for EVE2 database user
 - `dbcon_illusion.js` - Update password for Illusion database user
 
-## Step 7: Start the Application
+---
+
+## ?? **Step 7: Start the Application**
+
+**?? TL;DR:** Run `node main.js` or use start-local.ps1 script to launch server.
 
 ```powershell
 # Start on default port 80 (requires admin privileges)
@@ -108,7 +188,11 @@ The application will be available at:
 - `http://localhost` (port 80)
 - `http://localhost:3000` (if using port 3000)
 
-## Troubleshooting
+---
+
+## ?? **Troubleshooting**
+
+**?? TL;DR:** Common issues - database connection fails, port already in use, missing dependencies, wrong passwords.
 
 ### MariaDB won't start
 ```powershell
@@ -146,7 +230,11 @@ If you get "The '<' operator is reserved" error in PowerShell, use `Get-Content`
 Get-Content "EVE2 DDQ.sql" | mysql -u username -pPassword database_name
 ```
 
-## Useful Commands
+---
+
+## ?? **Useful Commands**
+
+**?? TL;DR:** Quick reference for starting server, accessing database, checking status, stopping server.
 
 ```powershell
 # Check Node/npm versions
@@ -172,7 +260,9 @@ mysql -u root -p
 mysql -u root -p -e "SHOW DATABASES;"
 ```
 
-## Development vs Production
+---
+
+## ?? **Development vs Production**
 
 **Local Development:**
 - Use different database passwords
@@ -186,7 +276,9 @@ mysql -u root -p -e "SHOW DATABASES;"
 - Port 80/443
 - Keep production config files separate
 
-## Next Steps
+---
+
+## ?? **Next Steps**
 
 1. Consider using environment variables for configuration
 2. Add `.gitignore` to exclude sensitive config files

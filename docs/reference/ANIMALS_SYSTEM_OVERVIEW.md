@@ -14,9 +14,43 @@ tags: [animals, architecture, system-overview]
 **Last Updated:** December 29, 2025  
 **Status:** ?? Current
 
-A complete web scraping and comparison system for Pathfinder 2e's Summon Animal spell, built to help players and GMs quickly compare and select animal summons.
+## ?? **Table of Contents**
 
-## ?? What's Included
+- [TL;DR](#tldr)
+- [What's Included](#-whats-included)
+- [The Problem This Solves](#-the-problem-this-solves)
+- [Usage Workflow](#-usage-workflow)
+- [Key Features](#-key-features)
+- [Example Use Cases](#-example-use-cases)
+- [Customization Options](#-customization-options)
+- [Integration Ideas](#-integration-ideas)
+- [Performance](#-performance)
+- [Ethics & Legal](#-ethics--legal)
+- [Known Limitations](#-known-limitations)
+- [Future Enhancements](#-future-enhancements)
+- [Technical Details](#-technical-details)
+- [Contributing](#-contributing)
+- [Support](#-support)
+- [License](#-license)
+- [Credits](#-credits)
+
+---
+
+## ?? **TL;DR**
+
+**?? Complete system:** Web scraper + interactive comparison tool for Pathfinder 2e Summon Animal spell.
+
+**What it does:** Scrapes animals from Archives of Nethys, creates Normal/Weak/Elite versions, provides filterable UI.
+
+**Tech:** Node.js scraper (jsdom), vanilla JS comparison tool, JSON data store, fully offline after scraping.
+
+**Time:** 5-10 min scraping, instant filtering, works completely offline.
+
+---
+
+## ?? **What's Included**
+
+**?? TL;DR:** Scraper, comparison HTML, verification tool, generated JSON, comprehensive docs.
 
 ### Core Files
 
@@ -49,7 +83,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
 
 7. **`animals-data.json`** - Scraped creature data (created by scraper)
 
-## ?? The Problem This Solves
+## ?? **The Problem This Solves**
+
+**?? TL;DR:** Summon Animal allows any animal at given level - impossible to compare options without this tool.
 
 **Summon Animal** is a primal spell that lets you summon ANY animal of a given level. But this includes:
 - Normal animals at that level
@@ -60,7 +96,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
 
 **This tool:** Scrapes all animals, creates all three versions, and provides an interactive comparison interface.
 
-## ?? Usage Workflow
+## ?? **Usage Workflow**
+
+**?? TL;DR:** Five steps - install, scrape, verify (optional), open HTML, filter and compare.
 
 ```
 1. Install dependencies
@@ -79,7 +117,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
    ??> Use filters to find perfect summon for situation
 ```
 
-## ?? Key Features
+## ? **Key Features**
+
+**?? TL;DR:** Comprehensive scraping, powerful filtering, visual design, offline capability, all stats extracted.
 
 ### Scraper Features
 - ? Fetches all animals from trait page
@@ -113,7 +153,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
 - Special Abilities
 - Source book reference
 
-## ?? Example Use Cases
+## ?? **Example Use Cases**
+
+**?? TL;DR:** Character creation optimization, in-game quick reference, campaign planning.
 
 ### At Character Creation
 **"I'm building a level 5 primal caster. What are my best summon options?"**
@@ -135,7 +177,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
 2. Note which animals appear at multiple levels (weak/elite)
 3. Plan encounters or NPC summons
 
-## ?? Customization Options
+## ?? **Customization Options**
+
+**?? TL;DR:** Easy (CSS/HTML changes), medium (add filters/features), advanced (database/backend integration).
 
 ### Easy Customizations (No Coding)
 - Change color scheme in CSS
@@ -156,7 +200,9 @@ A complete web scraping and comparison system for Pathfinder 2e's Summon Animal 
 - Build encounter calculator
 - Add custom creatures or house rules
 
-## ?? Integration Ideas
+## ?? **Integration Ideas**
+
+**?? TL;DR:** Add to existing site, create character sheets, build encounter tools.
 
 ### Add to Existing Website
 ```javascript
@@ -181,7 +227,9 @@ app.get('/data/animals-data.json', (req, res) => {
 - Plan themed encounters (all aquatic, all flying, etc.)
 - Create challenge ratings
 
-## ? Performance
+## ? **Performance**
+
+**?? TL;DR:** Scraping takes 5-10 min (respectful delays), viewer is instant, works on all devices.
 
 ### Scraping
 - **Time:** ~5-10 minutes for full scrape (~100 animals)
@@ -195,7 +243,9 @@ app.get('/data/animals-data.json', (req, res) => {
 - **Browser Support:** All modern browsers
 - **Mobile:** Responsive design works on phones
 
-## ?? Ethics & Legal
+## ?? **Ethics & Legal**
+
+**?? TL;DR:** Respectful scraping practices, proper attribution, personal/educational use only.
 
 ### Respectful Scraping
 - ? 1-second delays between requests
@@ -215,7 +265,9 @@ app.get('/data/animals-data.json', (req, res) => {
 - ? Hammer server with requests
 - ? Use for commercial purposes without permission
 
-## ?? Known Limitations
+## ?? **Known Limitations**
+
+**?? TL;DR:** Parser edge cases, site changes break scraper, manual verification recommended, text-only (no images).
 
 1. **Parser Edge Cases**
    - Some special abilities might not parse perfectly
@@ -233,7 +285,9 @@ app.get('/data/animals-data.json', (req, res) => {
 4. **No Images**
    - Currently text-only (could add image scraping)
 
-## ?? Future Enhancements
+## ?? **Future Enhancements**
+
+**?? TL;DR:** Planned features include images, print sheets, comparison mode, PDF export, favorites.
 
 ### Planned
 - [ ] Add creature images
@@ -250,7 +304,9 @@ app.get('/data/animals-data.json', (req, res) => {
 - [ ] Add custom creatures support
 - [ ] Create mobile app version
 
-## ??? Technical Details
+## ?? **Technical Details**
+
+**?? TL;DR:** Node.js + jsdom for scraping, vanilla JS for viewer, ~500KB JSON, minimal dependencies.
 
 ### Stack
 - **Node.js** - Runtime for scraper
@@ -286,7 +342,9 @@ animal-comparison.html
 - **animals-data.json**: ~500KB (varies by number of animals)
 - **Total package**: ~25KB (excluding data and node_modules)
 
-## ?? Contributing
+## ?? **Contributing**
+
+**?? TL;DR:** Report bugs, suggest features, improve parsing, share use cases.
 
 Want to improve this tool? Here's how:
 
@@ -308,7 +366,9 @@ If you find animals that parse incorrectly:
 2. Save the HTML source
 3. Report the issue with examples
 
-## ?? Support
+## ?? **Support**
+
+**?? TL;DR:** Run verify script, check console errors, ensure data file exists, try test mode.
 
 ### Troubleshooting Steps
 1. Run `npm run verify` to check data
@@ -322,18 +382,18 @@ If you find animals that parse incorrectly:
 - **"Error loading data"** - Run scraper first or check file path
 - **"Incomplete data"** - Some animals might have non-standard formatting
 
-## ?? License
+## ?? **License**
 
 MIT License - Free for personal and educational use
 
-## ?? Credits
+## ?? **Credits**
 
-- **Data Source:** Archives of Nethys (2e.aonprd.com)
-- **Game System:** Pathfinder 2e by Paizo Publishing
-- **Tool Developer:** Built for the PF2e community
+**Data Source:** Archives of Nethys (2e.aonprd.com)  
+**Game System:** Pathfinder 2e by Paizo Publishing  
+**Tool Developer:** Built for the PF2e community
 
 ---
 
 **Built with ?? for the Pathfinder 2e community**
 
-*May your summons always be optimal!* ????????
+*May your summons always be optimal!* ??????

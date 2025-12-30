@@ -1,18 +1,58 @@
-# Environment Variables Setup for DirectAdmin
+---
+title: "DirectAdmin Environment Setup Guide"
+version: v2.0.0
+created: 2024-12-22
+updated: 2025-12-29
+status: current
+category: setup
+tags: [directadmin, environment-variables, production, deployment]
+---
 
-This guide will help you migrate your production credentials to environment variables and configure them in DirectAdmin.
+# ?? DirectAdmin Environment Setup Guide
+
+**Version:** v2.0.0  
+**Last Updated:** December 29, 2025  
+**Status:** ?? Current
+
+## ?? **Table of Contents**
+
+- [TL;DR](#tldr)
+- [Overview](#-overview)
+- [Step 1: Install Required Package](#-step-1-install-required-package)
+- [Step 2: Create Environment Files](#-step-2-create-environment-files)
+- [Step 3: Update Database Config Files](#-step-3-update-database-config-files)
+- [Step 4: DirectAdmin Configuration](#-step-4-directadmin-configuration)
+- [Step 5: Update .gitignore](#-step-5-update-gitignore)
+- [Step 6: Testing](#-step-6-testing)
+- [Files to Commit to GitHub](#-files-to-commit-to-github)
+- [Deployment Workflow](#-deployment-workflow)
+- [DirectAdmin Environment Variable Locations](#-directadmin-environment-variable-locations)
+- [Tips for DirectAdmin](#-tips-for-directadmin)
+- [Troubleshooting](#-troubleshooting)
+
+---
+
+## ?? **TL;DR**
+
+**?? Purpose:** Move database passwords from code to environment variables for security.
+
+**Steps:** Install dotenv ? create .env file ? update dbcon files ? set vars in DirectAdmin ? test.
+
+**Result:** No hardcoded passwords, same .env pattern for local and production.
+
+**Time:** 15-20 minutes
+
+---
 
 ## ?? **Overview:**
 
-We'll create a secure system where:
-- ? Production passwords stay out of Git
-- ? Local development uses `.env` file
-- ? Production uses DirectAdmin environment variables
-- ? Code works in both environments automatically
+**?? TL;DR:** Environment variables keep secrets out of code - use .env locally, DirectAdmin panel for production.
 
 ---
 
 ## ?? **Step 1: Install Required Package**
+
+**?? TL;DR:** Install dotenv package to load environment variables from .env file.
 
 ```powershell
 npm install dotenv --save
@@ -23,6 +63,8 @@ This adds the `dotenv` package to load environment variables from `.env` files.
 ---
 
 ## ?? **Step 2: Create Environment Files**
+
+**?? TL;DR:** Create .env for local secrets, .env.example as template for others.
 
 ### **Create `.env` (Local Development - NOT committed to Git)**
 
@@ -111,6 +153,8 @@ PORT=3000
 
 ## ?? **Step 3: Update Database Config Files**
 
+**?? TL;DR:** Modify dbcon.js files to use process.env instead of hardcoded values.
+
 ### **Update `dbcon.js`:**
 
 ```javascript
@@ -173,6 +217,8 @@ app.use(session({
 ---
 
 ## ??? **Step 4: DirectAdmin Configuration**
+
+**?? TL;DR:** Set environment variables in DirectAdmin Node.js panel for production.
 
 DirectAdmin supports environment variables through Node.js app setup. Here's how:
 
@@ -256,6 +302,8 @@ pm2 start ecosystem.config.js --env production
 
 ## ?? **Step 5: Update .gitignore**
 
+**?? TL;DR:** Ensure .env is gitignored so secrets never get committed.
+
 Make sure your `.gitignore` includes:
 
 ```gitignore
@@ -274,6 +322,8 @@ dbcon_illusion.local.js
 ---
 
 ## ? **Step 6: Testing**
+
+**?? TL;DR:** Test locally with .env, verify production with DirectAdmin env vars.
 
 ### **Test Locally:**
 
@@ -298,6 +348,8 @@ node main.js 3000
 
 ## ?? **Files to Commit to GitHub:**
 
+**?? TL;DR:** Commit .env.example and updated dbcon files, never commit .env itself.
+
 ```
 ? .env.example         - Template (no real passwords)
 ? dbcon.js            - Uses environment variables
@@ -318,6 +370,8 @@ node main.js 3000
 
 ## ?? **Deployment Workflow:**
 
+**?? TL;DR:** Local uses .env file, production uses DirectAdmin environment variables panel.
+
 ### **Local Development:**
 1. Use `.env` file with local credentials
 2. Run `.\start-local.ps1 3000`
@@ -337,6 +391,8 @@ node main.js 3000
 ---
 
 ## ?? **DirectAdmin Environment Variable Locations:**
+
+**?? TL;DR:** Node.js Selector ? select app ? Environment Variables tab.
 
 Environment variables in DirectAdmin can be set in several places:
 
@@ -359,6 +415,8 @@ Environment variables in DirectAdmin can be set in several places:
 ---
 
 ## ?? **Tips for DirectAdmin:**
+
+**?? TL;DR:** Use different passwords for prod, document variables, restart after changes, backup settings.
 
 1. **After setting environment variables in DirectAdmin:**
    - Always restart your Node.js application
@@ -383,7 +441,9 @@ Environment variables in DirectAdmin can be set in several places:
 
 ---
 
-## ? **Troubleshooting:**
+## ?? **Troubleshooting:**
+
+**?? TL;DR:** Common issues - .env not loaded, variables not set in DirectAdmin, typos in var names, app not restarted.
 
 ### **"Cannot connect to database" on production:**
 - Check environment variables are set correctly in DirectAdmin
