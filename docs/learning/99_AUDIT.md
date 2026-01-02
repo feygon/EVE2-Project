@@ -1,3 +1,14 @@
+---
+title: "Neuro-Accessibility Audit - Learning Documents"
+version: v2.1.0
+created: 2025-12-28
+updated: 2025-12-29
+status: current
+phase: documentation
+read_order: 99
+tags: [accessibility, audit, documentation, meta]
+---
+
 # ?? Neuro-Accessibility Audit - Learning Documents
 
 **Date:** December 28, 2025  
@@ -285,4 +296,5 @@ Short paragraph (2-3 lines).
 ---
 
 **All learning documents now follow neuro-accessibility best practices!** ??
+
 

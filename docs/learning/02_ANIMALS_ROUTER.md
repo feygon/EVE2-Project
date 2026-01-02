@@ -1,3 +1,14 @@
+---
+title: "Animals.js Router Migration Guide"
+version: v2.1.0
+created: 2025-12-28
+updated: 2025-12-29
+status: active
+phase: migration
+read_order: 2
+tags: [animals, express, router, api, migration]
+---
+
 # ?? Animals.js - Detailed MERN Migration Guide
 
 **File:** `animals.js`  
@@ -366,3 +377,4 @@ router.get('/api/*', ...);          // ? API endpoints
 
 **Key Takeaway:**  
 You've been writing REST APIs alongside Handlebars all along. The migration is simpler than you think! ??
+

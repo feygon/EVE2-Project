@@ -1,3 +1,14 @@
+---
+title: "MERN Migration Annotations - Architecture Analysis"
+version: v2.1.0
+created: 2025-12-28
+updated: 2025-12-29
+status: active
+phase: migration
+read_order: 1
+tags: [mern, nodejs, express, handlebars, architecture]
+---
+
 # ?? MERN Migration Annotations - What's What?
 
 **Purpose:** Identify which parts of the codebase are Node.js, Express, Handlebars, or Business Logic  
@@ -12,8 +23,7 @@
 - [Summary Table](#summary-table)
 - [Migration Path for Animals Tool](#migration-path-for-animals-tool)
 - [What Changes in Each File](#what-changes-in-each-file)
-- [Key Insights for MERN](#key-insights-for-mern)
-- [Next Steps](#next-steps)
+- [Key Insights for MERN](#next-steps)
 
 ---
 
@@ -46,7 +56,7 @@
  * - Business Logic: callbacks, queries (KEEP FOR API)
  */
 
-// ============================================
+ // ============================================
 // NODE.JS CORE - Native Node modules
 // ? KEEP IN MERN (Backend needs these)
 // ============================================

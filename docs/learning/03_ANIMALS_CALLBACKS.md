@@ -1,3 +1,14 @@
+---
+title: "Animals Callbacks Business Logic Analysis"
+version: v2.1.0
+created: 2025-12-28
+updated: 2025-12-29
+status: active
+phase: migration
+read_order: 3
+tags: [animals, callbacks, business-logic, api]
+---
+
 # ?? animalsCallbacks.js - Business Logic Layer Analysis
 
 **File:** `scripts/animalsCallbacks.js`  
@@ -553,3 +564,4 @@ getAnimalDetail: async function(req, res) {
 ---
 
 **You were already writing MERN-style code without realizing it!** ??
+
