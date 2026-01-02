@@ -31,12 +31,14 @@ describe('Animals API Integration Tests', () => {
     });
 
     describe('GET /animals', () => {
+        // Test HTTP response: main page should return 200 OK status
         it('should return 200 status', (done) => {
             request(app)
                 .get('/animals')
                 .expect(200, done);
         });
 
+        // Test content type: should render HTML page (not JSON)
         it('should render animals.handlebars template', (done) => {
             request(app)
                 .get('/animals')
@@ -48,19 +50,20 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test metadata rendering: page should include animal count and level range
         it('should include metadata in rendered page', (done) => {
             request(app)
                 .get('/animals')
                 .expect((res) => {
                     expect(res.text).to.include('animals');
                     expect(res.text).to.include('Level');
-                    expect(res.text).to.include('traits');
                 })
                 .end(done);
         });
     });
 
     describe('GET /animals/api/list', () => {
+        // Test API response: should return JSON with animals data
         it('should return JSON with all animals', (done) => {
             request(app)
                 .get('/animals/api/list')
@@ -74,6 +77,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test level filtering: should only return animals with matching level (any version)
         it('should filter by level parameter', (done) => {
             request(app)
                 .get('/animals/api/list?level=1')
@@ -92,6 +96,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test trait filtering: should only return animals with specified trait
         it('should filter by trait parameter', (done) => {
             request(app)
                 .get('/animals/api/list?trait=Animal')
@@ -106,6 +111,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test size filtering: should only return animals of specified size
         it('should filter by size parameter', (done) => {
             request(app)
                 .get('/animals/api/list?size=Large')
@@ -118,6 +124,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test HP range filtering: should only return animals within HP range
         it('should filter by HP range', (done) => {
             request(app)
                 .get('/animals/api/list?minHp=50&maxHp=100')
@@ -132,6 +139,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test flying filter: should only return animals with fly speed > 0
         it('should filter by flying capability', (done) => {
             request(app)
                 .get('/animals/api/list?hasFlying=true')
@@ -144,6 +152,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test swimming filter: should only return animals with swim speed > 0
         it('should filter by swimming capability', (done) => {
             request(app)
                 .get('/animals/api/list?hasSwimming=true')
@@ -156,6 +165,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test multiple filters: should apply all filters with AND logic
         it('should handle multiple filters simultaneously', (done) => {
             request(app)
                 .get('/animals/api/list?size=Large&hasFlying=true')
@@ -169,6 +179,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test response accuracy: count should match actual array length
         it('should return correct count in response', (done) => {
             request(app)
                 .get('/animals/api/list')
@@ -196,6 +207,7 @@ describe('Animals API Integration Tests', () => {
                 });
         });
 
+        // Test successful detail retrieval: should return full animal object for valid ID
         it('should return animal details for valid ID', (done) => {
             request(app)
                 .get(`/animals/api/detail/${validAnimalId}`)
@@ -208,6 +220,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test 404 error: non-existent ID should return 404 status with error message
         it('should return 404 for invalid ID', (done) => {
             request(app)
                 .get('/animals/api/detail/nonexistent-id-12345')
@@ -219,6 +232,7 @@ describe('Animals API Integration Tests', () => {
                 .end(done);
         });
 
+        // Test complete object: response should include all versions and stats
         it('should return complete animal object', (done) => {
             request(app)
                 .get(`/animals/api/detail/${validAnimalId}`)

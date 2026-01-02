@@ -50,6 +50,7 @@ describe('Animals Callbacks', () => {
             ]
         };
 
+        // Test basic file loading: verify JSON file is read and parsed correctly
         it('should load and parse JSON data correctly', async () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
             
@@ -59,6 +60,7 @@ describe('Animals Callbacks', () => {
             expect(fsStub.readFile).to.have.been.calledOnce;
         });
 
+        // Test caching mechanism: second call should use cached data, not reload file
         it('should return cached data when cache is valid', async () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
             
@@ -72,6 +74,7 @@ describe('Animals Callbacks', () => {
             expect(fsStub.readFile).to.have.been.calledOnce; // Still only called once
         });
 
+        // Test cache bypass: forceReload=true should ignore cache and reload from file
         it('should force reload when forceReload=true', async () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
             
@@ -81,6 +84,7 @@ describe('Animals Callbacks', () => {
             expect(fsStub.readFile).to.have.been.calledTwice;
         });
 
+        // Test data validation: missing 'animals' array should throw error (defensive programming)
         it('should validate data structure (animals array exists)', async () => {
             fsStub.readFile.resolves(JSON.stringify({ metadata: {} }));
             
@@ -92,6 +96,7 @@ describe('Animals Callbacks', () => {
             }
         });
 
+        // Test retry logic: should retry failed reads up to MAX_RETRY_ATTEMPTS (resilience)
         it('should retry up to MAX_RETRY_ATTEMPTS times', async () => {
             fsStub.readFile
                 .onFirstCall().rejects(new Error('Read error'))
@@ -104,6 +109,7 @@ describe('Animals Callbacks', () => {
             expect(fsStub.readFile).to.have.been.calledThrice;
         });
 
+        // Test max retry failure: after all retries exhausted, should throw final error
         it('should throw error after max retry attempts', async () => {
             fsStub.readFile.rejects(new Error('Persistent error'));
             
@@ -115,6 +121,7 @@ describe('Animals Callbacks', () => {
             }
         });
 
+        // Test stale cache fallback: if reload fails but stale cache exists, return stale data
         it('should return stale cache as fallback on error', async () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
             
@@ -131,6 +138,7 @@ describe('Animals Callbacks', () => {
     });
 
     describe('clearCache()', () => {
+        // Test cache clearing: verify cache is cleared and next call reloads from file
         it('should clear animalsCache and lastLoadTime', async () => {
             const mockData = {
                 metadata: { animal_count: 1 },
@@ -207,6 +215,7 @@ describe('Animals Callbacks', () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
         });
 
+        // Test level filter: should return animals with level 3 in any version (normal/weak/elite)
         it('should filter by level (checks all versions)', async () => {
             req.query.level = '3';
             
@@ -218,6 +227,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test trait filter: should return only animals with specified trait
         it('should filter by trait', async () => {
             req.query.trait = 'Animal';
             
@@ -229,6 +239,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test size filter: should return only animals of specified size (Large, Small, etc.)
         it('should filter by size', async () => {
             req.query.size = 'Large';
             
@@ -240,6 +251,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test HP range filter: should return animals with HP between minHp and maxHp
         it('should filter by HP range', async () => {
             req.query.minHp = '10';
             req.query.maxHp = '50';
@@ -252,6 +264,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test flying filter: should return only animals with fly speed > 0
         it('should filter by flying capability', async () => {
             req.query.hasFlying = 'true';
             
@@ -263,6 +276,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test multiple filters: should combine all filters with AND logic
         it('should handle multiple filters simultaneously', async () => {
             req.query.size = 'Small';
             req.query.hasFlying = 'true';
@@ -275,6 +289,7 @@ describe('Animals Callbacks', () => {
             });
         });
 
+        // Test error handling: should return 500 status with error message on failure
         it('should return 500 status on error', async () => {
             fsStub.readFile.rejects(new Error('File error'));
             animalsCallbacks.clearCache();
@@ -307,6 +322,7 @@ describe('Animals Callbacks', () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
         });
 
+        // Test successful lookup: should return complete animal object for valid ID
         it('should find animal by ID', async () => {
             req.params.id = 'dog';
             
@@ -317,6 +333,7 @@ describe('Animals Callbacks', () => {
             );
         });
 
+        // Test not found: should return 404 status for non-existent animal ID
         it('should return 404 when animal not found', async () => {
             req.params.id = 'nonexistent';
             
@@ -328,6 +345,7 @@ describe('Animals Callbacks', () => {
             }));
         });
 
+        // Test error handling: should return 500 status if data loading fails
         it('should return 500 status on error', async () => {
             fsStub.readFile.rejects(new Error('File error'));
             animalsCallbacks.clearCache();
@@ -384,30 +402,35 @@ describe('Animals Callbacks', () => {
             fsStub.readFile.resolves(JSON.stringify(mockData));
         });
 
+        // Test successful page load: should call complete callback after data loads
         it('should load data successfully', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(complete).to.have.been.calledOnce;
         });
 
+        // Test context population: should add metadata to context object
         it('should populate context with metadata', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(context.metadata).to.deep.equal(mockData.metadata);
         });
 
+        // Test context population: should add animals array to context
         it('should populate context with animals array', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(context.animals).to.deep.equal(mockData.animals);
         });
 
+        // Test trait extraction: should extract unique traits from trait_index for filtering
         it('should extract unique traits for filtering', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(context.traits).to.have.members(['Animal', 'Minion']);
         });
 
+        // Test level range calculation: should find min/max levels across all versions
         it('should calculate correct min/max level range', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
@@ -415,18 +438,21 @@ describe('Animals Callbacks', () => {
             expect(context.maxLevel).to.equal(4); // From elite version
         });
 
+        // Test AONPRD URL: should add Archives of Nethys base URL to context
         it('should add aonprdBaseUrl to context', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(context.aonprdBaseUrl).to.equal('https://2e.aonprd.com');
         });
 
+        // Test callback invocation: should call complete callback after success
         it('should call complete() callback', async () => {
             await animalsCallbacks.getAnimalsPage(res, context, complete);
             
             expect(complete).to.have.been.calledOnce;
         });
 
+        // Test error handling: should send 500 error and NOT call complete on failure
         it('should return 500 error on failure', async () => {
             fsStub.readFile.rejects(new Error('Load error'));
             animalsCallbacks.clearCache();
