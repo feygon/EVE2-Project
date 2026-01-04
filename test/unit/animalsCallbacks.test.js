@@ -480,5 +480,31 @@ describe('Animals Callbacks', () => {
             expect(res.send).to.have.been.called;
             expect(complete).to.not.have.been.called;
         });
+
+        // Test trait_index fallback: should handle missing trait_index gracefully
+        it('should handle missing trait_index', async () => {
+            const dataWithoutTraitIndex = {
+                metadata: { animal_count: 1 },
+                animals: [
+                    {
+                        id: 'dog',
+                        name: 'Dog',
+                        versions: {
+                            normal: { level: 1 },
+                            elite: { level: 3 }
+                        }
+                    }
+                ]
+            };
+            
+            fsStub.readFile.resolves(JSON.stringify(dataWithoutTraitIndex));
+            animalsCallbacks.clearCache();
+            
+            await animalsCallbacks.getAnimalsPage(res, context, complete);
+            
+            expect(context.traits).to.deep.equal([]);
+            expect(complete).to.have.been.calledOnce;
+        });
     });
 });
+
