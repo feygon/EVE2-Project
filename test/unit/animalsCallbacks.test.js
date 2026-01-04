@@ -84,6 +84,23 @@ describe('Animals Callbacks', () => {
             expect(fsStub.readFile).to.have.been.calledTwice;
         });
 
+        // Test concurrent requests: multiple simultaneous calls should only trigger one file read
+        it('should handle concurrent load requests (isLoading flag)', async () => {
+            fsStub.readFile.resolves(JSON.stringify(mockData));
+            
+            // Fire off two requests simultaneously WITHOUT awaiting
+            const promise1 = animalsCallbacks.loadAnimalsData();
+            const promise2 = animalsCallbacks.loadAnimalsData();
+            
+            // Both should succeed and return same data
+            const [result1, result2] = await Promise.all([promise1, promise2]);
+            
+            // But file should only be read ONCE (not twice)
+            expect(fsStub.readFile).to.have.been.calledOnce;
+            expect(result1).to.deep.equal(mockData);
+            expect(result2).to.deep.equal(mockData);
+        });
+
         // Test data validation: missing 'animals' array should throw error (defensive programming)
         it('should validate data structure (animals array exists)', async () => {
             fsStub.readFile.resolves(JSON.stringify({ metadata: {} }));
