@@ -216,39 +216,6 @@ describe('Handlebars Helpers', () => {
         });
     });
 
-    describe('and(var1, var2, options)', () => {
-        // Note: The actual helper has a quirk - it loops through ALL arguments
-        // checking if any == false, then uses the LAST argument as options
-        // But the options object itself might be checked as well
-
-        // Test: Skip and() tests due to helper implementation issues
-        // The helper doesn't properly separate arguments from options
-        it.skip('should return true when no arguments are literally false', () => {
-            const options = {
-                fn: function() { return 'true block'; },
-                inverse: function() { return 'false block'; }
-            };
-            const context = {};
-            const result = helpers.and.call(context, 1, 'string', true, options);
-            expect(result).to.equal('true block');
-        });
-
-        it.skip('should return false when any argument is literally false', () => {
-            const options = {
-                fn: function() { return 'true block'; },
-                inverse: function() { return 'false block'; }
-            };
-            const context = {};
-            const result = helpers.and.call(context, true, false, true, options);
-            expect(result).to.equal('false block');
-        });
-
-        // Test error handling: calling with no arguments should throw
-        it('should throw error when called without arguments', () => {
-            expect(() => helpers.and()).to.throw(/AND function without objects to compare/);
-        });
-    });
-
     describe('compare2same(lvalue1, rvalue1, lvalue2, rvalue2, options)', () => {
         let options;
 

@@ -42,20 +42,6 @@ exports.compare = function(lvalue, rvalue, options) {
     }
 };
 
-exports.and = function(var1, var2, options) {
-    var ct = arguments.length;
-    if (ct < 1) {throw new Error("AND function without objects to compare");}
-    var truthy = true;
-    var i; for (i=0; i<ct; i++) {
-        if (arguments[i] == false) {truthy = false;}
-    }
-    if (truthy) {
-        return options.fn(this);
-    } else {
-        return options.inverse(this);
-    }
-};
-
 exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
 
     if (arguments.length < 5){
