@@ -42,6 +42,31 @@ function Find-MySQLPath {
     return $null
 }
 
+# Function to get database credentials
+function Get-DBCredentials {
+    param(
+        [string]$DatabaseName,
+        [string]$DefaultUser = "root"
+    )
+    
+    Write-Host ""
+    Write-Host "=== Credentials for $DatabaseName ===" -ForegroundColor Cyan
+    Write-Host "Enter MySQL username (default: $DefaultUser):" -ForegroundColor Cyan
+    $username = Read-Host
+    if ([string]::IsNullOrWhiteSpace($username)) {
+        $username = $DefaultUser
+    }
+    
+    Write-Host "Enter MySQL password for $username@$DatabaseName" -ForegroundColor Cyan
+    $password = Read-Host -AsSecureString
+    $passwordPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+    
+    return @{
+        Username = $username
+        Password = $passwordPlain
+    }
+}
+
 # Find MySQL binaries
 $mysqlPath = Find-MySQLPath
 
@@ -83,30 +108,24 @@ Write-Host ""
 if ($Action -eq "backup") {
     Write-Host "Creating database backups..." -ForegroundColor Green
     Write-Host ""
-    
-    # Get MySQL credentials
-    Write-Host "Enter MySQL username (default: root):" -ForegroundColor Cyan
-    $username = Read-Host
-    if ([string]::IsNullOrWhiteSpace($username)) {
-        $username = "root"
-    }
-    
-    Write-Host "Enter MySQL password:" -ForegroundColor Cyan
-    $password = Read-Host -AsSecureString
-    $passwordPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+    Write-Host "NOTE: Each database may have different credentials." -ForegroundColor Yellow
+    Write-Host "You will be prompted for credentials for each database." -ForegroundColor Yellow
+    Write-Host ""
     
     # Backup EVE2 database
-    Write-Host ""
-    Write-Host "Backing up EVE2 database..." -ForegroundColor Cyan
+    Write-Host "--- Backing up EVE2 database ---" -ForegroundColor Cyan
     $eve2BackupFile = Join-Path $backupDir "eve2_backup_$timestamp.sql"
+    $eve2Creds = Get-DBCredentials -DatabaseName "EVE2 (realfey_realfey_eve2_project)" -DefaultUser "realfey_realfey_realfeyuser"
     
     try {
-        & $mysqldump -u $username -p"$passwordPlain" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
+        & $mysqldump -u $eve2Creds.Username -p"$($eve2Creds.Password)" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "? EVE2 database backed up to: $eve2BackupFile" -ForegroundColor Green
+            $fileSize = "{0:N2} MB" -f ((Get-Item $eve2BackupFile).Length / 1MB)
+            Write-Host "? EVE2 database backed up to: $eve2BackupFile ($fileSize)" -ForegroundColor Green
         } else {
             Write-Host "? Failed to backup EVE2 database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+            Write-Host "  Check username/password for EVE2 database" -ForegroundColor Yellow
         }
     } catch {
         Write-Host "? Failed to backup EVE2 database: $_" -ForegroundColor Red
@@ -114,16 +133,19 @@ if ($Action -eq "backup") {
     
     # Backup Illusion database
     Write-Host ""
-    Write-Host "Backing up Illusion Spells database..." -ForegroundColor Cyan
+    Write-Host "--- Backing up Illusion Spells database ---" -ForegroundColor Cyan
     $illusionBackupFile = Join-Path $backupDir "illusion_backup_$timestamp.sql"
+    $illusionCreds = Get-DBCredentials -DatabaseName "Illusion Spells (realfey_illusion_spells_DB)" -DefaultUser "realfey_illusion_spells_DB"
     
     try {
-        & $mysqldump -u $username -p"$passwordPlain" realfey_illusion_spells_DB | Out-File -FilePath $illusionBackupFile -Encoding UTF8
+        & $mysqldump -u $illusionCreds.Username -p"$($illusionCreds.Password)" realfey_illusion_spells_DB | Out-File -FilePath $illusionBackupFile -Encoding UTF8
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "? Illusion Spells database backed up to: $illusionBackupFile" -ForegroundColor Green
+            $fileSize = "{0:N2} MB" -f ((Get-Item $illusionBackupFile).Length / 1MB)
+            Write-Host "? Illusion Spells database backed up to: $illusionBackupFile ($fileSize)" -ForegroundColor Green
         } else {
             Write-Host "? Failed to backup Illusion Spells database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+            Write-Host "  Check username/password for Illusion database" -ForegroundColor Yellow
         }
     } catch {
         Write-Host "? Failed to backup Illusion Spells database: $_" -ForegroundColor Red
@@ -131,17 +153,22 @@ if ($Action -eq "backup") {
     
     # Backup Animals database (if exists)
     Write-Host ""
-    Write-Host "Backing up Animals database..." -ForegroundColor Cyan
+    Write-Host "--- Checking for Animals database ---" -ForegroundColor Cyan
+    
+    # Try with root credentials first (ask user)
+    $animalsCreds = Get-DBCredentials -DatabaseName "Animals (realfey_animals_db) - Optional" -DefaultUser "root"
     $animalsBackupFile = Join-Path $backupDir "animals_backup_$timestamp.sql"
     
     try {
-        & $mysqldump -u $username -p"$passwordPlain" realfey_animals_db 2>&1 | Out-Null
+        # Test if database exists
+        & $mysqldump -u $animalsCreds.Username -p"$($animalsCreds.Password)" realfey_animals_db --no-data 2>&1 | Out-Null
         
         if ($LASTEXITCODE -eq 0) {
-            & $mysqldump -u $username -p"$passwordPlain" realfey_animals_db | Out-File -FilePath $animalsBackupFile -Encoding UTF8
-            Write-Host "? Animals database backed up to: $animalsBackupFile" -ForegroundColor Green
+            & $mysqldump -u $animalsCreds.Username -p"$($animalsCreds.Password)" realfey_animals_db | Out-File -FilePath $animalsBackupFile -Encoding UTF8
+            $fileSize = "{0:N2} MB" -f ((Get-Item $animalsBackupFile).Length / 1MB)
+            Write-Host "? Animals database backed up to: $animalsBackupFile ($fileSize)" -ForegroundColor Green
         } else {
-            Write-Host "? Animals database not found (skipped)" -ForegroundColor Yellow
+            Write-Host "? Animals database not found or no access (skipped)" -ForegroundColor Yellow
         }
     } catch {
         Write-Host "? Animals database backup skipped: $_" -ForegroundColor Yellow
@@ -181,19 +208,25 @@ if ($Action -eq "backup") {
         
         # Determine which database
         $database = ""
+        $defaultUser = "root"
+        
         if ($selectedFile.Name -like "*eve2*") {
             $database = "realfey_realfey_eve2_project"
             $defaultUser = "realfey_realfey_realfeyuser"
+            $dbDisplayName = "EVE2"
         } elseif ($selectedFile.Name -like "*illusion*") {
             $database = "realfey_illusion_spells_DB"
             $defaultUser = "realfey_illusion_spells_DB"
+            $dbDisplayName = "Illusion Spells"
         } elseif ($selectedFile.Name -like "*animals*") {
             $database = "realfey_animals_db"
             $defaultUser = "realfey_animals_user"
+            $dbDisplayName = "Animals"
         } else {
             Write-Host "?  Cannot determine database from filename" -ForegroundColor Yellow
             Write-Host "Enter database name:" -ForegroundColor Cyan
             $database = Read-Host
+            $dbDisplayName = $database
             $defaultUser = "root"
         }
         
@@ -204,27 +237,19 @@ if ($Action -eq "backup") {
         $confirm = Read-Host
         
         if ($confirm -eq "yes") {
-            Write-Host ""
-            Write-Host "Enter MySQL username (default: $defaultUser):" -ForegroundColor Cyan
-            $username = Read-Host
-            if ([string]::IsNullOrWhiteSpace($username)) {
-                $username = $defaultUser
-            }
-            
-            Write-Host "Enter MySQL password:" -ForegroundColor Cyan
-            $password = Read-Host -AsSecureString
-            $passwordPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+            $restoreCreds = Get-DBCredentials -DatabaseName $dbDisplayName -DefaultUser $defaultUser
             
             Write-Host ""
             Write-Host "Restoring database..." -ForegroundColor Cyan
             
             try {
-                Get-Content $selectedFile.FullName | & $mysql -u $username -p"$passwordPlain" $database
+                Get-Content $selectedFile.FullName | & $mysql -u $restoreCreds.Username -p"$($restoreCreds.Password)" $database
                 
                 if ($LASTEXITCODE -eq 0) {
                     Write-Host "? Database restored successfully!" -ForegroundColor Green
                 } else {
                     Write-Host "? Failed to restore database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+                    Write-Host "  Check username/password for $dbDisplayName database" -ForegroundColor Yellow
                 }
             } catch {
                 Write-Host "? Failed to restore database: $_" -ForegroundColor Red
