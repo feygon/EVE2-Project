@@ -15,11 +15,18 @@ $backupDir = "database_backups"
 # Function to find MySQL installation
 function Find-MySQLPath {
     $possiblePaths = @(
+        # MariaDB paths (your system!)
+        "C:\Program Files\MariaDB 12.1\bin",
+        "C:\Program Files\MariaDB 11.0\bin",
+        "C:\Program Files\MariaDB 10.11\bin",
+        "C:\Program Files (x86)\MariaDB 12.1\bin",
+        # MySQL paths
         "C:\Program Files\MySQL\MySQL Server 8.0\bin",
         "C:\Program Files\MySQL\MySQL Server 8.1\bin",
         "C:\Program Files\MySQL\MySQL Server 8.2\bin",
         "C:\Program Files\MySQL\MySQL Server 8.3\bin",
         "C:\Program Files (x86)\MySQL\MySQL Server 8.0\bin",
+        # XAMPP, WAMP, Laragon
         "C:\xampp\mysql\bin",
         "C:\wamp64\bin\mysql\mysql8.0.27\bin",
         "C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin"
@@ -27,7 +34,7 @@ function Find-MySQLPath {
     
     foreach ($path in $possiblePaths) {
         if (Test-Path (Join-Path $path "mysqldump.exe")) {
-            Write-Host "Found MySQL at: $path" -ForegroundColor Green
+            Write-Host "Found MySQL/MariaDB at: $path" -ForegroundColor Green
             return $path
         }
     }
