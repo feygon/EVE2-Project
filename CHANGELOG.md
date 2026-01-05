@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Planned
+- **MERN Migration** - Transition from Handlebars to React frontend
+  - See `docs/learning/` for migration planning documentation
+  - Express backend remains, routes will become REST API endpoints
+  - Business logic in callbacks preserved as API controllers
+
+---
+
+## [2.1.1] - 2025-01-07
+
+### Verified
+- **Production Deployment**
+  - All v2.1.0 fixes verified in production environment
+  - Spell URL corrections confirmed working
+  - Sustained duration logic validated
+  - Test coverage maintained at 100%
+
+### Changed
+- **Version Numbering**
+  - Incremented to 2.1.1 for future changes
+  - Preparing codebase for MERN migration (v3.0.0)
+
+---
+
 ## [2.1.0] - 2025-01-07
 
 ### Fixed

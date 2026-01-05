@@ -1,16 +1,17 @@
 ---
 title: "MERN Migration Annotations - Architecture Analysis"
-version: v2.1.0
+version: v2.1.1
 created: 2025-12-28
-updated: 2025-12-29
+updated: 2025-01-07
 status: active
-phase: migration
+phase: migration-planning
 read_order: 1
 tags: [mern, nodejs, express, handlebars, architecture]
 ---
 
 # ?? MERN Migration Annotations - What's What?
 
+**Version:** 2.1.1  
 **Purpose:** Identify which parts of the codebase are Node.js, Express, Handlebars, or Business Logic  
 **Goal:** Help you understand what stays in MERN and what gets replaced by React
 
@@ -24,6 +25,7 @@ tags: [mern, nodejs, express, handlebars, architecture]
 - [Migration Path for Animals Tool](#migration-path-for-animals-tool)
 - [What Changes in Each File](#what-changes-in-each-file)
 - [Key Insights for MERN](#next-steps)
+- [Version History](#version-history)
 
 ---
 
@@ -282,17 +284,24 @@ router.get('/api/animals', async (req, res) => {
 
 ---
 
-## ?? **Next Steps**
+## ?? **Version History**
 
-**?? TL;DR:** Read docs in order, trace code flow, identify patterns, form migration hypothesis.
+### **v2.1.1 (2025-01-07)**
+- ? Production deployment verified
+- ? All v2.1.0 fixes confirmed working
+- ? Test coverage maintained at 100%
+- ?? Updated for MERN migration planning
 
-1. **Read this file thoroughly** - Form mental model
-2. **Examine animals.js** - See routing patterns
-3. **Look at animalsCallbacks.js** - Business logic stays!
-4. **Check helpers.js** - These become React utilities
-5. **Review animals.handlebars** - This becomes React components
+### **v2.1.0 (2025-01-07)**
+- ? Fixed spell formatting bugs
+- ? Added comprehensive test suite (124 tests)
+- ? Corrected 45 spell URLs
+- ? Achieved 100% branch coverage
 
-**Tomorrow:** Annotate `animals.js` to show exact migration path
+### **v2.0.0**
+- Initial illusion spell system
+- 14 subjective spell categories
+- Handlebars integration
 
 ---
 
