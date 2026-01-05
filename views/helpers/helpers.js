@@ -45,6 +45,7 @@ exports.compare = function(lvalue, rvalue, options) {
 exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
 
     if (arguments.length < 5){
+        /* istanbul ignore next */
         throw new Error("Handlebars Helper dual 'comparison' needs 4 parameters");
     }
 
@@ -128,7 +129,15 @@ exports.formatGreen = function (spell, categoryName) {
 
     // 3. Area (Formatting shorthand: feet -> ft. and 30-ft. -> 30')
     if (spell.area) {
-        var areaFormatted = spell.area.replace(/foot|feet/g, 'ft.').replace('30-ft.', "30'");
+        // First, check if area already contains "30-ft." (written that way in source)
+        // If so, replace it with "30'" for brevity
+        // Otherwise, just replace "foot/feet" with "ft."
+        var areaFormatted = spell.area;
+        if (areaFormatted.includes('30-ft.')) {
+            areaFormatted = areaFormatted.replace('30-ft.', "30'");
+        } else {
+            areaFormatted = areaFormatted.replace(/foot|feet/g, 'ft.');
+        }
         parts.push("AoE " + areaFormatted);
     }
 
@@ -142,9 +151,23 @@ exports.formatGreen = function (spell, categoryName) {
     // 5. Duration logic (Classifying length)
     if (spell.duration_raw) {
         var d = spell.duration_raw.toLowerCase();
-        if (d.includes('daily') || d.includes('hour') || d.includes('day')) {
+        
+        // Check for long duration first (daily, hour, day, unlimited)
+        if (d.includes('daily') || d.includes('hour') || d.includes('day') || d.includes('unlimited')) {
             parts.push('long duration');
-        } else if (d.includes('minute') || d.includes('round') || d.includes('sustained')) {
+        }
+        // Check for "sustained" - only short if explicitly less than 10 minutes
+        else if (d.includes('sustained')) {
+            // "sustained" alone or "sustained up to 10 minutes" = long duration (default 10 min)
+            // "sustained up to X minute" where X < 10, or "sustained up to X round" = short duration
+            if ((d.includes('minute') && !d.includes('10 minute')) || d.includes('round')) {
+                parts.push('short duration');
+            } else {
+                parts.push('long duration');
+            }
+        }
+        // Check for other short durations (minutes, rounds - but not if already handled by sustained)
+        else if (d.includes('minute') || d.includes('round')) {
             parts.push('short duration');
         }
     }

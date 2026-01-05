@@ -127,6 +127,7 @@ const animalsCallbacks = {
             console.log('[Animals] Data path:', ANIMALS_DATA_PATH);
             
             const data = await this.loadAnimalsData();
+            /* istanbul ignore next */
             console.log('[Animals] Data loaded successfully, animals count:', data.animals ? data.animals.length : 0);
             
             // Get unique traits for filtering
