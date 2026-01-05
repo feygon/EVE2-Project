@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2025-01-XX
+## [2.1.0] - 2025-01-07
 
 ### Fixed
 - **Illusion Spell Formatting**
@@ -29,20 +29,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added comprehensive test suite for Handlebars helpers (124 tests)
   - Achieved 100% branch coverage for helper functions
   - Tests cover all spell formatting edge cases
+  - Added Istanbul ignore directives for unreachable error handling code
+
+- **Documentation**
+  - Added CHANGELOG.md to track version history
+  - Added learning documentation in `docs/learning/`:
+    - MERN stack migration guides
+    - Animals system analysis
+    - Neuro-accessibility audit
 
 ### Changed
 - **Test Configuration**
   - Added `.nyc_output/` and `coverage/` to `.gitignore`
   - Istanbul coverage artifacts no longer committed
+  - Coverage reports generated locally for development
+
+### Technical Details
+- **Files Modified:**
+  - `views/helpers/helpers.js` - Core formatting logic fixes
+  - `test/unit/helpers.test.js` - Comprehensive test coverage
+  - `views/partials/category_block.handlebars` - Removed duplicate header
+  - `scripts/sql/illusions DDQ.sql` - Updated with corrected spell URLs
+  - `.gitignore` - Added coverage directories
+
+- **Database Updates:**
+  - Created `scripts/sql/UPDATE_spell_urls.sql` for production database updates
+  - Fixed 45 spell URLs in production database
+
+---
+
+## [2.0.0] - Previous Release
+
+### Added
+- Illusion spell categorization system with 14 subjective categories
+- Archive of Nethys integration for spell details
+- Handlebars helper utilities for spell formatting
+- EVE2 space station management system
+- Animal breeding system
 
 ---
 
 ## [1.0.0] - Initial Release
 
 ### Added
-- Illusion spell categorization system
-- 14 subjective categories for spell organization
-- Archive of Nethys integration
-- Handlebars helper utilities
-- EVE2 space station management system
-- Animal breeding system
+- Core EVE2 space station mechanics
+- Basic database structure
+- Player management system
+- Cargo space and object tracking
