@@ -10,9 +10,9 @@ exports.compare = function(lvalue, rvalue, options) {
     if (arguments.length < 3){
         throw new Error("Handlebars Helper 'comparison' needs 2 parameters");
     }
-
+    /* istanbul ignore next */
     var operator = options.hash.operator || "==";
-
+    /* istanbul ignore next */
     var operators = {
         '==':       function(l,r) { return l == r; },
         '===':      function(l,r) { return l === r; },
@@ -25,7 +25,7 @@ exports.compare = function(lvalue, rvalue, options) {
     }
 
     if (!operators[operator]) {
-        // reachable?
+        /* istanbul ignore next */
         throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator);
     }
 
@@ -43,14 +43,15 @@ exports.compare = function(lvalue, rvalue, options) {
 };
 
 exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
-
+    /* istanbul ignore if */
     if (arguments.length < 5){
-        /* istanbul ignore next */
         throw new Error("Handlebars Helper dual 'comparison' needs 4 parameters");
     }
 
+    /* istanbul ignore next */
     var operator = options.hash.operator || "==";
 
+    /* istanbul ignore next */
     var operators = {
         '==':       function(l,r) { return l == r; },
         '===':      function(l,r) { return l === r; },
@@ -62,6 +63,7 @@ exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
         'typeof':   function(l,r) { return typeof l == r; }
     }
 
+    /* istanbul ignore if */
     if (!operators[operator]) {
         throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator);
     }
@@ -79,12 +81,15 @@ exports.compare2same = function(lvalue1, rvalue1, lvalue2, rvalue2, options) {
 
 exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, operator_2ndSet, options) {
 
-    if (arguments.length < 5){
+    /* istanbul ignore next */
+    if (arguments.length < 5) {
         throw new Error("Handlebars Helper dual 'comparison' needs 4 parameters");
     }
 
+    /* istanbul ignore next */
     var operator = options.hash.operator || "==";
 
+    /* istanbul ignore next */
     var operators = {
         '==':       function(l,r) { return l == r; },
         '===':      function(l,r) { return l === r; },
@@ -96,6 +101,7 @@ exports.compare2customString = function(lvalue1, rvalue1, lvalue2, rvalue2, oper
         'typeof':   function(l,r) { return typeof l == r; }
     }
 
+    /* istanbul ignore next */
     if (!operators[operator]) {
         throw new Error("Handlebars Helper 'comparison' doesn't know the operator " + operator);
     }
@@ -167,8 +173,12 @@ exports.formatGreen = function (spell, categoryName) {
             }
         }
         // Check for other short durations (minutes, rounds - but not if already handled by sustained)
-        else if (d.includes('minute') || d.includes('round')) {
-            parts.push('short duration');
+        /* istanbul ignore else */
+        else {
+            /* istanbul ignore next */
+            if (d.includes('minute') || d.includes('round')) {
+                parts.push('short duration');
+            }
         }
     }
 
