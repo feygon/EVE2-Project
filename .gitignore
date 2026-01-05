@@ -3,6 +3,24 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
+# Legacy app (v2.x - Handlebars)
+legacy/node_modules/
+legacy/sessions/
+legacy/.env
+
+# MERN backend (v3.x - API)
+mern/backend/node_modules/
+mern/backend/.env
+mern/backend/logs/
+
+# MERN frontend (v3.x - React)
+mern/frontend/node_modules/
+mern/frontend/build/
+mern/frontend/.env.local
+mern/frontend/.env.development.local
+mern/frontend/.env.test.local
+mern/frontend/.env.production.local
+
 # Local development config files
 *.local.js
 dbcon.local.js
