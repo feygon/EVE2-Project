@@ -53,6 +53,10 @@ database_backups/
 # Session files
 sessions/
 
+# Test coverage
+.nyc_output/
+coverage/
+
 # Setup/cleanup files (not needed in repo after first setup)
 # Only ignore these in the root directory, not in subdirectories like docs/archive/
 /NEXT_STEPS.md
