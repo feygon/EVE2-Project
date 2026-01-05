@@ -12,11 +12,62 @@ param(
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $backupDir = "database_backups"
 
+# Function to find MySQL installation
+function Find-MySQLPath {
+    $possiblePaths = @(
+        "C:\Program Files\MySQL\MySQL Server 8.0\bin",
+        "C:\Program Files\MySQL\MySQL Server 8.1\bin",
+        "C:\Program Files\MySQL\MySQL Server 8.2\bin",
+        "C:\Program Files\MySQL\MySQL Server 8.3\bin",
+        "C:\Program Files (x86)\MySQL\MySQL Server 8.0\bin",
+        "C:\xampp\mysql\bin",
+        "C:\wamp64\bin\mysql\mysql8.0.27\bin",
+        "C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin"
+    )
+    
+    foreach ($path in $possiblePaths) {
+        if (Test-Path (Join-Path $path "mysqldump.exe")) {
+            Write-Host "Found MySQL at: $path" -ForegroundColor Green
+            return $path
+        }
+    }
+    
+    return $null
+}
+
+# Find MySQL binaries
+$mysqlPath = Find-MySQLPath
+
+if (-not $mysqlPath) {
+    Write-Host "================================" -ForegroundColor Red
+    Write-Host "ERROR: MySQL Not Found" -ForegroundColor Red
+    Write-Host "================================" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Could not locate MySQL installation." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Please enter the path to your MySQL bin directory:" -ForegroundColor Cyan
+    Write-Host "Example: C:\Program Files\MySQL\MySQL Server 8.0\bin" -ForegroundColor Gray
+    Write-Host ""
+    $mysqlPath = Read-Host "MySQL bin path"
+    
+    if (-not (Test-Path (Join-Path $mysqlPath "mysqldump.exe"))) {
+        Write-Host ""
+        Write-Host "Invalid path or mysqldump.exe not found!" -ForegroundColor Red
+        Write-Host "Exiting..." -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Set full paths to MySQL utilities
+$mysqldump = Join-Path $mysqlPath "mysqldump.exe"
+$mysql = Join-Path $mysqlPath "mysql.exe"
+
 # Create backup directory if it doesn't exist
 if (-not (Test-Path $backupDir)) {
     New-Item -ItemType Directory -Path $backupDir | Out-Null
 }
 
+Write-Host ""
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host "Database Tools" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
@@ -43,8 +94,13 @@ if ($Action -eq "backup") {
     $eve2BackupFile = Join-Path $backupDir "eve2_backup_$timestamp.sql"
     
     try {
-        mysqldump -u $username -p"$passwordPlain" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
-        Write-Host "? EVE2 database backed up to: $eve2BackupFile" -ForegroundColor Green
+        & $mysqldump -u $username -p"$passwordPlain" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "? EVE2 database backed up to: $eve2BackupFile" -ForegroundColor Green
+        } else {
+            Write-Host "? Failed to backup EVE2 database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+        }
     } catch {
         Write-Host "? Failed to backup EVE2 database: $_" -ForegroundColor Red
     }
@@ -55,10 +111,33 @@ if ($Action -eq "backup") {
     $illusionBackupFile = Join-Path $backupDir "illusion_backup_$timestamp.sql"
     
     try {
-        mysqldump -u $username -p"$passwordPlain" realfey_illusion_spells_DB | Out-File -FilePath $illusionBackupFile -Encoding UTF8
-        Write-Host "? Illusion Spells database backed up to: $illusionBackupFile" -ForegroundColor Green
+        & $mysqldump -u $username -p"$passwordPlain" realfey_illusion_spells_DB | Out-File -FilePath $illusionBackupFile -Encoding UTF8
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "? Illusion Spells database backed up to: $illusionBackupFile" -ForegroundColor Green
+        } else {
+            Write-Host "? Failed to backup Illusion Spells database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+        }
     } catch {
         Write-Host "? Failed to backup Illusion Spells database: $_" -ForegroundColor Red
+    }
+    
+    # Backup Animals database (if exists)
+    Write-Host ""
+    Write-Host "Backing up Animals database..." -ForegroundColor Cyan
+    $animalsBackupFile = Join-Path $backupDir "animals_backup_$timestamp.sql"
+    
+    try {
+        & $mysqldump -u $username -p"$passwordPlain" realfey_animals_db 2>&1 | Out-Null
+        
+        if ($LASTEXITCODE -eq 0) {
+            & $mysqldump -u $username -p"$passwordPlain" realfey_animals_db | Out-File -FilePath $animalsBackupFile -Encoding UTF8
+            Write-Host "? Animals database backed up to: $animalsBackupFile" -ForegroundColor Green
+        } else {
+            Write-Host "? Animals database not found (skipped)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "? Animals database backup skipped: $_" -ForegroundColor Yellow
     }
     
     Write-Host ""
@@ -80,7 +159,8 @@ if ($Action -eq "backup") {
     Write-Host "Available backup files:" -ForegroundColor Cyan
     for ($i = 0; $i -lt $backupFiles.Count; $i++) {
         $file = $backupFiles[$i]
-        Write-Host "  [$i] $($file.Name) - $($file.LastWriteTime)" -ForegroundColor White
+        $size = "{0:N2} MB" -f ($file.Length / 1MB)
+        Write-Host "  [$i] $($file.Name) - $($file.LastWriteTime) ($size)" -ForegroundColor White
     }
     
     Write-Host ""
@@ -100,8 +180,11 @@ if ($Action -eq "backup") {
         } elseif ($selectedFile.Name -like "*illusion*") {
             $database = "realfey_illusion_spells_DB"
             $defaultUser = "realfey_illusion_spells_DB"
+        } elseif ($selectedFile.Name -like "*animals*") {
+            $database = "realfey_animals_db"
+            $defaultUser = "realfey_animals_user"
         } else {
-            Write-Host "??  Cannot determine database from filename" -ForegroundColor Yellow
+            Write-Host "?  Cannot determine database from filename" -ForegroundColor Yellow
             Write-Host "Enter database name:" -ForegroundColor Cyan
             $database = Read-Host
             $defaultUser = "root"
@@ -129,8 +212,13 @@ if ($Action -eq "backup") {
             Write-Host "Restoring database..." -ForegroundColor Cyan
             
             try {
-                Get-Content $selectedFile.FullName | mysql -u $username -p"$passwordPlain" $database
-                Write-Host "? Database restored successfully!" -ForegroundColor Green
+                Get-Content $selectedFile.FullName | & $mysql -u $username -p"$passwordPlain" $database
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "? Database restored successfully!" -ForegroundColor Green
+                } else {
+                    Write-Host "? Failed to restore database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+                }
             } catch {
                 Write-Host "? Failed to restore database: $_" -ForegroundColor Red
             }
