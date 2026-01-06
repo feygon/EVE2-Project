@@ -329,3 +329,8 @@ label:after { content: ":"; }
 #badButton:hover{
     background-color: darkred;
 }
+/* Top navigation utility menu */
+ul.utility { list-style: none; margin: 0; padding: 10px 0; display: flex; gap: 20px; justify-content: center; }
+ul.utility li { display: inline-block; }
+ul.utility li a { color: #fff; text-decoration: none; padding: 5px 10px; display: block; }
+ul.utility li a:hover { background-color: rgba(255,255,255,0.2); border-radius: 3px; }
