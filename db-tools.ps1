@@ -2,6 +2,12 @@
 # Usage: 
 #   Backup: .\db-tools.ps1 backup
 #   Restore: .\db-tools.ps1 restore
+#
+# Notes:
+#   - Illusion Spells DB is the primary local database (always backed up)
+#   - EVE2 and Animals DBs are optional (might only exist in production)
+#   - Each database can have different credentials
+#   - Backups are saved to database_backups/ directory with timestamp
 
 param(
     [Parameter(Mandatory=$true)]
@@ -112,26 +118,33 @@ if ($Action -eq "backup") {
     Write-Host "You will be prompted for credentials for each database." -ForegroundColor Yellow
     Write-Host ""
     
-    # Backup EVE2 database
-    Write-Host "--- Backing up EVE2 database ---" -ForegroundColor Cyan
-    $eve2BackupFile = Join-Path $backupDir "eve2_backup_$timestamp.sql"
-    $eve2Creds = Get-DBCredentials -DatabaseName "EVE2 (realfey_realfey_eve2_project)" -DefaultUser "realfey_realfey_realfeyuser"
+    # Backup EVE2 database (optional - might not exist locally)
+    Write-Host "--- Checking for EVE2 database ---" -ForegroundColor Cyan
+    Write-Host "Do you want to backup EVE2 database? (y/n) [n]:" -ForegroundColor Yellow
+    $backupEve2 = Read-Host
     
-    try {
-        & $mysqldump -u $eve2Creds.Username -p"$($eve2Creds.Password)" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
+    if ($backupEve2 -eq "y") {
+        $eve2BackupFile = Join-Path $backupDir "eve2_backup_$timestamp.sql"
+        $eve2Creds = Get-DBCredentials -DatabaseName "EVE2 (realfey_realfey_eve2_project)" -DefaultUser "realfey_realfey_realfeyuser"
         
-        if ($LASTEXITCODE -eq 0) {
-            $fileSize = "{0:N2} MB" -f ((Get-Item $eve2BackupFile).Length / 1MB)
-            Write-Host "? EVE2 database backed up to: $eve2BackupFile ($fileSize)" -ForegroundColor Green
-        } else {
-            Write-Host "? Failed to backup EVE2 database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
-            Write-Host "  Check username/password for EVE2 database" -ForegroundColor Yellow
+        try {
+            & $mysqldump -u $eve2Creds.Username -p"$($eve2Creds.Password)" realfey_realfey_eve2_project | Out-File -FilePath $eve2BackupFile -Encoding UTF8
+            
+            if ($LASTEXITCODE -eq 0) {
+                $fileSize = "{0:N2} MB" -f ((Get-Item $eve2BackupFile).Length / 1MB)
+                Write-Host "? EVE2 database backed up to: $eve2BackupFile ($fileSize)" -ForegroundColor Green
+            } else {
+                Write-Host "? Failed to backup EVE2 database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+                Write-Host "  Database may not exist locally" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "? Failed to backup EVE2 database: $_" -ForegroundColor Red
         }
-    } catch {
-        Write-Host "? Failed to backup EVE2 database: $_" -ForegroundColor Red
+    } else {
+        Write-Host "? EVE2 database backup skipped" -ForegroundColor Yellow
     }
     
-    # Backup Illusion database
+    # Backup Illusion database (primary local database)
     Write-Host ""
     Write-Host "--- Backing up Illusion Spells database ---" -ForegroundColor Cyan
     $illusionBackupFile = Join-Path $backupDir "illusion_backup_$timestamp.sql"
@@ -151,27 +164,31 @@ if ($Action -eq "backup") {
         Write-Host "? Failed to backup Illusion Spells database: $_" -ForegroundColor Red
     }
     
-    # Backup Animals database (if exists)
+    # Backup Animals database (optional - future use)
     Write-Host ""
     Write-Host "--- Checking for Animals database ---" -ForegroundColor Cyan
+    Write-Host "Do you want to backup Animals database? (y/n) [n]:" -ForegroundColor Yellow
+    $backupAnimals = Read-Host
     
-    # Try with root credentials first (ask user)
-    $animalsCreds = Get-DBCredentials -DatabaseName "Animals (realfey_animals_db) - Optional" -DefaultUser "root"
-    $animalsBackupFile = Join-Path $backupDir "animals_backup_$timestamp.sql"
-    
-    try {
-        # Test if database exists
-        & $mysqldump -u $animalsCreds.Username -p"$($animalsCreds.Password)" realfey_animals_db --no-data 2>&1 | Out-Null
+    if ($backupAnimals -eq "y") {
+        $animalsBackupFile = Join-Path $backupDir "animals_backup_$timestamp.sql"
+        $animalsCreds = Get-DBCredentials -DatabaseName "Animals (realfey_animals_db)" -DefaultUser "root"
         
-        if ($LASTEXITCODE -eq 0) {
+        try {
             & $mysqldump -u $animalsCreds.Username -p"$($animalsCreds.Password)" realfey_animals_db | Out-File -FilePath $animalsBackupFile -Encoding UTF8
-            $fileSize = "{0:N2} MB" -f ((Get-Item $animalsBackupFile).Length / 1MB)
-            Write-Host "? Animals database backed up to: $animalsBackupFile ($fileSize)" -ForegroundColor Green
-        } else {
-            Write-Host "? Animals database not found or no access (skipped)" -ForegroundColor Yellow
+            
+            if ($LASTEXITCODE -eq 0) {
+                $fileSize = "{0:N2} MB" -f ((Get-Item $animalsBackupFile).Length / 1MB)
+                Write-Host "? Animals database backed up to: $animalsBackupFile ($fileSize)" -ForegroundColor Green
+            } else {
+                Write-Host "? Failed to backup Animals database (Exit code: $LASTEXITCODE)" -ForegroundColor Red
+                Write-Host "  Database may not exist locally" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "? Failed to backup Animals database: $_" -ForegroundColor Red
         }
-    } catch {
-        Write-Host "? Animals database backup skipped: $_" -ForegroundColor Yellow
+    } else {
+        Write-Host "? Animals database backup skipped" -ForegroundColor Yellow
     }
     
     Write-Host ""
