@@ -113,6 +113,7 @@ function all_players(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.all_players returns: " + JSON.stringify(error));
 			res.end();
+			return;  // Stop execution after error
 		}
 		// console.log("callbacks.select.all_players results: " + JSON.stringify(results)
 		// 	+ "\n---------------results--------------");
@@ -134,6 +135,7 @@ function item_structure_list(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.item_structure_list returns: " + JSON.stringify(error));
 			res.end();
+			return;
 		}
 		context.item_structure_list = results;
 		complete.complete(cbName);
@@ -151,6 +153,7 @@ function item_structure_types(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.item_structure_types returns: " + JSON.stringify(error));
 			res.end();
+			return;
 		}
 		context.item_structure_types = results;
 		complete.complete(cbName);
@@ -168,6 +171,7 @@ function item_use_scales(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.item_use_scales returns: " + JSON.stringify(error));
 			res.end();
+			return;
 		}
 		context.item_use_scales = results;
 		complete.complete(cbName);
@@ -186,6 +190,7 @@ function itemUse_list_orderbyqq(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.itemUse_list_orderbyqq returns: " + JSON.stringify(error));
 			res.end();
+			return;
 		}
 		context.itemUse_list_orderbyqq = results;
 		complete.complete(cbName);
@@ -204,6 +209,7 @@ function useless_item_structures(res, mysql, context, complete) {
 		if(error){
 			res.write("callback.select.useless_item_structures returns: " + JSON.stringify(error));
 			res.end();
+			return;
 		}
 		context.useless_item_structures = results;
 		complete.complete(cbName);
@@ -226,7 +232,8 @@ function session_player(res, mysql, subcontext, subcomplete) {
 		if(error){
 			res.write("callbacks.select.session_player returns: "
 				+ JSON.stringify(error) + "\n----------------------------");
-			res.end;
+			res.end();
+			return;
 		}
 		subcontext.session_player = results;
 		// console.log("subcontext.session_player ought to be returning: \n"
@@ -252,7 +259,8 @@ function ship_in_space(res, req, mysql, context, complete) {
 		if(error){
 			res.write("first query from callbacks.select.ship_in_space says:\n"
 				+ JSON.stringify(error));
-			res.end;
+			res.end();
+			return;
 		}
 		context.CargoSpaces_in_CargoSpace_deep = results;
 		step();
@@ -262,7 +270,8 @@ function ship_in_space(res, req, mysql, context, complete) {
 		if(error){
 			res.write("first query from callbacks.select.ship_in_space says:\n"
 				+ JSON.stringify(error));
-			res.end;
+			res.end();
+			return;
 		}
 		context.objects_in_listed_cargoSpaces = results;
 		step();
@@ -294,7 +303,8 @@ function stations_in_space(res, req, mysql, context, complete) {
 		if(error) {
 			res.write("callbacks.select.stations_in_space says:\n"
 				+ JSON.stringify(error));
-			res.end;
+			res.end();
+			return;
 		}
 //		console.log("setting stations_in_space to results:" + JSON.stringify(results)
 //		 + "\n---------------------");
@@ -318,7 +328,8 @@ function linked_locations(res, req, mysql, context, complete) {
 		if(error) {
 			res.write("callbacks.select.linked_locations says: " 
 				+ JSON.stringify(error) + "\n---------------------");
-			res.end;
+			res.end();
+			return;
 		}
 		// console.log("setting context.linked_locations to results:" 
 		// 	+ JSON.stringify(results) + "\n---------------------");
@@ -338,7 +349,8 @@ function allLocations(res, mysql, context, complete) {
 		if(error) {
 			res.write("callbacks.select.linked_locations says: " 
 				+ JSON.stringify(error) + "\n---------------------");
-			res.end;
+			res.end();
+			return;
 		}
 		// console.log("setting context.linked_locations to results:" 
 		// 	+ JSON.stringify(results) + "\n---------------------");
@@ -361,7 +373,8 @@ function insert_object(res, mysql, context, complete) {
 	mysql.pool.query(sql, inserts, function(error, results, fields){
 		if(error){
 			res.write(cbName + " says: " + JSON.stringify(error) + "\n^^^^error^^^^");
-			res.end;
+			res.end();
+			return;
 		}
 		// nothing to add to context.
 		complete.complete(cbName);
@@ -379,7 +392,8 @@ function del_object(res, mysql, context, complete) {
 		if(error) {
 			res.write("callbacks.delete.del_object returns: "
 				+ JSON.stringify(error) + "\n---------------------------");
-			res.end;
+			res.end();
+			return;
 		}
 		complete(cbName);
 	});
@@ -434,7 +448,8 @@ function out_in_space(req, mysql, tag, sql, inserts, complete) {
 			if(error) {
 				res.write("callbacks.delete.del_object returns: "
 					+ JSON.stringify(error) + "\n---------------------------");
-				res.end;
+				res.end();
+				return;
 			}
 			console.log("---------------------------results----------\n"
 				+ JSON.stringify(results));
