@@ -1,5 +1,8 @@
-// Load environment variables (not needed on DirectAdmin - uses system env vars)
-// require('dotenv').config();
+// Load environment variables for local development
+// In production, DirectAdmin Node.js Selector manages environment variables
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 var mysql = require('mysql');
 var pool = mysql.createPool({

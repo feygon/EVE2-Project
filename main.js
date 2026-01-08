@@ -6,8 +6,11 @@
  * @date 2022-10-01
  * @author Feygon Nickerson
  */
-// Load environment variables (not needed on DirectAdmin - uses system env vars)
-// require('dotenv').config();
+// Load environment variables for local development
+// In production, DirectAdmin Node.js Selector manages environment variables
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 // Importing required modules
 var express=require('express');  // Express.js framework
