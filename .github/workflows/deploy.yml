@@ -55,6 +55,14 @@ jobs:
             --exclude='github-deploy-key*' \
             ./ ${{ secrets.SSH_USERNAME}}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
       
+      # Remove any .env file on server to ensure DirectAdmin env vars are used
+      - name: Remove .env file from server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && rm -f .env && echo '.env file removed if it existed'"
+      
       # DirectAdmin handles node_modules, skip manual npm install
       # - name: Install production dependencies
       #   run: |
