@@ -17,6 +17,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.2] - 2025-01-07
+
+### Fixed
+- **Database Connection**
+  - Resolved persistent authentication issues caused by orphaned `.env` file
+  - Disabled `dotenv` loading in production (DirectAdmin manages environment variables)
+  - Hardcoded database username temporarily to ensure stable connection
+  - Reset MySQL user passwords for `realfey_realfey_realfeyuser`
+  - Production database now connecting successfully
+
+- **Sidebar Navigation**
+  - Added navigation links to homepage sidebar (Home, Login, Space Station, etc.)
+  - Added navigation links to player page sidebar (Home, ReadMe, Resume)
+  - Confirmed existing sidebars working correctly (industry, space_station, out_in_space)
+
+### Changed
+- **Deployment Pipeline**
+  - Added automatic `.env` file removal step to GitHub Actions workflow
+  - Ensures DirectAdmin environment variables take precedence over file-based config
+  - Prevents future authentication issues from stale configuration files
+
+### Technical Details
+- **Files Modified:**
+  - `dbcon.js` - Commented out dotenv, hardcoded username
+  - `main.js` - Commented out dotenv for production
+  - `.github/workflows/deploy.yml` - Added `.env` removal step
+  - `views/homepage.handlebars` - Added sidebar navigation
+  - `views/player.handlebars` - Added sidebar navigation
+
+- **Deployment:**
+  - 6 commits pushed to resolve database and navigation issues
+  - All changes deployed and verified in production
+  - Site operational at https://www.realfeygon.com/eve2/
+
+---
+
 ## [2.1.1] - 2025-01-07
 
 ### Verified

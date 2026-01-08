@@ -1,7 +1,7 @@
 {
-  "name": "realfeygon.com",
-  "version": "1.0.0",
-  "description": "",
+  "name": "realfeygon-eve2",
+  "version": "2.1.2",
+  "description": "EVE Online-inspired space station management system with Pathfinder 2e spell tools",
   "main": "main.js",
   "dependencies": {
     "body-parser": "^1.19.0",
