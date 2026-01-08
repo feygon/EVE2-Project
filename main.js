@@ -6,8 +6,8 @@
  * @date 2022-10-01
  * @author Feygon Nickerson
  */
-// Load environment variables
-require('dotenv').config();
+// Load environment variables (not needed on DirectAdmin - uses system env vars)
+// require('dotenv').config();
 
 // Importing required modules
 var express=require('express');  // Express.js framework
