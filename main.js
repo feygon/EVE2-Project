@@ -69,6 +69,7 @@ app.set('queries', queries);
 
 // Set a route for each module
 app.use('/resume/', require('./resume.js'));
+app.use('/spa-resume/', require('./spa-resume.js'));
 app.use('/eve2/', require('./eve2.js'));
 app.use('/illusion/', require('./illusion.js'));
 app.use('/animals/', require('./animals.js'));  // Animal comparison tool
@@ -79,9 +80,8 @@ app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site-index.html'));
 });
 
-// Root redirects to resume (default)
-app.get('/',(req,res)=> { 
-	res.redirect(301, "https://www.realfeygon.com/resume") 
+app.get('/',(req,res)=> {
+	res.redirect(301, "https://www.realfeygon.com/resume")
 });
 
 app.use(function(req, res){

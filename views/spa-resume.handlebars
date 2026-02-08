@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Resume of Feygon Willow Nickerson - Software Engineer specializing in SaaS systems, C#/.NET, and agentic development workflows">
+    <title>{{title}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Respect user's motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+            padding: 40px 20px;
+            /* Minimum font size for readability */
+            font-size: clamp(16px, 1rem, 18px);
+        }
+
+        /* Skip link for keyboard navigation */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #31521B;
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 100;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 0 0 4px 0;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid #99CB38;
+            outline-offset: 2px;
+        }
+
+        .resume {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 60px;
+            background: #fff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .resume::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #31521B, #99CB38);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .resume-header {
+            text-align: center;
+            padding-bottom: 30px;
+            margin-bottom: 35px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .resume-header h1 {
+            margin: 0 0 12px 0;
+            color: #1a1a1a;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .resume-subtitle {
+            font-size: 1.15em;
+            color: #2d4a17; /* Darkened for contrast - 7.5:1 ratio */
+            font-weight: 500;
+            margin: 8px 0;
+        }
+
+        .resume-contact {
+            font-size: 1em;
+            color: #555; /* Improved contrast - 7.46:1 */
+            margin-top: 15px;
+        }
+
+        /* Hide decorative separators from screen readers */
+        .resume-contact .separator {
+            color: #888;
+        }
+
+        .resume-contact .separator[aria-hidden="true"] {
+            user-select: none;
+        }
+
+        .resume-contact a {
+            color: #1e3a10; /* Darkened for 10:1+ contrast */
+            text-decoration: underline; /* Always visible, not just on hover */
+            text-decoration-color: #99CB38;
+            text-underline-offset: 3px;
+            font-weight: 500;
+            transition: color 0.2s ease, text-decoration-color 0.2s ease;
+        }
+
+        .resume-contact a:hover {
+            color: #2d4a17;
+            text-decoration-color: #2d4a17;
+        }
+
+        /* Visible focus states for keyboard navigation */
+        a:focus,
+        button:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .resume-section {
+            margin-bottom: 35px;
+        }
+
+        .resume-section h2 {
+            color: #2d4a17; /* Improved contrast */
+            font-size: 1.3em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7aa84a; /* Slightly darker green for visibility */
+            display: inline-block;
+        }
+
+        .summary-text {
+            font-size: 1.05em;
+            color: #333; /* Improved contrast - 12.6:1 */
+            line-height: 1.8;
+        }
+
+        .skills-grid {
+            display: grid;
+            gap: 6px;
+        }
+
+        .skill-category {
+            padding: 10px 18px;
+            background: linear-gradient(90deg, #f8faf5 0%, #fff 100%);
+            border-left: 4px solid #7aa84a;
+            border-radius: 0 6px 6px 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .skill-category:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(49, 82, 27, 0.15);
+        }
+
+        .skill-category strong {
+            color: #2d4a17;
+            font-weight: 600;
+        }
+
+        .job, .project, .education {
+            margin-bottom: 28px;
+            padding-left: 15px;
+            border-left: 3px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .job:hover, .project:hover {
+            border-left-color: #7aa84a;
+        }
+
+        /* Focus-within for keyboard users navigating inside jobs/projects */
+        .job:focus-within, .project:focus-within {
+            border-left-color: #667eea;
+        }
+
+        .job h3, .project h3, .education h3 {
+            margin: 0 0 6px 0;
+            color: #1a1a1a;
+            font-size: 1.15em;
+            font-weight: 600;
+        }
+
+        .company, .institution {
+            font-weight: 600;
+            color: #2d4a17;
+            margin: 4px 0;
+        }
+
+        /* Using <time> element for semantic dates */
+        .dates, time {
+            font-style: normal;
+            color: #595959; /* Improved contrast - 7:1 ratio */
+            font-size: 0.9em; /* Slightly larger for readability */
+            font-weight: 500;
+            margin: 4px 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+
+        .job ul {
+            margin: 12px 0 0 0;
+            padding-left: 24px; /* Slightly more padding for bullet visibility */
+        }
+
+        .job li {
+            margin-bottom: 8px;
+            color: #333;
+            position: relative;
+        }
+
+        .job li::marker {
+            color: #7aa84a;
+        }
+
+        .project p {
+            margin: 6px 0;
+            color: #333;
+        }
+
+        .project a {
+            color: #1e3a10;
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-color: #7aa84a;
+            text-underline-offset: 2px;
+            transition: color 0.2s ease;
+        }
+
+        .project a:hover {
+            color: #2d4a17;
+            text-decoration-color: #2d4a17;
+        }
+
+        /* Community section - personality zone */
+        .community-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 5px;
+        }
+
+        .community-list li {
+            padding: 8px 14px;
+            background: #f8faf5;
+            border-radius: 8px;
+            border-left: 4px solid #7aa84a;
+            color: #333;
+            font-size: 1em;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .community-list li:hover {
+            transform: translateX(5px);
+            background: #f0f5eb;
+        }
+
+        /* Darken emojis for visibility */
+        .emoji {
+            filter: contrast(1.2) brightness(0.85);
+            margin-right: 6px;
+        }
+
+        /* Navigation with proper ARIA landmark */
+        .nav-back {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #ddd;
+        }
+
+        .nav-back a {
+            display: inline-block;
+            color: #1e3a10;
+            text-decoration: none;
+            margin: 0 8px;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 500;
+            border: 2px solid #2d4a17;
+            transition: all 0.2s ease;
+        }
+
+        .nav-back a:hover {
+            background: #2d4a17;
+            color: #fff;
+        }
+
+        .nav-back a:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .resume {
+                border: 2px solid #000;
+            }
+            .skill-category,
+            .community-list li {
+                border: 1px solid #333;
+            }
+            a {
+                text-decoration: underline !important;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                font-size: 11pt;
+            }
+            .skip-link {
+                display: none;
+            }
+            .resume {
+                box-shadow: none;
+                padding: 20px;
+                max-width: 100%;
+            }
+            .resume::before {
+                display: none;
+            }
+            .nav-back {
+                display: none;
+            }
+            .skill-category:hover,
+            .job:hover,
+            .project:hover,
+            .community-list li:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            a {
+                color: #000 !important;
+                text-decoration: underline !important;
+            }
+            /* Print URLs after links */
+            .resume-contact a[href^="http"]::after,
+            .project a[href^="http"]::after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+                color: #555;
+            }
+            .resume-contact a[href^="mailto"]::after {
+                content: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .resume {
+                padding: 25px 20px;
+            }
+            .resume-header h1 {
+                font-size: 1.8em;
+            }
+            .nav-back a {
+                display: block;
+                margin: 8px auto;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <article class="resume" id="main-content" role="main">
+        <header class="resume-header">
+            <h1>Feygon Willow Nickerson</h1>
+            <p class="resume-subtitle" role="doc-subtitle">Software Engineer | SaaS Systems | C# / .NET | CI/CD</p>
+            <p class="resume-contact">
+                <span>Portland Metro, OR</span>
+                <span class="separator" aria-hidden="true"> | </span>
+                <a href="mailto:feygon@gmail.com" aria-label="Email Feygon">feygon@gmail.com</a>
+                <span class="separator" aria-hidden="true"> | </span>
+                <a href="https://linkedin.com/in/feygon-willow" aria-label="LinkedIn profile (opens in new context)">LinkedIn</a>
+                <span class="separator" aria-hidden="true"> | </span>
+                <a href="https://github.com/ETLProcess" aria-label="GitHub profile (opens in new context)">GitHub</a>
+            </p>
+        </header>
+
+        <section class="resume-section" aria-labelledby="summary-heading">
+            <h2 id="summary-heading">Summary</h2>
+            <p class="summary-text">
+                Software engineer with 4 years of SaaS experience, currently developing products with agentic SDLC workflows using Claude Code and GitHub Copilot.
+                I specialize in extending complex, multi-layer data structures with an emphasis on maintainable, human-readable code and keeping clients on the upgrade path.
+                Background in theater taught me to translate between technical and non-technical stakeholders—useful when gathering requirements from people who know what they need but not what to call it.
+            </p>
+        </section>
+
+        <section class="resume-section" aria-labelledby="skills-heading">
+            <h2 id="skills-heading">Core Skills</h2>
+            <div class="skills-grid" role="list">
+                <div class="skill-category" role="listitem">
+                    <strong>Languages:</strong> C#, .NET, JavaScript, SQL, HTML/CSS, XML, JSON
+                </div>
+                <div class="skill-category" role="listitem">
+                    <strong>Frameworks:</strong> ASP.NET MVC, Entity Framework, WPF, WinForms, Node.js, Express, Unity
+                </div>
+                <div class="skill-category" role="listitem">
+                    <strong>Practices:</strong> Agile, Behavior-Driven Development (BDD), Requirements-Driven Development (RDD), TDD, CI/CD, technical documentation
+                </div>
+                <div class="skill-category" role="listitem">
+                    <strong>AI-Assisted Dev:</strong> Claude Code, GitHub Copilot, structured prompting, agentic workflows
+                </div>
+                <div class="skill-category" role="listitem">
+                    <strong>Tools:</strong> Git, GitHub, Azure DevOps, Visual Studio, VS Code, Trello
+                </div>
+            </div>
+        </section>
+
+        <section class="resume-section" aria-labelledby="experience-heading">
+            <h2 id="experience-heading">Experience</h2>
+
+            <article class="job">
+                <h3>Software Engineer / Implementation Consultant</h3>
+                <p class="company">Huron Consulting Group</p>
+                <time class="dates" datetime="2021-11/2024-02">November 2021 – February 2024</time>
+                <ul>
+                    <li>Extended proprietary multi-layer data structures (JavaScript, C#, SQL, XML)</li>
+                    <li><span class="emoji" aria-hidden="true">🔬</span> Implemented mission-critical research administration software for cancer research and academic research institutions</li>
+                    <li>Translated stakeholder needs into user stories and acceptance criteria</li>
+                    <li><span class="emoji" aria-hidden="true">📝</span> Produced technical documentation that other developers actually use</li>
+                    <li>Configured and debugged application-layer portal solutions across multiple client environments</li>
+                </ul>
+            </article>
+
+            <article class="job">
+                <h3>ETL Developer <span aria-label="Contract position">(Contract)</span></h3>
+                <p class="company">Retail Dimensions</p>
+                <time class="dates" datetime="2021-02/2021-05">February 2021 – May 2021</time>
+                <ul>
+                    <li>Built ETL pipeline in C# .NET with Entity Framework for point-of-sale integration</li>
+                    <li><span class="emoji" aria-hidden="true">🎯</span> Developed WPF MVVM interface for RetailPro integration—simplified a 100+ setting UI into something humans could navigate</li>
+                    <li>Championed test-driven development on a team that hadn't done it before</li>
+                </ul>
+            </article>
+
+            <article class="job">
+                <h3>ETL Developer <span aria-label="Contract position">(Contract)</span></h3>
+                <p class="company">Metro Presort via CampusPoint</p>
+                <time class="dates" datetime="2019-12/2020-05">December 2019 – May 2020</time>
+                <ul>
+                    <li><span class="emoji" aria-hidden="true">🏆</span> Maintained 100% SLA delivery for 250,000+ essential healthcare statements during 2020 lockdown</li>
+                    <li>Refactored legacy ETL system using OOP design patterns (C#, ADO.NET)</li>
+                    <li>Handled Tier 3 support and client-facing requirements gathering</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="resume-section" aria-labelledby="projects-heading">
+            <h2 id="projects-heading">Projects</h2>
+
+            <article class="project">
+                <h3>Agentic SDLC Workflows</h3>
+                <time class="dates" datetime="2024">2024 – Present</time>
+                <ul>
+                    <li>Developed structured prompt workflows using Claude Code and GitHub Copilot for architectural mapping, coordinated refactoring, and automated testing</li>
+                    <li>Clear specs in, reliable outputs out: built a Requirements-Driven Development methodology</li>
+                    <li>AI workflows became a special interest, not just a tool</li>
+                    <li>Accelerated a personal project modeling neurolinguistic processes—mapping qualitative patterns to quantitative structure, leveraging similarities to neural network architectures</li>
+                    <li>Conducted literature survey of dark matter research using agentic workflows to navigate mind mapping on ConnectedPapers
+                        <ul>
+                            <li>e.g. Faraoni (quasilocal mass) to Pavlidou (stability constraints)</li>
+                            <li>Nodes: papers in the similarity graph</li>
+                            <li>Edges: mutual connections between papers</li>
+                        </ul>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="project">
+                <h3>Unity Dialogue System</h3>
+                <time class="dates" datetime="2018/2019">2018 – 2019</time>
+                <p>Shipped a Unity tool for branching narrative development. Designed for writers who shouldn't need to touch code. Pending Asset Store release.</p>
+            </article>
+
+            <article class="project">
+                <h3>EVE2 Full-Stack App</h3>
+                <time class="dates" datetime="2018">2018 – Present</time>
+                <p>Full-stack web application modeling EVE Online game mechanics. Built with Node.js, Express, MySQL, and Handlebars. <a href="/eve2/">View it live on this site</a>.</p>
+            </article>
+        </section>
+
+        <section class="resume-section" aria-labelledby="community-heading">
+            <h2 id="community-heading">Community & Approach</h2>
+            <ul class="community-list">
+                <li><span class="emoji" aria-hidden="true">🤖</span> Human-in-the-loop AI-assisted development—I treat the AI like a junior dev that needs clear specs</li>
+                <li><span class="emoji" aria-hidden="true">✅</span> Requirements-driven development and acceptance-focused delivery</li>
+                <li><span class="emoji" aria-hidden="true">🔍</span> I document obsessively, test deliberately, and refactor without breaking things</li>
+                <li><span class="emoji" aria-hidden="true">📝</span> Documentation-first engineering with accessibility-aware standards</li>
+                <li><span class="emoji" aria-hidden="true">⚙️</span> Refactoring strategy and technical debt triage—incremental, test-backed improvements over big-bang rewrites</li>
+                <li><span class="emoji" aria-hidden="true">🛡️</span> Build automated testing workflows that catch regressions before clients do</li>
+                <li><span class="emoji" aria-hidden="true">🧩</span> Genuinely enjoy working through hard problems with other technical-minded people</li>
+                <li><span class="emoji" aria-hidden="true">🎁</span> Shipped community tools—built things other developers actually use</li>
+            </ul>
+        </section>
+
+        <section class="resume-section" aria-labelledby="education-heading">
+            <h2 id="education-heading">Education</h2>
+
+            <article class="education">
+                <h3>Oregon State University</h3>
+                <p class="institution">B.S. Computer Science</p>
+                <time class="dates" datetime="2018">2018</time>
+            </article>
+
+            <article class="education">
+                <h3>Oregon State University</h3>
+                <p class="institution">B.S. Theatre Arts</p>
+                <time class="dates" datetime="2010">2010</time>
+            </article>
+        </section>
+
+        <nav class="nav-back" aria-label="Other projects on this site">
+            <a href="/">Home</a>
+            <a href="/eve2/">EVE2</a>
+            <a href="/illusion/">Illusion Spells</a>
+            <a href="/animals/">Animals</a>
+        </nav>
+    </article>
+</body>
+</html>
