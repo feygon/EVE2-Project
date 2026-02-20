@@ -229,3 +229,38 @@ exports.formatNumber = function(num) {
     if (typeof num === 'undefined' || num === null) return '0';
     return Math.round(num).toLocaleString('en-US');
 };
+
+// Format breakdown object into tooltip string (e.g., "SS: $27,000\nSMA: $5,000\nRental: $21,000")
+exports.formatBreakdown = function(obj) {
+    if (!obj || typeof obj !== 'object') return '';
+
+    const items = [];
+    for (const [key, value] of Object.entries(obj)) {
+        // Skip 'total' field
+        if (key === 'total') continue;
+
+        // Format key (capitalize, replace underscores)
+        const label = key.replace(/_/g, ' ')
+                         .split(' ')
+                         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                         .join(' ');
+
+        // Format value as currency
+        const amount = '$' + Math.round(value).toLocaleString('en-US');
+        items.push(label + ': ' + amount);
+    }
+
+    return items.join('\n');
+};
+
+// Count non-total items in breakdown object
+exports.countItems = function(obj) {
+    if (!obj || typeof obj !== 'object') return 0;
+
+    let count = 0;
+    for (const key in obj) {
+        if (key !== 'total') count++;
+    }
+
+    return count;
+};
