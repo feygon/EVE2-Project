@@ -215,14 +215,25 @@
             },
             success: function(response) {
                 console.log('[Nickerson] Metrics response:', response);
+                console.log('[Nickerson] Response.success:', response.success);
+                console.log('[Nickerson] Response.metrics:', response.metrics);
+
                 if (response.success) {
+                    console.log('[Nickerson] Success is true, updating cards...');
                     // Update each card's metrics
                     $('.scenario-card').each(function() {
                         const scenarioId = $(this).data('scenario-id');
+                        console.log('[Nickerson] Checking scenario:', scenarioId);
+                        console.log('[Nickerson] Metrics for this scenario:', response.metrics[scenarioId]);
                         if (response.metrics[scenarioId]) {
+                            console.log('[Nickerson] Calling updateCardMetrics for', scenarioId);
                             updateCardMetrics($(this), response.metrics[scenarioId]);
+                        } else {
+                            console.warn('[Nickerson] No metrics found for', scenarioId);
                         }
                     });
+                } else {
+                    console.error('[Nickerson] Response.success was false');
                 }
                 $('.scenario-card').removeClass('loading');
             },
