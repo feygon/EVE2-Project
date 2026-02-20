@@ -293,3 +293,92 @@ body {
 [title] {
     position: relative;
 }
+
+/* ===== PROJECTION TABLE STYLES ===== */
+
+/* Projection table structure */
+.projection-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: white;
+}
+
+/* Section headers (Assets, Cash Flow) */
+.section-header {
+    background: #34495e;
+    color: white;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid #2c3e50;
+}
+
+/* Table headers */
+.projection-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-weight: 600;
+}
+
+/* Table cells */
+.projection-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333;
+}
+
+/* Alternating row colors */
+.projection-table tbody tr:nth-child(even) td {
+    background-color: #f8f9fa;
+}
+
+/* Tooltip-enabled cells */
+.ira-cell,
+.real-estate-cell,
+.ltc-cell,
+.income-cell,
+.expenses-cell {
+    cursor: help;
+    position: relative;
+}
+
+/* Color coding for financial data */
+.income-cell {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.expenses-cell {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+/* Emphasized cells */
+.pool-close {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.total-assets {
+    font-weight: bold;
+    background-color: #ecf0f1 !important;
+    color: #2c3e50;
+}
+
+/* Responsive table wrapper */
+@media (max-width: 1600px) {
+    .projection-table {
+        font-size: 12px;
+    }
+
+    .projection-table th,
+    .projection-table td {
+        padding: 8px;
+    }
+}

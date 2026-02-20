@@ -264,3 +264,137 @@ exports.countItems = function(obj) {
 
     return count;
 };
+
+// Add helper for summing numbers
+exports.add = function(...args) {
+    // Remove the options object (last argument)
+    const options = args.pop();
+    return args.reduce((sum, num) => sum + (num || 0), 0);
+};
+
+// Format IRA tooltip with comprehensive breakdown
+exports.formatIraTooltip = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+
+    return `IRA Activity:
+
+SDIRA Checking Open: $${formatNum(projection.sdira_checking_open)}
+Annuity SMA Payments In: +$${formatNum(projection.annuity_payments)}
+  └─ From 7 separate annuity instruments
+SDIRA Checking Available: $${formatNum(projection.sdira_checking_available)}
+Distributions Out: -$${formatNum(projection.sdira_distributions)}
+SDIRA Checking Close: $${formatNum(projection.sdira_checking_close)}
+
+ManagedIRA Open: $${formatNum(projection.managed_ira_open)}
+Growth (4%): +$${formatNum(projection.managed_ira_growth)}
+Distributions Out: -$${formatNum(projection.managed_ira_distributions)}
+ManagedIRA Close: $${formatNum(projection.managed_ira_close)}
+────────────────────────
+Total IRA Open: $${formatNum(projection.total_ira_open)}
+Total IRA Close: $${formatNum(projection.total_ira_close)}
+Total Change: $${formatNum(projection.total_ira_close - projection.total_ira_open)}`;
+};
+
+// Format Real Estate tooltip
+exports.formatRealEstateTooltip = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+
+    return `Real Estate:
+House (Primary): $${formatNum(projection.house_value)} (+$${formatNum(projection.house_appreciation)})
+Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projection.condo_appreciation)})
+────────────────────────
+Total: $${formatNum(projection.real_estate_total)}
+Total Appreciation: +$${formatNum(projection.house_appreciation + projection.condo_appreciation)}`;
+};
+
+// Format LTC tooltip
+exports.formatLtcTooltip = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+
+    return `LTC Savings:
+Starting Balance: $${formatNum(projection.ltc_savings_open)}
+Used This Year: -$${formatNum(projection.ltc_savings_spent)}
+────────────────────────
+Remaining: $${formatNum(projection.ltc_savings_close)}`;
+};
+
+// Format Income tooltip (enhanced with IRA breakdown)
+exports.formatIncomeTooltip = function(income, projection) {
+    if (!income || typeof income !== 'object') return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const lines = [];
+
+    lines.push('Income Sources:');
+
+    if (income.ssdi) {
+        lines.push(`SSDI: $${formatNum(income.ssdi)}`);
+    }
+
+    if (income.ira_distributions) {
+        lines.push(`IRA Distributions: $${formatNum(income.ira_distributions)}`);
+        if (projection) {
+            if (projection.sdira_distributions > 0) {
+                lines.push(`  └─ From SDIRA Checking: $${formatNum(projection.sdira_distributions)}`);
+            }
+            if (projection.managed_ira_distributions > 0) {
+                lines.push(`  └─ From ManagedIRA: $${formatNum(projection.managed_ira_distributions)}`);
+            }
+        }
+    }
+
+    if (income.ltc_spending) {
+        lines.push(`LTC Savings Spending: $${formatNum(income.ltc_spending)}`);
+    }
+
+    if (income.rental) {
+        lines.push(`Rental Income: $${formatNum(income.rental)}`);
+    }
+
+    if (income.ltc_payout) {
+        lines.push(`LTC Policy Payout: $${formatNum(income.ltc_payout)}`);
+    }
+
+    if (income.sma_payments) {
+        lines.push(`SMA Payments: $${formatNum(income.sma_payments)}`);
+    }
+
+    lines.push('────────────────────────');
+    lines.push(`Total Income: $${formatNum(income.total)}`);
+
+    return lines.join('\n');
+};
+
+// Format Expenses tooltip (ALL expenses itemized)
+exports.formatExpensesTooltip = function(expenses) {
+    if (!expenses || typeof expenses !== 'object') return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const lines = [];
+
+    lines.push('Expenses:');
+
+    // Iterate ALL expense keys except 'total'
+    for (const [key, value] of Object.entries(expenses)) {
+        if (key === 'total') continue;
+
+        // Format key to readable label
+        const label = key.replace(/_/g, ' ')
+                         .split(' ')
+                         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                         .join(' ');
+
+        lines.push(`${label}: $${formatNum(value)}`);
+    }
+
+    lines.push('────────────────────────');
+    lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
+
+    return lines.join('\n');
+};
