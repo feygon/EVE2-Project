@@ -53,11 +53,13 @@
      * Update cards to show scenarios for selected trigger year
      */
     function updateCardsForTriggerYear(year) {
+        console.log('[Nickerson] Updating cards for trigger year:', year);
         $('.scenario-card').each(function() {
             const $card = $(this);
             const disposition = $card.data('disposition');
             const scenarioId = scenarioMap[year][disposition];
 
+            console.log('[Nickerson] Setting card', disposition, 'to scenario', scenarioId);
             $card.data('scenario-id', scenarioId);
 
             // Update LTC trigger slider value
@@ -73,6 +75,7 @@
      * Initialize scenario cards with proper scenario IDs
      */
     function initializeCards() {
+        console.log('[Nickerson] Initializing cards for trigger year:', currentTriggerYear);
         updateCardsForTriggerYear(currentTriggerYear);
     }
 
@@ -170,12 +173,18 @@
 
         $('.scenario-card').each(function() {
             const scenarioId = $(this).data('scenario-id');
+            console.log('[Nickerson] Card scenario ID:', scenarioId);
             if (scenarioId) {
                 scenarioIds.push(scenarioId);
             }
         });
 
-        if (scenarioIds.length === 0) return;
+        console.log('[Nickerson] Loading metrics for scenarios:', scenarioIds);
+
+        if (scenarioIds.length === 0) {
+            console.warn('[Nickerson] No scenario IDs found, skipping metrics load');
+            return;
+        }
 
         // Show loading state
         $('.scenario-card').addClass('loading');
@@ -186,6 +195,7 @@
             contentType: 'application/json',
             data: JSON.stringify({ scenarioIds: scenarioIds }),
             success: function(response) {
+                console.log('[Nickerson] Metrics response:', response);
                 if (response.success) {
                     // Update each card's metrics
                     $('.scenario-card').each(function() {
@@ -198,7 +208,8 @@
                 $('.scenario-card').removeClass('loading');
             },
             error: function(xhr, status, error) {
-                console.error('Error loading metrics:', error);
+                console.error('[Nickerson] Error loading metrics:', error);
+                console.error('[Nickerson] XHR:', xhr);
                 $('.scenario-card').removeClass('loading');
             }
         });
