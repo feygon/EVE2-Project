@@ -210,6 +210,9 @@
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ scenarioIds: scenarioIds }),
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 console.log('[Nickerson] Metrics response:', response);
                 if (response.success) {
@@ -242,6 +245,9 @@
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ ltcTrigger: newYear }),
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 if (response.success && response.metrics) {
                     updateCardMetrics($card, response.metrics);
