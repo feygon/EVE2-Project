@@ -1,0 +1,302 @@
+/**
+ * Nickerson BurnRate Financial Planning Styles
+ * Dark theme with cyan accents inspired by animals.handlebars
+ */
+
+body {
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #dcdcdc;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main Container */
+.container {
+    background-color: #333333;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Header */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #444;
+}
+
+.header-bar h1 {
+    margin: 0;
+    color: #66ccff;
+    font-size: 2em;
+}
+
+.btn-logout {
+    background-color: #444;
+    color: #dcdcdc;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: #555;
+}
+
+/* LTC Trigger Selector */
+.ltc-trigger-selector {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.ltc-trigger-selector label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    color: #66ccff;
+}
+
+.trigger-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.trigger-btn {
+    background-color: #2a2a2a;
+    color: #dcdcdc;
+    border: 2px solid #444;
+    padding: 12px 24px;
+    font-size: 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.trigger-btn:hover {
+    background-color: #333;
+    border-color: #66ccff;
+}
+
+.trigger-btn.active {
+    background-color: #66ccff;
+    color: #1a1a1a;
+    border-color: #66ccff;
+    font-weight: bold;
+}
+
+/* Scenario Comparison Grid */
+.scenario-comparison {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1400px) {
+    .scenario-comparison {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Scenario Cards */
+.scenario-card {
+    background-color: #232323;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.scenario-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(102, 204, 255, 0.2);
+}
+
+.card-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.card-header h2 {
+    margin: 0 0 8px 0;
+    color: #66ccff;
+    font-size: 1.5em;
+}
+
+.card-subtitle {
+    margin: 0;
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* LTC Trigger Control */
+.ltc-trigger-control {
+    margin-bottom: 20px;
+}
+
+.ltc-trigger-control label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #66ccff;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.slider-container input[type="range"] {
+    flex: 1;
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #66ccff;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #66ccff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+}
+
+.ltc-value, .param-value {
+    min-width: 60px;
+    text-align: right;
+    font-weight: bold;
+    color: #66ccff;
+}
+
+/* Advanced Parameters */
+.advanced-params-section {
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.param-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #66ccff;
+}
+
+.param-toggle-label:hover {
+    color: #82b1ff;
+}
+
+.param-toggle {
+    cursor: pointer;
+}
+
+.param-sliders {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #444;
+}
+
+.param-row {
+    margin-bottom: 15px;
+}
+
+.param-row label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9em;
+    color: #dcdcdc;
+}
+
+/* Metrics */
+.metrics {
+    padding-top: 15px;
+}
+
+.metrics h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+    color: #66ccff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+.metric-row:last-child {
+    border-bottom: none;
+}
+
+.metric-label {
+    color: #999;
+    font-size: 0.95em;
+    cursor: help;
+}
+
+.metric-value {
+    font-weight: bold;
+    color: #66ccff;
+    font-size: 1.05em;
+}
+
+/* Loading State */
+.scenario-card.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.scenario-card.loading::after {
+    content: "Calculating...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2a2a2a;
+    padding: 15px 30px;
+    border-radius: 4px;
+    border: 2px solid #66ccff;
+    color: #66ccff;
+    font-weight: bold;
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 40px;
+}
+
+/* Tooltips */
+[title] {
+    position: relative;
+}
