@@ -75,6 +75,20 @@ app.use('/illusion/', require('./illusion.js'));
 app.use('/animals/', require('./animals.js'));  // Animal comparison tool
 app.use('/', require('./documentation.js'));  // Documentation routes
 
+// Nickerson BurnRate Module (conditionally loaded from private repo)
+// This module is deployed separately from feygon/BurnRate-Private
+// It will not exist in development unless you manually copy files or symlink
+try {
+    var dbNickerson = require('./dbcon_nickerson.js');
+    var NickersonCallbacks = require('./scripts/NickersonCallbacks.js');
+    app.set('dbNickerson', dbNickerson);
+    app.set('NickersonCallbacks', NickersonCallbacks);
+    app.use('/Nickerson/', require('./Nickerson.js'));
+    console.log('✓ Nickerson BurnRate module loaded successfully');
+} catch (e) {
+    console.log('ℹ Nickerson BurnRate module not available (expected in local dev without private repo)');
+}
+
 // Site index route - serve the site map
 app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site-index.html'));

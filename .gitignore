@@ -83,3 +83,15 @@ install-phpmyadmin.ps1
 
 # HeidiSQL or other database GUI portable installations
 HeidiSQL/
+
+# Nickerson BurnRate Module (deployed from private repo)
+# These files come from feygon/BurnRate-Private and should NOT be in public repo
+Nickerson.js
+dbcon_nickerson.js
+dbcon_nickerson.local.js
+scripts/NickersonCallbacks.js
+views/nickerson/
+views/layouts/nickerson.handlebars
+data/burnrate*.db
+public/js/nickerson/
+public/css/nickerson/

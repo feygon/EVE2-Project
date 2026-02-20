@@ -53,6 +53,15 @@ jobs:
             --exclude='tmp/' \
             --exclude='.github' \
             --exclude='github-deploy-key*' \
+            --exclude='Nickerson.js' \
+            --exclude='dbcon_nickerson.js' \
+            --exclude='dbcon_nickerson.local.js' \
+            --exclude='scripts/NickersonCallbacks.js' \
+            --exclude='views/nickerson' \
+            --exclude='views/layouts/nickerson.handlebars' \
+            --exclude='data' \
+            --exclude='public/js/nickerson' \
+            --exclude='public/css/nickerson' \
             ./ ${{ secrets.SSH_USERNAME}}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
       
       # Remove any .env file on server to ensure DirectAdmin env vars are used
