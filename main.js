@@ -87,6 +87,7 @@ try {
     console.log('✓ Nickerson BurnRate module loaded successfully');
 } catch (e) {
     console.log('ℹ Nickerson BurnRate module not available (expected in local dev without private repo)');
+    console.log('Error details:', e.message);
 }
 
 // Site index route - serve the site map

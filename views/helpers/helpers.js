@@ -223,3 +223,9 @@ exports.or = function(...args) {
 exports.json = function(context) {
     return JSON.stringify(context);
 };
+
+// Format number with commas (e.g., 1234567 -> 1,234,567)
+exports.formatNumber = function(num) {
+    if (typeof num === 'undefined' || num === null) return '0';
+    return Math.round(num).toLocaleString('en-US');
+};
