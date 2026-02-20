@@ -31,6 +31,7 @@
         initializeTriggerSelector();
         initializeCards();
         initializeSliders();
+        initializeDetailLinks();
         loadInitialMetrics();
     });
 
@@ -77,6 +78,23 @@
     function initializeCards() {
         console.log('[Nickerson] Initializing cards for trigger year:', currentTriggerYear);
         updateCardsForTriggerYear(currentTriggerYear);
+    }
+
+    /**
+     * Initialize detail links to navigate to scenario detail pages
+     */
+    function initializeDetailLinks() {
+        $('.btn-details').on('click', function(e) {
+            e.preventDefault();
+            const $card = $(this).closest('.scenario-card');
+            const scenarioId = $card.data('scenario-id');
+
+            if (scenarioId) {
+                window.location.href = '/Nickerson/scenario/' + scenarioId;
+            } else {
+                console.warn('[Nickerson] No scenario ID found for detail link');
+            }
+        });
     }
 
     /**
