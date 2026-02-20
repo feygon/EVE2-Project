@@ -245,7 +245,7 @@ body {
 
 /* Metrics */
 .metrics {
-    padding-top: 15px;
+    padding-top: 8px;
 }
 
 .metrics h3 {
@@ -259,7 +259,7 @@ body {
 .metric-row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 6px 0;
     border-bottom: 1px solid #333;
 }
 

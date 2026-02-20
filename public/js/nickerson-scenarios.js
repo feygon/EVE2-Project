@@ -279,6 +279,7 @@
         console.log('[Nickerson] Updating card metrics:', metrics);
         console.log('[Nickerson] Card disposition:', $card.data('disposition'));
 
+        $card.find('.gross-income').text(formatCurrency(metrics.gross_income));
         $card.find('.pool-start').text(formatCurrency(metrics.pool_start));
         $card.find('.pool-min').text(formatCurrency(metrics.pool_min) +
                                       (metrics.pool_min_year ? ' (' + metrics.pool_min_year + ')' : ''));
