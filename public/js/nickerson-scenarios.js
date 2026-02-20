@@ -297,6 +297,7 @@
         console.log('[Nickerson] Updating card metrics:', metrics);
         console.log('[Nickerson] Card disposition:', $card.data('disposition'));
 
+        // Update values
         $card.find('.gross-income').text(formatCurrency(metrics.gross_income));
         $card.find('.pool-start').text(formatCurrency(metrics.pool_start));
         $card.find('.pool-min').text(formatCurrency(metrics.pool_min) +
@@ -310,7 +311,34 @@
 
         $card.find('.ltc-total').text(formatCurrency(metrics.ltc_total));
 
+        // Update tooltips with itemized breakdowns if available
+        if (metrics.income_breakdown) {
+            $card.find('.gross-income').attr('title', formatBreakdown('Income Sources', metrics.income_breakdown));
+        }
+        if (metrics.pool_start_breakdown) {
+            $card.find('.pool-start').attr('title', formatBreakdown('Pool Start Sources', metrics.pool_start_breakdown));
+        }
+        if (metrics.pool_final_breakdown) {
+            $card.find('.pool-final').attr('title', formatBreakdown('Pool EOY Components', metrics.pool_final_breakdown));
+        }
+        if (metrics.ira_breakdown) {
+            $card.find('.ira-start').attr('title', formatBreakdown('IRA Accounts', metrics.ira_breakdown));
+        }
+
         console.log('[Nickerson] Metrics updated');
+    }
+
+    /**
+     * Format breakdown data for tooltip display
+     */
+    function formatBreakdown(title, breakdown) {
+        if (!breakdown || Object.keys(breakdown).length === 0) return title;
+
+        let lines = [title + ':'];
+        Object.entries(breakdown).forEach(([key, value]) => {
+            lines.push('  ' + key + ': ' + formatCurrency(value));
+        });
+        return lines.join('\n');
     }
 
     /**
