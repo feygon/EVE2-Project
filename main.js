@@ -49,6 +49,7 @@ app.use(session({
 // Setting up the view engine
 app.engine('handlebars', handlebars.engine);
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());  // Parse JSON request bodies
 app.use('/static', express.static('public'));  // Serving static files
 app.set('view engine', 'handlebars');
 
