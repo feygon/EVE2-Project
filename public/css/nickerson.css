@@ -148,6 +148,18 @@ body {
     color: #66ccff;
 }
 
+/* Memory Care Control */
+.memory-care-control {
+    margin-bottom: 20px;
+}
+
+.memory-care-control label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #66ccff;
+}
+
 .slider-container {
     display: flex;
     align-items: center;
@@ -182,7 +194,7 @@ body {
     border: none;
 }
 
-.ltc-value, .param-value {
+.ltc-value, .memory-care-value, .param-value {
     min-width: 60px;
     text-align: right;
     font-weight: bold;

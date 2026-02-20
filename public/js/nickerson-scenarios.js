@@ -108,6 +108,22 @@
             }, 500));
         });
 
+        // Memory care offset sliders (synchronized across all cards)
+        $('.memory-care-slider').on('input', function() {
+            const offset = parseInt($(this).val());
+            const yearsText = offset === 1 ? '1 year' : offset + ' years';
+
+            // Update display value for this card
+            $(this).siblings('.memory-care-value').text(yearsText);
+
+            // Sync all other memory care sliders
+            $('.memory-care-slider').not(this).val(offset);
+            $('.memory-care-slider').not(this).siblings('.memory-care-value').text(yearsText);
+
+            // TODO: Update backend when memory care offset is implemented
+            // For now, this is UI-only (Phase 1)
+        });
+
         // Advanced parameters toggle
         $('.param-toggle').on('change', function() {
             const $card = $(this).closest('.scenario-card');
