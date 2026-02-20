@@ -78,16 +78,26 @@ app.use('/', require('./documentation.js'));  // Documentation routes
 // Nickerson BurnRate Module (conditionally loaded from private repo)
 // This module is deployed separately from feygon/BurnRate-Private
 // It will not exist in development unless you manually copy files or symlink
+console.log('[NICKERSON] Attempting to load Nickerson module...');
 try {
+    console.log('[NICKERSON] Loading dbcon_nickerson.js...');
     var dbNickerson = require('./dbcon_nickerson.js');
+    console.log('[NICKERSON] dbcon_nickerson.js loaded successfully');
+
+    console.log('[NICKERSON] Loading NickersonCallbacks.js...');
     var NickersonCallbacks = require('./scripts/NickersonCallbacks.js');
+    console.log('[NICKERSON] NickersonCallbacks.js loaded successfully');
+
     app.set('dbNickerson', dbNickerson);
     app.set('NickersonCallbacks', NickersonCallbacks);
+
+    console.log('[NICKERSON] Loading Nickerson.js router...');
     app.use('/Nickerson/', require('./Nickerson.js'));
     console.log('✓ Nickerson BurnRate module loaded successfully');
 } catch (e) {
-    console.log('ℹ Nickerson BurnRate module not available (expected in local dev without private repo)');
-    console.log('Error details:', e.message);
+    console.log('❌ Nickerson BurnRate module failed to load');
+    console.log('Error:', e.message);
+    console.log('Stack:', e.stack);
 }
 
 // Site index route - serve the site map
