@@ -10,17 +10,17 @@
         2028: {
             baseline: 'ScA_Baseline',
             rental: 'ScA_Rental',
-            snt: 'ScA_SNT'
+            sale: 'ScA_SNT'  // Temporarily using SNT scenario until Sale scenario is created
         },
         2030: {
             baseline: 'ScB_Baseline',
             rental: 'ScB_Rental',
-            snt: 'ScB_SNT'
+            sale: 'ScB_SNT'  // Temporarily using SNT scenario until Sale scenario is created
         },
         2032: {
             baseline: 'ScC_Baseline',
             rental: 'ScC_Rental',
-            snt: 'ScC_SNT'
+            sale: 'ScC_SNT'  // Temporarily using SNT scenario until Sale scenario is created
         }
     };
 
