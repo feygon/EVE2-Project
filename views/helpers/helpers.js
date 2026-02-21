@@ -414,6 +414,15 @@ exports.formatIncomeTooltip = function(income, projection) {
     lines.push('────────────────────────');
     lines.push(`Total Budget: $${formatNum(income.total)}`);
 
+    // Note about rental income earmarking
+    if (income.rental && income.rental > 0) {
+        lines.push('');
+        lines.push('Note: Rental income is earmarked for');
+        lines.push('condo expenses (mortgage, management,');
+        lines.push('taxes, etc.) and is ADDITIONAL to the');
+        lines.push('Pre-Memory Care Gross Expenses slider.');
+    }
+
     // Add AGI reference
     if (projection && projection.agi !== undefined) {
         lines.push('');
