@@ -1,0 +1,127 @@
+<!-- Scenario Card Partial -->
+<div class="scenario-card" data-scenario-id="" data-disposition="{{disposition}}">
+    <div class="card-header">
+        <h2>{{title}}</h2>
+        <p class="card-subtitle">{{subtitle}}</p>
+    </div>
+
+    <div class="ltc-trigger-control">
+        <label>LTC Trigger Year</label>
+        <div class="slider-container">
+            <input type="range" min="2026" max="2036" value="2028" step="1"
+                   class="ltc-slider" data-card="{{cardNumber}}">
+            <span class="ltc-value">2028</span>
+        </div>
+    </div>
+
+    <div class="memory-care-control">
+        <label>Memory Care, years later</label>
+        <div class="slider-container">
+            <input type="range" min="0" max="4" value="0" step="1"
+                   class="memory-care-slider" data-card="{{cardNumber}}">
+            <span class="memory-care-value">0 years</span>
+        </div>
+    </div>
+
+    <div class="advanced-params-section">
+        <label class="param-toggle-label">
+            <input type="checkbox" class="param-toggle" data-card="{{cardNumber}}">
+            ⚙️ Advanced Parameters
+        </label>
+
+        <div class="param-sliders" style="display:none;">
+            <div class="param-row">
+                <label>IRA Growth Rate</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="10" value="4.0" step="0.1"
+                           class="param-slider" data-param="ira_growth" data-card="{{cardNumber}}">
+                    <span class="param-value">4.0%</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Lifestyle Expenses</label>
+                <div class="slider-container">
+                    <input type="range" min="50000" max="150000" value="95000" step="1000"
+                           class="param-slider" data-param="lifestyle" data-card="{{cardNumber}}">
+                    <span class="param-value">$95,000/yr</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Primary House Appreciation</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="15" value="8.0" step="0.1"
+                           class="param-slider" data-param="primary_appreciation" data-card="{{cardNumber}}">
+                    <span class="param-value">8.0%</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Condo Appreciation</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="15" value="6.0" step="0.1"
+                           class="param-slider" data-param="condo_appreciation" data-card="{{cardNumber}}">
+                    <span class="param-value">6.0%</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Memory Care Inflation</label>
+                <div class="slider-container">
+                    <input type="range" min="3" max="10" value="5.0" step="0.5"
+                           class="param-slider" data-param="memory_care_inflation" data-card="{{cardNumber}}">
+                    <span class="param-value">5.0%</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Management Fee</label>
+                <div class="slider-container">
+                    <input type="range" min="6" max="10" value="8.0" step="0.5"
+                           class="param-slider" data-param="management_fee" data-card="{{cardNumber}}">
+                    <span class="param-value">8.0%</span>
+                </div>
+            </div>
+            <div class="param-row">
+                <label>Monthly Rental Income</label>
+                <div class="slider-container">
+                    <input type="range" min="2000" max="3500" value="2350" step="50"
+                           class="param-slider" data-param="rental_income" data-card="{{cardNumber}}">
+                    <span class="param-value">$2,350/mo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="metrics">
+        <h3>Financial Metrics (2026-2040)</h3>
+        <div class="metric-row">
+            <span class="metric-label" title="All liquid assets at start (SDIRA + ManagedIRA + LTC Savings)">Liquid Assets Start:</span>
+            <span class="metric-value liquid-assets-start">$643,000</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Minimum liquid assets during projection">Liquid Assets Min:</span>
+            <span class="metric-value liquid-assets-min">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Liquid assets at end of 2040">Liquid Assets Final:</span>
+            <span class="metric-value liquid-assets-final">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Combined SDIRA + ManagedIRA balance at start">IRA Start:</span>
+            <span class="metric-value ira-start">$368,000</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Minimum combined IRA balance during projection">IRA Min:</span>
+            <span class="metric-value ira-min">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Combined IRA balance in 2040">IRA Final:</span>
+            <span class="metric-value ira-final">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Total LTC payouts from trigger year onward">LTC Disbursed:</span>
+            <span class="metric-value ltc-total">—</span>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <a href="#" class="btn-details">View Details →</a>
+    </div>
+</div>
