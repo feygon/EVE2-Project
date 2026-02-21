@@ -24,14 +24,18 @@
         titleEl.textContent = title || 'Details';
 
         // Parse content line by line and style LTC Savings Spending
-        const lines = content.split('\n');
-        const styledLines = lines.map(line => {
-            if (line.includes('LTC Savings Spending:')) {
-                return '<span style="font-weight: bold; color: #66ccff;">' + escapeHtml(line) + '</span>';
-            }
-            return escapeHtml(line);
-        });
-        contentEl.innerHTML = '<pre>' + styledLines.join('\n') + '</pre>';
+        if (!content) {
+            contentEl.innerHTML = '<pre>No content available</pre>';
+        } else {
+            const lines = content.split('\n');
+            const styledLines = lines.map(line => {
+                if (line.includes('LTC Savings Spending:')) {
+                    return '<span style="font-weight: bold; color: #66ccff;">' + escapeHtml(line) + '</span>';
+                }
+                return escapeHtml(line);
+            });
+            contentEl.innerHTML = '<pre>' + styledLines.join('\n') + '</pre>';
+        }
 
         // Show sidebar
         sidebar.classList.add('active');
