@@ -13,12 +13,17 @@
 
     // Open tooltip sidebar
     window.openTooltipSidebar = function(title, content) {
+        console.log('openTooltipSidebar called', { title, contentLength: content ? content.length : 0 });
+
         const sidebar = document.getElementById('tooltip-sidebar');
         const overlay = document.getElementById('tooltip-sidebar-overlay');
         const titleEl = document.getElementById('tooltip-sidebar-title');
         const contentEl = document.getElementById('tooltip-sidebar-content');
 
-        if (!sidebar || !overlay) return;
+        if (!sidebar || !overlay) {
+            console.error('Sidebar or overlay element not found');
+            return;
+        }
 
         // Set title and content
         titleEl.textContent = title || 'Details';
@@ -73,10 +78,16 @@
 
     // Initialize tooltip sidebar on page load
     document.addEventListener('DOMContentLoaded', function() {
-        if (!isMobile()) return;
+        console.log('Tooltip sidebar init, isMobile:', isMobile(), 'width:', window.innerWidth);
+
+        if (!isMobile()) {
+            console.log('Not mobile, skipping sidebar initialization');
+            return;
+        }
 
         // Find all cells with title attribute
         const cells = document.querySelectorAll('.projection-table td[title]');
+        console.log('Found cells with title attribute:', cells.length);
 
         cells.forEach(function(cell) {
             // Add click event listener
