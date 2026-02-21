@@ -417,6 +417,72 @@ exports.formatIncomeTooltip = function(income, projection) {
     return lines.join('\n');
 };
 
+// Format AGI (Adjusted Gross Income) tooltip - Taxable Income
+exports.formatAgiTooltip = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const lines = [];
+
+    lines.push('Taxable Income (AGI):');
+    lines.push('');
+
+    // Social Security (85% taxable)
+    if (projection.income && projection.income.ssdi) {
+        const taxableSS = projection.income.ssdi * 0.85;
+        lines.push(`Social Security (85%): $${formatNum(taxableSS)}`);
+        lines.push(`  (Total SS: $${formatNum(projection.income.ssdi)})`);
+    }
+
+    // Rental income (100% taxable)
+    if (projection.income && projection.income.rental) {
+        lines.push(`Rental Income: $${formatNum(projection.income.rental)}`);
+    }
+
+    // IRA distributions (excluding HELOC)
+    if (projection.income && projection.income.ira_distributions) {
+        const totalIRA = projection.income.ira_distributions;
+        const helocDrawn = projection.heloc_drawn || 0;
+        const taxableIRA = totalIRA - helocDrawn;
+
+        if (helocDrawn > 0) {
+            lines.push(`IRA Distributions: $${formatNum(taxableIRA)}`);
+            lines.push(`  (Total IRA: $${formatNum(totalIRA)})`);
+            lines.push(`  (HELOC excluded: -$${formatNum(helocDrawn)})`);
+        } else if (taxableIRA > 0) {
+            lines.push(`IRA Distributions: $${formatNum(taxableIRA)}`);
+        }
+    }
+
+    lines.push('');
+    lines.push('Non-Taxable Cash Flow (excluded):');
+
+    // LTC Savings Spending (not taxable - withdrawing existing savings)
+    if (projection.income && projection.income.ltc_spending) {
+        lines.push(`  LTC Savings: $${formatNum(projection.income.ltc_spending)}`);
+    }
+
+    // LTC Policy Payout (not taxable - insurance benefit)
+    if (projection.income && projection.income.ltc_payout) {
+        lines.push(`  LTC Insurance: $${formatNum(projection.income.ltc_payout)}`);
+    }
+
+    // HELOC (not taxable - borrowed money)
+    if (projection.heloc_drawn && projection.heloc_drawn > 0) {
+        lines.push(`  HELOC Proceeds: $${formatNum(projection.heloc_drawn)}`);
+    }
+
+    // SMA payments go to SDIRA (not directly taxable income)
+    if (projection.income && projection.income.sma_payments) {
+        lines.push(`  SMA to SDIRA: $${formatNum(projection.income.sma_payments)}`);
+    }
+
+    lines.push('────────────────────────');
+    lines.push(`Adjusted Gross Income: $${formatNum(projection.agi || 0)}`);
+
+    return lines.join('\n');
+};
+
 // Format Expenses tooltip (ALL expenses itemized)
 exports.formatExpensesTooltip = function(expenses) {
     if (!expenses || typeof expenses !== 'object') return '';
