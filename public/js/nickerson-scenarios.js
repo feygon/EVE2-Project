@@ -397,21 +397,28 @@
         // Update LTC total
         $card.find('.ltc-total').text(formatCurrency(metrics.ltc_total));
 
-        // Update final real estate values
-        $card.find('.house-value-final').text(formatCurrency(metrics.house_value_final));
-        $card.find('.condo-value-final').text(
-            metrics.condo_value_final > 0
-                ? formatCurrency(metrics.condo_value_final)
-                : (metrics.condo_sale_year ? '$0 (sold ' + metrics.condo_sale_year + ')' : '$0')
-        );
+        // Update final real estate values (multi-line display)
+        let realEstateLines = [];
+        realEstateLines.push('Primary: ' + formatCurrency(metrics.house_value_final));
 
-        // Update real estate liquidation
-        let realEstateText = 'None';
+        if (metrics.condo_value_final > 0) {
+            realEstateLines.push('ArborRoses: ' + formatCurrency(metrics.condo_value_final));
+        } else if (metrics.condo_sale_year) {
+            realEstateLines.push('ArborRoses: $0 (sold ' + metrics.condo_sale_year + ')');
+        } else {
+            realEstateLines.push('ArborRoses: $0');
+        }
+
+        // Join with line breaks and set HTML
+        $card.find('.real-estate-final').html(realEstateLines.join('<br>'));
+
+        // Update real estate liquidation (multi-line display)
+        let realEstateLiqLines = [];
         let realEstateTooltip = 'No real estate liquidation needed';
 
         if (metrics.condo_sale_year) {
             // Condo was sold
-            realEstateText = 'Condo sold: ' + formatCurrency(metrics.condo_sale_proceeds) + ' (' + metrics.condo_sale_year + ')';
+            realEstateLiqLines.push('Condo sold: ' + formatCurrency(metrics.condo_sale_proceeds) + ' (' + metrics.condo_sale_year + ')');
             realEstateTooltip = 'Condo sold in ' + metrics.condo_sale_year + ' for ' + formatCurrency(metrics.condo_sale_proceeds);
 
             if (metrics.heloc_max_balance > 0) {
@@ -419,15 +426,22 @@
             }
         } else if (metrics.heloc_max_balance > 0) {
             // HELOC used but no sale
-            realEstateText = 'HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')';
+            realEstateLiqLines.push('HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')');
             realEstateTooltip = 'Peak HELOC balance: ' + formatCurrency(metrics.heloc_max_balance) + ' in ' + metrics.heloc_year;
         } else if (metrics.real_estate_liquidation_total > 0) {
             // Critical case: HELOC maxed, property sale needed
-            realEstateText = 'CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')';
+            realEstateLiqLines.push('CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')');
             realEstateTooltip = 'WARNING: All assets exhausted. Additional liquidation needed.';
+        } else {
+            realEstateLiqLines.push('None');
         }
 
-        $card.find('.real-estate-liquidated').text(realEstateText).attr('title', realEstateTooltip);
+        // Add final mortgage balance if any (SNT scenarios)
+        if (metrics.mortgage_final && metrics.mortgage_final > 0) {
+            realEstateLiqLines.push('Refi: ' + formatCurrency(metrics.mortgage_final));
+        }
+
+        $card.find('.real-estate-liquidated').html(realEstateLiqLines.join('<br>')).attr('title', realEstateTooltip);
 
         // Update tooltips with itemized breakdowns if available
         if (metrics.liquid_assets_breakdown) {

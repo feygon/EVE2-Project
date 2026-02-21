@@ -258,6 +258,8 @@ body {
     font-weight: bold;
     color: #66ccff;
     font-size: 1.05em;
+    text-align: right;
+    line-height: 1.4;
 }
 
 /* Loading State */
