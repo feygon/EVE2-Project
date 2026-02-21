@@ -565,10 +565,24 @@ exports.formatExpensesTooltip = function(expenses) {
     if (expenses.heloc_interest) {
         lines.push(`HELOC Interest: $${formatNum(expenses.heloc_interest)}`);
     }
-    if (expenses.federal_income_tax) {
-        lines.push(`Federal Income Tax: $${formatNum(expenses.federal_income_tax)}`);
+
+    // Taxes
+    const hasTaxes = expenses.federal_income_tax || expenses.oregon_income_tax;
+    if (hasTaxes) {
+        lines.push('');
+        lines.push('Income Taxes:');
+        if (expenses.federal_income_tax) {
+            lines.push(`  Federal: $${formatNum(expenses.federal_income_tax)}`);
+        }
+        if (expenses.oregon_income_tax) {
+            lines.push(`  Oregon State: $${formatNum(expenses.oregon_income_tax)}`);
+        }
+        const totalTax = (expenses.federal_income_tax || 0) + (expenses.oregon_income_tax || 0);
+        lines.push(`  Total Tax: $${formatNum(totalTax)}`);
     }
+
     if (expenses.lifestyle) {
+        lines.push('');
         lines.push(`Lifestyle: $${formatNum(expenses.lifestyle)}`);
     }
 
