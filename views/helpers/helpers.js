@@ -420,7 +420,7 @@ exports.formatIncomeTooltip = function(income, projection) {
         lines.push('Note: Rental income is earmarked for');
         lines.push('condo expenses (mortgage, management,');
         lines.push('taxes, etc.) and is ADDITIONAL to the');
-        lines.push('Pre-Memory Care Gross Expenses slider.');
+        lines.push('Personal Gross Expenses (Pre-Facility) slider.');
     }
 
     // Add AGI reference
