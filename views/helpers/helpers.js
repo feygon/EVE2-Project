@@ -407,10 +407,12 @@ exports.formatIncomeTooltip = function(income, projection) {
         lines.push(`SMA Payments: $${formatNum(income.sma_payments)}`);
     }
 
+    // Personal Budget = all income sources EXCEPT rental (which is earmarked)
+    const personalBudget = income.total - (income.rental || 0);
     lines.push('────────────────────────');
-    lines.push(`Total Budget: $${formatNum(income.total)}`);
+    lines.push(`Personal Budget: $${formatNum(personalBudget)}`);
 
-    // Rental income below total budget with divider
+    // Rental income below personal budget with divider
     if (income.rental && income.rental > 0) {
         lines.push('────────────────────────');
         lines.push(`Rental Income: $${formatNum(income.rental)}`);
