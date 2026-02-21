@@ -79,26 +79,26 @@
     }
 
     /**
-     * Update all scenarios with new memory care offset
+     * Update all scenarios with new memory care year
      */
-    function updateAllScenariosMemoryCare(offset) {
-        console.log('[Nickerson] Updating all scenarios memory care offset:', offset);
+    function updateAllScenariosMemoryCare(year) {
+        console.log('[Nickerson] Updating all scenarios memory care year:', year);
 
-        // Update all scenarios to the new offset
+        // Update all scenarios to the new year
         const scenarioIds = Object.values(scenarioMap);
         const updatePromises = scenarioIds.map(scenarioId => {
             return $.ajax({
                 url: '/Nickerson/scenario/' + scenarioId + '/update-memory-care',
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ memoryCareOffset: offset }),
+                data: JSON.stringify({ memoryCareYear: year }),
                 xhrFields: { withCredentials: true }
             });
         });
 
         // Wait for all updates to complete
         Promise.all(updatePromises).then(() => {
-            console.log('[Nickerson] Memory care offset updated, reloading metrics');
+            console.log('[Nickerson] Memory care year updated, reloading metrics');
             loadMetricsForAllCards();
         });
     }
@@ -177,30 +177,36 @@
     }
 
     /**
-     * Update memory care slider max value based on LTC trigger year and year of passing
+     * Update memory care slider range based on LTC trigger year and year of passing
      */
-    function updateMemoryCareMax(triggerYear, yearOfPassing) {
+    function updateMemoryCareRange(triggerYear, yearOfPassing) {
         if (!yearOfPassing) {
             yearOfPassing = parseInt($('.year-of-passing-slider').first().val()) || 2040;
         }
-        const maxOffset = yearOfPassing - triggerYear;
 
         $('.memory-care-slider').each(function() {
             const $slider = $(this);
             const currentValue = parseInt($slider.val());
 
-            // Update max attribute
-            $slider.attr('max', maxOffset);
+            // Update min and max attributes to year values
+            $slider.attr('min', triggerYear);
+            $slider.attr('max', yearOfPassing);
 
-            // If current value exceeds new max, adjust it
-            if (currentValue > maxOffset) {
-                $slider.val(maxOffset);
-                const yearsText = maxOffset === 1 ? '1 year' : maxOffset + ' years';
-                $slider.siblings('.memory-care-value').text(yearsText);
+            // If current value is outside the new range, constrain it
+            let newValue = currentValue;
+            if (currentValue < triggerYear) {
+                newValue = triggerYear;
+            } else if (currentValue > yearOfPassing) {
+                newValue = yearOfPassing;
+            }
+
+            if (newValue !== currentValue) {
+                $slider.val(newValue);
+                $slider.siblings('.memory-care-value').text(newValue);
             }
         });
 
-        console.log('[Nickerson] Memory care max updated to', maxOffset, 'years (trigger:', triggerYear, ', passing:', yearOfPassing, ')');
+        console.log('[Nickerson] Memory care range updated to', triggerYear, '-', yearOfPassing);
     }
 
     /**
@@ -208,7 +214,7 @@
      */
     function initializeCards() {
         console.log('[Nickerson] Initializing cards for trigger year:', currentTriggerYear);
-        updateMemoryCareMax(currentTriggerYear);  // Set initial max value
+        updateMemoryCareRange(currentTriggerYear);  // Set initial max value
         updateCardsForTriggerYear(currentTriggerYear);
     }
 
@@ -246,7 +252,7 @@
             $('.ltc-value').text(constrainedYear);
 
             // Update memory care slider max based on new trigger year
-            updateMemoryCareMax(constrainedYear, yearOfPassing);
+            updateMemoryCareRange(constrainedYear, yearOfPassing);
 
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.ltcSliderUpdateTimer);
@@ -256,19 +262,18 @@
             }, 300);  // 300ms debounce
         });
 
-        // Memory care offset sliders (synchronized across all cards)
+        // Memory care year sliders (synchronized across all cards)
         $('.memory-care-slider').on('input', function() {
-            const offset = parseInt($(this).val());
-            const yearsText = offset === 1 ? '1 year' : offset + ' years';
+            const year = parseInt($(this).val());
 
             // Update display value for all sliders
-            $('.memory-care-slider').val(offset);
-            $('.memory-care-value').text(yearsText);
+            $('.memory-care-slider').val(year);
+            $('.memory-care-value').text(year);
 
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.memoryCareSliderUpdateTimer);
             window.memoryCareSliderUpdateTimer = setTimeout(function() {
-                updateAllScenariosMemoryCare(offset);
+                updateAllScenariosMemoryCare(year);
             }, 300);  // 300ms debounce
         });
 
@@ -289,7 +294,7 @@
             }
 
             // Update memory care max based on new year of passing
-            updateMemoryCareMax(currentLtcTrigger, newYear);
+            updateMemoryCareRange(currentLtcTrigger, newYear);
 
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.yearOfPassingSliderUpdateTimer);
@@ -426,11 +431,10 @@
                             $('.year-of-passing-value').text(config.year_of_passing);
                         }
 
-                        // Update memory care offset slider
-                        if (config.memory_care_offset !== undefined) {
-                            const yearsText = config.memory_care_offset === 1 ? '1 year' : config.memory_care_offset + ' years';
-                            $('.memory-care-slider').val(config.memory_care_offset);
-                            $('.memory-care-value').text(yearsText);
+                        // Update memory care year slider
+                        if (config.memory_care_year !== undefined) {
+                            $('.memory-care-slider').val(config.memory_care_year);
+                            $('.memory-care-value').text(config.memory_care_year);
                         }
                     }
 
