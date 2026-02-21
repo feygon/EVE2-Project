@@ -344,10 +344,16 @@
                 'heloc_rate': 'heloc_rate'
             };
 
+            // Percentage parameters need to be converted from slider value (6.0) to decimal (0.06)
+            const percentageParams = ['ira_growth', 'primary_appreciation', 'condo_appreciation',
+                                       'memory_care_inflation', 'management_fee', 'mortgage_rate', 'heloc_rate'];
+
             if (paramMap[param]) {
                 clearTimeout(window.paramSliderUpdateTimer);
                 window.paramSliderUpdateTimer = setTimeout(function() {
-                    updateAllScenariosParameter(paramMap[param], value);
+                    // Convert percentage to decimal if needed
+                    const backendValue = percentageParams.includes(param) ? value / 100 : value;
+                    updateAllScenariosParameter(paramMap[param], backendValue);
                 }, 300);  // 300ms debounce
             }
         });
