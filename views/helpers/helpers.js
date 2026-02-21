@@ -625,6 +625,25 @@ exports.formatNetCashflowTooltip = function(income, expenses, projection) {
     return lines.join('\n');
 };
 
+// Format tax deduction display (federal and Oregon)
+exports.formatDeductionDisplay = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const fedAmt = projection.deduction_amount;
+    const fedType = projection.deduction_type;
+    const orAmt = projection.oregon_deduction_amount;
+    const orType = projection.oregon_deduction_type;
+
+    // If both use the same deduction type and amount
+    if (fedType === orType && Math.abs(fedAmt - orAmt) < 1) {
+        return `$${formatNum(fedAmt)} (${fedType})`;
+    }
+
+    // Different deductions for federal and Oregon
+    return `Fed: $${formatNum(fedAmt)} (${fedType})<br>OR: $${formatNum(orAmt)} (${orType})`;
+};
+
 // Format Tax Deductions tooltip - shows standard vs itemized breakdown
 exports.formatDeductionsTooltip = function(projection) {
     if (!projection || !projection.itemized_breakdown) return '';
@@ -671,9 +690,26 @@ exports.formatDeductionsTooltip = function(projection) {
 
     lines.push('');
     lines.push(`Total Itemized: $${formatNum(breakdown.itemized_total)}`);
-    lines.push(`Standard Deduction: $${formatNum(breakdown.standard_deduction)}`);
+    lines.push(`Federal Standard: $${formatNum(breakdown.standard_deduction)}`);
     lines.push('────────────────────────');
-    lines.push(`Using: $${formatNum(projection.deduction_amount)} (${projection.deduction_type})`);
+    lines.push(`Federal Using: $${formatNum(projection.deduction_amount)} (${projection.deduction_type})`);
+
+    // Add Oregon deduction info
+    if (projection.oregon_deduction_amount !== undefined) {
+        lines.push('');
+        lines.push('Oregon State Deduction:');
+        lines.push(`Oregon Standard: $2,605`);
+        lines.push(`Federal Itemized: $${formatNum(breakdown.itemized_total)}`);
+        lines.push('────────────────────────');
+        lines.push(`Oregon Using: $${formatNum(projection.oregon_deduction_amount)} (${projection.oregon_deduction_type})`);
+
+        // Note if Oregon uses different deduction than federal
+        if (projection.deduction_type !== projection.oregon_deduction_type) {
+            lines.push('');
+            lines.push('⚠️ Note: Oregon can use federal itemized');
+            lines.push('   deductions even if federal uses standard!');
+        }
+    }
 
     // Add AGI reference
     if (projection.agi !== undefined) {
