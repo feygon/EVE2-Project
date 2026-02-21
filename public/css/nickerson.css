@@ -303,7 +303,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    background-color: white;
+    background-color: #1a1a1a;
 }
 
 /* Section headers (Assets, Cash Flow) */
@@ -322,7 +322,7 @@ body {
     background: #34495e;
     color: white;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #2c3e50;
     text-align: left;
     font-weight: 600;
 }
@@ -330,14 +330,14 @@ body {
 /* Table cells */
 .projection-table td {
     padding: 10px;
-    border: 1px solid #ddd;
-    background-color: white;
-    color: #333;
+    border: 1px solid #444;
+    background-color: #333;
+    color: #dcdcdc;
 }
 
 /* Alternating row colors */
 .projection-table tbody tr:nth-child(even) td {
-    background-color: #f8f9fa;
+    background-color: #2a2a2a;
 }
 
 /* Tooltip-enabled cells */
@@ -364,13 +364,13 @@ body {
 /* Emphasized cells */
 .pool-close {
     font-weight: bold;
-    color: #2c3e50;
+    color: #66ccff;
 }
 
 .total-assets {
     font-weight: bold;
-    background-color: #ecf0f1 !important;
-    color: #2c3e50;
+    background-color: #3a3a3a !important;
+    color: #66ccff;
 }
 
 /* Responsive table wrapper */
