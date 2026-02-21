@@ -569,6 +569,39 @@ exports.formatExpensesTooltip = function(expenses) {
     return lines.join('\n');
 };
 
+// Format Net Cashflow tooltip - explains calculation
+exports.formatNetCashflowTooltip = function(income, expenses, projection) {
+    if (!income || !expenses) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const lines = [];
+
+    const netCashflow = (income.total || 0) - (expenses.total || 0);
+
+    lines.push('Net Cashflow Calculation:');
+    lines.push('');
+    lines.push(`Budget (all cash inflow): $${formatNum(income.total)}`);
+    lines.push(`Base Expenses (all outflow): -$${formatNum(expenses.total)}`);
+    lines.push('────────────────────────');
+    lines.push(`Net Cashflow: $${formatNum(netCashflow)}`);
+    lines.push('');
+    lines.push('Important Notes:');
+    lines.push('');
+    lines.push('• Federal tax is included in Base Expenses');
+    lines.push('• This is net ANNUAL cashflow');
+    lines.push('• Withholdings NOT modeled separately');
+    lines.push('  (IRA distributions and tax payments');
+    lines.push('   are treated as annual net amounts)');
+    lines.push('');
+    lines.push('• Negative cashflow funded by:');
+    lines.push('  1. LTC Savings (50% of shortfall)');
+    lines.push('  2. IRA distributions');
+    lines.push('  3. HELOC (if IRAs insufficient)');
+    lines.push('  4. Real estate sale (if debt > 60% LTV)');
+
+    return lines.join('\n');
+};
+
 // Format Tax Deductions tooltip - shows standard vs itemized breakdown
 exports.formatDeductionsTooltip = function(projection) {
     if (!projection || !projection.itemized_breakdown) return '';
