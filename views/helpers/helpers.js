@@ -412,73 +412,75 @@ exports.formatIncomeTooltip = function(income, projection) {
     }
 
     lines.push('────────────────────────');
-    lines.push(`Total Income: $${formatNum(income.total)}`);
+    lines.push(`Total Budget: $${formatNum(income.total)}`);
+
+    // Add AGI reference
+    if (projection && projection.agi !== undefined) {
+        lines.push('');
+        lines.push(`AGI (see Income (taxable) column): $${formatNum(projection.agi)}`);
+    }
 
     return lines.join('\n');
 };
 
-// Format AGI (Adjusted Gross Income) tooltip - Taxable Income
-exports.formatAgiTooltip = function(projection) {
+// Format Taxable Income tooltip - shows income from taxable sources and AGI breakdown
+exports.formatTaxableIncomeTooltip = function(projection) {
     if (!projection) return '';
 
     const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
     const lines = [];
 
-    lines.push('Taxable Income (AGI):');
+    lines.push('Income from Taxable Sources:');
     lines.push('');
 
-    // Social Security (85% taxable)
+    // Social Security (full amount)
     if (projection.income && projection.income.ssdi) {
-        const taxableSS = projection.income.ssdi * 0.85;
-        lines.push(`Social Security (85%): $${formatNum(taxableSS)}`);
-        lines.push(`  (Total SS: $${formatNum(projection.income.ssdi)})`);
+        lines.push(`Social Security: $${formatNum(projection.income.ssdi)}`);
     }
 
-    // Rental income (100% taxable)
+    // Rental income (full amount)
     if (projection.income && projection.income.rental) {
         lines.push(`Rental Income: $${formatNum(projection.income.rental)}`);
     }
 
-    // IRA distributions (excluding HELOC)
+    // IRA distributions (including HELOC if drawn)
+    if (projection.income && projection.income.ira_distributions) {
+        lines.push(`IRA Distributions: $${formatNum(projection.income.ira_distributions)}`);
+        if (projection.heloc_drawn && projection.heloc_drawn > 0) {
+            lines.push(`  (includes $${formatNum(projection.heloc_drawn)} HELOC)`);
+        }
+    }
+
+    lines.push('────────────────────────');
+    lines.push(`Total Taxable Sources: $${formatNum(projection.taxable_income_total || 0)}`);
+    lines.push('');
+    lines.push('Adjusted Gross Income (AGI):');
+    lines.push('');
+
+    // AGI breakdown - what actually gets taxed
+    if (projection.income && projection.income.ssdi) {
+        const taxableSS = projection.income.ssdi * 0.85;
+        lines.push(`SS (85% taxable): $${formatNum(taxableSS)}`);
+    }
+
+    if (projection.income && projection.income.rental) {
+        lines.push(`Rental (100% taxable): $${formatNum(projection.income.rental)}`);
+    }
+
     if (projection.income && projection.income.ira_distributions) {
         const totalIRA = projection.income.ira_distributions;
         const helocDrawn = projection.heloc_drawn || 0;
         const taxableIRA = totalIRA - helocDrawn;
 
         if (helocDrawn > 0) {
-            lines.push(`IRA Distributions: $${formatNum(taxableIRA)}`);
-            lines.push(`  (Total IRA: $${formatNum(totalIRA)})`);
-            lines.push(`  (HELOC excluded: -$${formatNum(helocDrawn)})`);
+            lines.push(`IRA (excluding HELOC): $${formatNum(taxableIRA)}`);
         } else if (taxableIRA > 0) {
-            lines.push(`IRA Distributions: $${formatNum(taxableIRA)}`);
+            lines.push(`IRA: $${formatNum(taxableIRA)}`);
         }
     }
 
-    lines.push('');
-    lines.push('Non-Taxable Cash Flow (excluded):');
-
-    // LTC Savings Spending (not taxable - withdrawing existing savings)
-    if (projection.income && projection.income.ltc_spending) {
-        lines.push(`  LTC Savings: $${formatNum(projection.income.ltc_spending)}`);
-    }
-
-    // LTC Policy Payout (not taxable - insurance benefit)
-    if (projection.income && projection.income.ltc_payout) {
-        lines.push(`  LTC Insurance: $${formatNum(projection.income.ltc_payout)}`);
-    }
-
-    // HELOC (not taxable - borrowed money)
-    if (projection.heloc_drawn && projection.heloc_drawn > 0) {
-        lines.push(`  HELOC Proceeds: $${formatNum(projection.heloc_drawn)}`);
-    }
-
-    // SMA payments go to SDIRA (not directly taxable income)
-    if (projection.income && projection.income.sma_payments) {
-        lines.push(`  SMA to SDIRA: $${formatNum(projection.income.sma_payments)}`);
-    }
-
     lines.push('────────────────────────');
-    lines.push(`Adjusted Gross Income: $${formatNum(projection.agi || 0)}`);
+    lines.push(`AGI (amount taxed): $${formatNum(projection.agi || 0)}`);
 
     return lines.join('\n');
 };
