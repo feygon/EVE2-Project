@@ -362,7 +362,9 @@
                 'management_fee': 'management_fee',
                 'rental_income': 'rental_income_monthly',
                 'mortgage_rate': 'mortgage_rate',
-                'heloc_rate': 'heloc_rate'
+                'heloc_rate': 'heloc_rate',
+                'medical_base_monthly': 'medical_base_monthly',
+                'memory_care_cost': 'memory_care_cost'
             };
 
             // Percentage parameters need to be converted from slider value (6.0) to decimal (0.06)
@@ -391,8 +393,12 @@
             displayText = '$' + formatNumber(value) + '/yr';
         } else if (param === 'rental_income') {
             displayText = '$' + formatNumber(value) + '/mo';
+        } else if (param === 'medical_base_monthly') {
+            displayText = '$' + formatNumber(value) + '/mo';
         } else if (param === 'managed_ira_start') {
             displayText = '$' + formatNumber(value);
+        } else if (param === 'memory_care_cost') {
+            displayText = '$' + formatNumber(value) + '/yr';
         } else {
             displayText = value.toFixed(1) + '%';
         }
