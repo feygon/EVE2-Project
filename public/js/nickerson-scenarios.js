@@ -5,23 +5,12 @@
 (function() {
     'use strict';
 
-    // Scenario mapping: year + disposition -> scenario ID
+    // Scenario mapping: disposition -> scenario ID
+    // LTC trigger year is dynamically updated via slider
     const scenarioMap = {
-        2028: {
-            baseline: 'ScA_Baseline',
-            rental: 'ScA_Rental',
-            sale: 'ScA_SNT'  // Temporarily using SNT scenario until Sale scenario is created
-        },
-        2030: {
-            baseline: 'ScB_Baseline',
-            rental: 'ScB_Rental',
-            sale: 'ScB_SNT'  // Temporarily using SNT scenario until Sale scenario is created
-        },
-        2032: {
-            baseline: 'ScC_Baseline',
-            rental: 'ScC_Rental',
-            sale: 'ScC_SNT'  // Temporarily using SNT scenario until Sale scenario is created
-        }
+        baseline: 'ScA_Baseline',
+        rental: 'ScA_Rental',
+        sale: 'ScA_SNT'
     };
 
     let currentTriggerYear = 2028;
@@ -55,21 +44,38 @@
      */
     function updateCardsForTriggerYear(year) {
         console.log('[Nickerson] Updating cards for trigger year:', year);
-        $('.scenario-card').each(function() {
-            const $card = $(this);
-            const disposition = $card.data('disposition');
-            const scenarioId = scenarioMap[year][disposition];
 
-            console.log('[Nickerson] Setting card', disposition, 'to scenario', scenarioId);
-            $card.data('scenario-id', scenarioId);
-
-            // Update LTC trigger slider value
-            $card.find('.ltc-slider').val(year);
-            $card.find('.ltc-value').text(year);
+        // Update all scenarios to the new trigger year
+        const scenarioIds = Object.values(scenarioMap);
+        const updatePromises = scenarioIds.map(scenarioId => {
+            return $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-ltc',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ ltcTrigger: year }),
+                xhrFields: { withCredentials: true }
+            });
         });
 
-        // Load metrics for new scenarios
-        loadMetricsForAllCards();
+        // Wait for all updates to complete
+        Promise.all(updatePromises).then(() => {
+            // Update card UI
+            $('.scenario-card').each(function() {
+                const $card = $(this);
+                const disposition = $card.data('disposition');
+                const scenarioId = scenarioMap[disposition];
+
+                console.log('[Nickerson] Setting card', disposition, 'to scenario', scenarioId);
+                $card.data('scenario-id', scenarioId);
+
+                // Update LTC trigger slider value
+                $card.find('.ltc-slider').val(year);
+                $card.find('.ltc-value').text(year);
+            });
+
+            // Load metrics for updated scenarios
+            loadMetricsForAllCards();
+        });
     }
 
     /**
@@ -104,26 +110,17 @@
         // LTC trigger sliders (synchronized across all cards)
         $('.ltc-slider').on('input', function() {
             const newYear = parseInt($(this).val());
-            const cardNum = parseInt($(this).data('card'));
 
-            // Update display value for this card
-            $(this).siblings('.ltc-value').text(newYear);
+            // Update display value for all sliders
+            $('.ltc-slider').val(newYear);
+            $('.ltc-value').text(newYear);
 
-            // Sync all other LTC sliders
-            $('.ltc-slider').not(this).val(newYear);
-            $('.ltc-slider').not(this).siblings('.ltc-value').text(newYear);
-
-            // Update scenario for this card
-            const $card = $(this).closest('.scenario-card');
-            const disposition = $card.data('disposition');
-            const scenarioId = scenarioMap[newYear][disposition];
-            $card.data('scenario-id', scenarioId);
-
-            // Debounced metric update
-            clearTimeout($card.data('updateTimer'));
-            $card.data('updateTimer', setTimeout(function() {
-                updateScenarioLTC($card, scenarioId, newYear);
-            }, 500));
+            // Debounced update to avoid too many API calls while dragging
+            clearTimeout(window.ltcSliderUpdateTimer);
+            window.ltcSliderUpdateTimer = setTimeout(function() {
+                currentTriggerYear = newYear;
+                updateCardsForTriggerYear(newYear);
+            }, 300);  // 300ms debounce
         });
 
         // Memory care offset sliders (synchronized across all cards)
