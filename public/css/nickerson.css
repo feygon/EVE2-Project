@@ -384,3 +384,132 @@ body {
         padding: 8px;
     }
 }
+
+/* ===== MOBILE TOOLTIP SIDEBAR ===== */
+
+/* Sidebar overlay (dark background) */
+.tooltip-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.tooltip-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Sidebar panel */
+.tooltip-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 90%;
+    max-width: 400px;
+    height: 100%;
+    background-color: #2a2a2a;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.tooltip-sidebar.active {
+    right: 0;
+}
+
+/* Sidebar header */
+.tooltip-sidebar-header {
+    background-color: #34495e;
+    color: #66ccff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #444;
+}
+
+.tooltip-sidebar-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.tooltip-sidebar-close {
+    background: none;
+    border: none;
+    color: #66ccff;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tooltip-sidebar-close:hover {
+    color: #fff;
+}
+
+/* Sidebar content */
+.tooltip-sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    color: #dcdcdc;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.tooltip-sidebar-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+}
+
+/* Mobile-friendly cell links */
+@media (max-width: 768px) {
+    .projection-table td[title] {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .projection-table td[title]:hover {
+        background-color: #3a3a3a;
+    }
+
+    /* Remove default tooltips on mobile */
+    .projection-table td[title]:hover::before,
+    .projection-table td[title]:hover::after {
+        display: none;
+    }
+
+    /* Add tap indicator */
+    .projection-table td[title]::after {
+        content: ' ⓘ';
+        font-size: 0.8em;
+        color: #66ccff;
+        opacity: 0.6;
+        margin-left: 4px;
+    }
+}
+
+/* Desktop: hide the info icon */
+@media (min-width: 769px) {
+    .tooltip-sidebar-overlay,
+    .tooltip-sidebar {
+        display: none;
+    }
+}

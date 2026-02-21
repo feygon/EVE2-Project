@@ -641,7 +641,8 @@ exports.formatDeductionDisplay = function(projection) {
     }
 
     // Different deductions for federal and Oregon
-    return `Fed: $${formatNum(fedAmt)} (${fedType})<br>OR: $${formatNum(orAmt)} (${orType})`;
+    // Return as separate divs for proper line breaks
+    return `<div>Fed: $${formatNum(fedAmt)}</div><div style="font-size: 0.85em;">(${fedType})</div><div style="margin-top: 4px;">OR: $${formatNum(orAmt)}</div><div style="font-size: 0.85em;">(${orType})</div>`;
 };
 
 // Format Tax Deductions tooltip - shows standard vs itemized breakdown
