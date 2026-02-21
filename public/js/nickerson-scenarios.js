@@ -129,10 +129,38 @@
     }
 
     /**
-     * Update memory care slider max value based on LTC trigger year
+     * Update all scenarios with new year of passing
      */
-    function updateMemoryCareMax(triggerYear) {
-        const maxOffset = 2040 - triggerYear;
+    function updateAllScenariosYearOfPassing(year) {
+        console.log('[Nickerson] Updating all scenarios year of passing:', year);
+
+        // Update all scenarios to the new year
+        const scenarioIds = Object.values(scenarioMap);
+        const updatePromises = scenarioIds.map(scenarioId => {
+            return $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-year-of-passing',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ yearOfPassing: year }),
+                xhrFields: { withCredentials: true }
+            });
+        });
+
+        // Wait for all updates to complete
+        Promise.all(updatePromises).then(() => {
+            console.log('[Nickerson] Year of passing updated, reloading metrics');
+            loadMetricsForAllCards();
+        });
+    }
+
+    /**
+     * Update memory care slider max value based on LTC trigger year and year of passing
+     */
+    function updateMemoryCareMax(triggerYear, yearOfPassing) {
+        if (!yearOfPassing) {
+            yearOfPassing = parseInt($('.year-of-passing-slider').first().val()) || 2040;
+        }
+        const maxOffset = yearOfPassing - triggerYear;
 
         $('.memory-care-slider').each(function() {
             const $slider = $(this);
@@ -149,7 +177,7 @@
             }
         });
 
-        console.log('[Nickerson] Memory care max updated to', maxOffset, 'years (trigger:', triggerYear, ')');
+        console.log('[Nickerson] Memory care max updated to', maxOffset, 'years (trigger:', triggerYear, ', passing:', yearOfPassing, ')');
     }
 
     /**
@@ -185,19 +213,23 @@
         // LTC trigger sliders (synchronized across all cards)
         $('.ltc-slider').on('input', function() {
             const newYear = parseInt($(this).val());
+            const yearOfPassing = parseInt($('.year-of-passing-slider').first().val()) || 2040;
+
+            // Constrain to year of passing
+            const constrainedYear = Math.min(newYear, yearOfPassing);
 
             // Update display value for all sliders
-            $('.ltc-slider').val(newYear);
-            $('.ltc-value').text(newYear);
+            $('.ltc-slider').val(constrainedYear);
+            $('.ltc-value').text(constrainedYear);
 
             // Update memory care slider max based on new trigger year
-            updateMemoryCareMax(newYear);
+            updateMemoryCareMax(constrainedYear, yearOfPassing);
 
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.ltcSliderUpdateTimer);
             window.ltcSliderUpdateTimer = setTimeout(function() {
-                currentTriggerYear = newYear;
-                updateCardsForTriggerYear(newYear);
+                currentTriggerYear = constrainedYear;
+                updateCardsForTriggerYear(constrainedYear);
             }, 300);  // 300ms debounce
         });
 
@@ -214,6 +246,32 @@
             clearTimeout(window.memoryCareSliderUpdateTimer);
             window.memoryCareSliderUpdateTimer = setTimeout(function() {
                 updateAllScenariosMemoryCare(offset);
+            }, 300);  // 300ms debounce
+        });
+
+        // Year of passing sliders (synchronized across all cards)
+        $('.year-of-passing-slider').on('input', function() {
+            const newYear = parseInt($(this).val());
+
+            // Update display value for all sliders
+            $('.year-of-passing-slider').val(newYear);
+            $('.year-of-passing-value').text(newYear);
+
+            // Constrain LTC trigger year if needed
+            const currentLtcTrigger = parseInt($('.ltc-slider').first().val());
+            if (currentLtcTrigger > newYear) {
+                $('.ltc-slider').val(newYear);
+                $('.ltc-value').text(newYear);
+                currentTriggerYear = newYear;
+            }
+
+            // Update memory care max based on new year of passing
+            updateMemoryCareMax(currentLtcTrigger, newYear);
+
+            // Debounced update to avoid too many API calls while dragging
+            clearTimeout(window.yearOfPassingSliderUpdateTimer);
+            window.yearOfPassingSliderUpdateTimer = setTimeout(function() {
+                updateAllScenariosYearOfPassing(newYear);
             }, 300);  // 300ms debounce
         });
 
