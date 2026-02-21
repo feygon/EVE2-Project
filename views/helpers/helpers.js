@@ -647,6 +647,14 @@ exports.formatDeductionsTooltip = function(projection) {
         lines.push(`  Mortgage Interest: $${formatNum(breakdown.mortgage_interest)}`);
     }
 
+    if (breakdown.depreciation > 0) {
+        lines.push(`  Rental Property Depreciation: $${formatNum(breakdown.depreciation)}`);
+        if (breakdown.condo_value > 0) {
+            lines.push(`    Building value (80%): $${formatNum(breakdown.condo_value * 0.8)}`);
+            lines.push(`    Depreciation schedule: 27.5 years`);
+        }
+    }
+
     lines.push('');
     lines.push(`Total Itemized: $${formatNum(breakdown.itemized_total)}`);
     lines.push(`Standard Deduction: $${formatNum(breakdown.standard_deduction)}`);
