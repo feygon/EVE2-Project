@@ -272,6 +272,11 @@ exports.add = function(...args) {
     return args.reduce((sum, num) => sum + (num || 0), 0);
 };
 
+// Subtract helper
+exports.subtract = function(a, b) {
+    return (a || 0) - (b || 0);
+};
+
 // Multiply helper
 exports.multiply = function(a, b) {
     return (a || 0) * (b || 0);
