@@ -39,6 +39,14 @@
                 </div>
             </div>
             <div class="param-row">
+                <label>ManagedIRA Starting Balance</label>
+                <div class="slider-container">
+                    <input type="range" min="100000" max="1000000" value="300000" step="5000"
+                           class="param-slider" data-param="managed_ira_start" data-card="{{cardNumber}}">
+                    <span class="param-value">$300,000</span>
+                </div>
+            </div>
+            <div class="param-row">
                 <label>Lifestyle Expenses</label>
                 <div class="slider-container">
                     <input type="range" min="50000" max="150000" value="95000" step="1000"
@@ -118,6 +126,18 @@
         <div class="metric-row">
             <span class="metric-label" title="Total LTC payouts from trigger year onward">LTC Disbursed:</span>
             <span class="metric-value ltc-total">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Final value of primary house in 2040">Primary House Final:</span>
+            <span class="metric-value house-value-final">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Final value of condo in 2040 (or $0 if sold)">Condo Final:</span>
+            <span class="metric-value condo-value-final">—</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label" title="Year and total amount of real estate liquidation needed">Real Estate Liquidated:</span>
+            <span class="metric-value real-estate-liquidated">—</span>
         </div>
     </div>
 

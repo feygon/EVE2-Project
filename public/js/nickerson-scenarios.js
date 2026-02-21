@@ -104,6 +104,31 @@
     }
 
     /**
+     * Update all scenarios with new ManagedIRA starting balance
+     */
+    function updateAllScenariosManagedIra(amount) {
+        console.log('[Nickerson] Updating all scenarios ManagedIRA start:', amount);
+
+        // Update all scenarios to the new amount
+        const scenarioIds = Object.values(scenarioMap);
+        const updatePromises = scenarioIds.map(scenarioId => {
+            return $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-managed-ira',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ managedIraStart: amount }),
+                xhrFields: { withCredentials: true }
+            });
+        });
+
+        // Wait for all updates to complete
+        Promise.all(updatePromises).then(() => {
+            console.log('[Nickerson] ManagedIRA start updated, reloading metrics');
+            loadMetricsForAllCards();
+        });
+    }
+
+    /**
      * Update memory care slider max value based on LTC trigger year
      */
     function updateMemoryCareMax(triggerYear) {
@@ -219,7 +244,15 @@
                 updateParamDisplay($(this), param, value);
             });
 
-            // Note: Parameter updates are not yet persisted to backend in Phase 1
+            // Special handling for ManagedIRA starting balance - update backend
+            if (param === 'managed_ira_start') {
+                clearTimeout(window.managedIraSliderUpdateTimer);
+                window.managedIraSliderUpdateTimer = setTimeout(function() {
+                    updateAllScenariosManagedIra(value);
+                }, 300);  // 300ms debounce
+            }
+
+            // Note: Other parameter updates are not yet persisted to backend in Phase 1
             // Phase 2 will add backend storage and recalculation
         });
     }
@@ -235,6 +268,8 @@
             displayText = '$' + formatNumber(value) + '/yr';
         } else if (param === 'rental_income') {
             displayText = '$' + formatNumber(value) + '/mo';
+        } else if (param === 'managed_ira_start') {
+            displayText = '$' + formatNumber(value);
         } else {
             displayText = value.toFixed(1) + '%';
         }
@@ -361,6 +396,38 @@
 
         // Update LTC total
         $card.find('.ltc-total').text(formatCurrency(metrics.ltc_total));
+
+        // Update final real estate values
+        $card.find('.house-value-final').text(formatCurrency(metrics.house_value_final));
+        $card.find('.condo-value-final').text(
+            metrics.condo_value_final > 0
+                ? formatCurrency(metrics.condo_value_final)
+                : (metrics.condo_sale_year ? '$0 (sold ' + metrics.condo_sale_year + ')' : '$0')
+        );
+
+        // Update real estate liquidation
+        let realEstateText = 'None';
+        let realEstateTooltip = 'No real estate liquidation needed';
+
+        if (metrics.condo_sale_year) {
+            // Condo was sold
+            realEstateText = 'Condo sold: ' + formatCurrency(metrics.condo_sale_proceeds) + ' (' + metrics.condo_sale_year + ')';
+            realEstateTooltip = 'Condo sold in ' + metrics.condo_sale_year + ' for ' + formatCurrency(metrics.condo_sale_proceeds);
+
+            if (metrics.heloc_max_balance > 0) {
+                realEstateTooltip += '\nMax HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')';
+            }
+        } else if (metrics.heloc_max_balance > 0) {
+            // HELOC used but no sale
+            realEstateText = 'HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')';
+            realEstateTooltip = 'Peak HELOC balance: ' + formatCurrency(metrics.heloc_max_balance) + ' in ' + metrics.heloc_year;
+        } else if (metrics.real_estate_liquidation_total > 0) {
+            // Critical case: HELOC maxed, property sale needed
+            realEstateText = 'CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')';
+            realEstateTooltip = 'WARNING: All assets exhausted. Additional liquidation needed.';
+        }
+
+        $card.find('.real-estate-liquidated').text(realEstateText).attr('title', realEstateTooltip);
 
         // Update tooltips with itemized breakdowns if available
         if (metrics.liquid_assets_breakdown) {

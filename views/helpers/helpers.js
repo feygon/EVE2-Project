@@ -308,12 +308,43 @@ exports.formatRealEstateTooltip = function(projection) {
 
     const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
 
-    return `Real Estate:
+    let tooltip = `Real Estate:
 House (Primary): $${formatNum(projection.house_value)} (+$${formatNum(projection.house_appreciation)})
-Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projection.condo_appreciation)})
-────────────────────────
+Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projection.condo_appreciation)})`;
+
+    // Add debt information
+    if (projection.heloc_balance && projection.heloc_balance > 0) {
+        tooltip += `\nHELOC Balance: -$${formatNum(projection.heloc_balance)} (7.25% interest)`;
+    }
+    if (projection.mortgage_balance && projection.mortgage_balance > 0) {
+        tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)} (6.75% interest)`;
+    }
+    if ((projection.heloc_balance > 0 || projection.mortgage_balance > 0)) {
+        const totalDebt = (projection.heloc_balance || 0) + (projection.mortgage_balance || 0);
+        const houseValue = projection.house_value || 0;
+        const ltv = houseValue > 0 ? (totalDebt / houseValue * 100) : 0;
+        tooltip += `\nCombined LTV: ${ltv.toFixed(1)}% (${totalDebt >= houseValue * 0.6 ? '⚠️ TRIGGERS CONDO SALE' : 'OK'})`;
+    }
+
+    // Add condo sale notice if applicable
+    if (projection.condo_sold) {
+        tooltip += `\n\n⚠️ CONDO SOLD THIS YEAR`;
+        if (projection.condo_sale_proceeds) {
+            tooltip += ` for $${formatNum(projection.condo_sale_proceeds)}`;
+        }
+        if (projection.heloc_payoff) {
+            tooltip += `\n  HELOC paid off: $${formatNum(projection.heloc_payoff)}`;
+        }
+        if (projection.mortgage_paydown_from_sale) {
+            tooltip += `\n  Mortgage paid down: $${formatNum(projection.mortgage_paydown_from_sale)}`;
+        }
+    }
+
+    tooltip += `\n────────────────────────
 Total: $${formatNum(projection.real_estate_total)}
 Total Appreciation: +$${formatNum(projection.house_appreciation + projection.condo_appreciation)}`;
+
+    return tooltip;
 };
 
 // Format LTC tooltip
