@@ -297,29 +297,24 @@
         console.log('[Nickerson] Updating card metrics:', metrics);
         console.log('[Nickerson] Card disposition:', $card.data('disposition'));
 
-        // Update values
-        $card.find('.gross-income').text(formatCurrency(metrics.gross_income));
-        $card.find('.pool-start').text(formatCurrency(metrics.pool_start));
-        $card.find('.pool-min').text(formatCurrency(metrics.pool_min) +
-                                      (metrics.pool_min_year ? ' (' + metrics.pool_min_year + ')' : ''));
-        $card.find('.pool-final').text(formatCurrency(metrics.pool_final));
+        // Update liquid assets values
+        $card.find('.liquid-assets-start').text(formatCurrency(metrics.liquid_assets_start));
+        $card.find('.liquid-assets-min').text(formatCurrency(metrics.liquid_assets_min) +
+                                              (metrics.liquid_assets_min_year ? ' (' + metrics.liquid_assets_min_year + ')' : ''));
+        $card.find('.liquid-assets-final').text(formatCurrency(metrics.liquid_assets_final));
 
+        // Update IRA values
         $card.find('.ira-start').text(formatCurrency(metrics.ira_start));
         $card.find('.ira-min').text(formatCurrency(metrics.ira_min) +
                                      (metrics.ira_min_year ? ' (' + metrics.ira_min_year + ')' : ''));
         $card.find('.ira-final').text(formatCurrency(metrics.ira_final));
 
+        // Update LTC total
         $card.find('.ltc-total').text(formatCurrency(metrics.ltc_total));
 
         // Update tooltips with itemized breakdowns if available
-        if (metrics.income_breakdown) {
-            $card.find('.gross-income').attr('title', formatBreakdown('Income Sources', metrics.income_breakdown));
-        }
-        if (metrics.pool_start_breakdown) {
-            $card.find('.pool-start').attr('title', formatBreakdown('Pool Start Sources', metrics.pool_start_breakdown));
-        }
-        if (metrics.pool_final_breakdown) {
-            $card.find('.pool-final').attr('title', formatBreakdown('Pool EOY Components', metrics.pool_final_breakdown));
+        if (metrics.liquid_assets_breakdown) {
+            $card.find('.liquid-assets-start').attr('title', formatBreakdown('Liquid Assets', metrics.liquid_assets_breakdown));
         }
         if (metrics.ira_breakdown) {
             $card.find('.ira-start').attr('title', formatBreakdown('IRA Accounts', metrics.ira_breakdown));
