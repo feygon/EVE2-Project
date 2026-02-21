@@ -529,33 +529,39 @@
 
         // Update real estate liquidation (multi-line display)
         let realEstateLiqLines = [];
-        let realEstateTooltip = 'No real estate liquidation needed';
+        let realEstateTooltipParts = [];
 
+        // Show condo sale if it happened
         if (metrics.condo_sale_year) {
-            // Condo was sold
             realEstateLiqLines.push('Condo sold: ' + formatCurrency(metrics.condo_sale_proceeds) + ' (' + metrics.condo_sale_year + ')');
-            realEstateTooltip = 'Condo sold in ' + metrics.condo_sale_year + ' for ' + formatCurrency(metrics.condo_sale_proceeds);
-
-            if (metrics.heloc_max_balance > 0) {
-                realEstateTooltip += '\nMax HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')';
-            }
-        } else if (metrics.heloc_max_balance > 0) {
-            // HELOC used but no sale
-            realEstateLiqLines.push('HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')');
-            realEstateTooltip = 'Peak HELOC balance: ' + formatCurrency(metrics.heloc_max_balance) + ' in ' + metrics.heloc_year;
-        } else if (metrics.real_estate_liquidation_total > 0) {
-            // Critical case: HELOC maxed, property sale needed
-            realEstateLiqLines.push('CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')');
-            realEstateTooltip = 'WARNING: All assets exhausted. Additional liquidation needed.';
-        } else {
-            realEstateLiqLines.push('None');
+            realEstateTooltipParts.push('Condo sold in ' + metrics.condo_sale_year + ' for ' + formatCurrency(metrics.condo_sale_proceeds));
         }
 
-        // Add final mortgage balance if any (SNT scenarios)
+        // Show HELOC if it was used
+        if (metrics.heloc_max_balance > 0) {
+            realEstateLiqLines.push('HELOC: ' + formatCurrency(metrics.heloc_max_balance) + ' (' + metrics.heloc_year + ')');
+            realEstateTooltipParts.push('Peak HELOC balance: ' + formatCurrency(metrics.heloc_max_balance) + ' in ' + metrics.heloc_year);
+        }
+
+        // Show final mortgage balance if any (SNT scenarios)
         if (metrics.mortgage_final && metrics.mortgage_final > 0) {
             realEstateLiqLines.push('Refi: ' + formatCurrency(metrics.mortgage_final));
+            realEstateTooltipParts.push('Final mortgage balance: ' + formatCurrency(metrics.mortgage_final));
         }
 
+        // Show critical liquidation if needed
+        if (metrics.real_estate_liquidation_total > 0) {
+            realEstateLiqLines.push('CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')');
+            realEstateTooltipParts.push('WARNING: All assets exhausted. Additional liquidation needed.');
+        }
+
+        // If nothing was added, show "None"
+        if (realEstateLiqLines.length === 0) {
+            realEstateLiqLines.push('None');
+            realEstateTooltipParts.push('No real estate liquidation needed');
+        }
+
+        const realEstateTooltip = realEstateTooltipParts.join('\n');
         $card.find('.real-estate-liquidated').html(realEstateLiqLines.join('<br>')).attr('title', realEstateTooltip);
 
         // Update tooltips with itemized breakdowns if available
