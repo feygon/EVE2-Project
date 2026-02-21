@@ -236,6 +236,18 @@
     }
 
     /**
+     * Update timeline summary text based on current slider values
+     */
+    function updateTimelineSummary() {
+        const ltcYear = parseInt($('.ltc-slider').first().val()) || 2028;
+        const memoryCareYear = parseInt($('.memory-care-slider').first().val()) || 2031;
+        const passingYear = parseInt($('.year-of-passing-slider').first().val()) || 2040;
+
+        const summaryText = `LTC insurance payout in ${ltcYear}, Memory Care starts ${memoryCareYear}, Passing in ${passingYear}`;
+        $('.timeline-text').text(summaryText);
+    }
+
+    /**
      * Initialize all slider interactions
      */
     function initializeSliders() {
@@ -250,6 +262,9 @@
             // Update display value for all sliders
             $('.ltc-slider').val(constrainedYear);
             $('.ltc-value').text(constrainedYear);
+
+            // Update timeline summary
+            updateTimelineSummary();
 
             // Update memory care slider max based on new trigger year
             updateMemoryCareRange(constrainedYear, yearOfPassing);
@@ -270,6 +285,9 @@
             $('.memory-care-slider').val(year);
             $('.memory-care-value').text(year);
 
+            // Update timeline summary
+            updateTimelineSummary();
+
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.memoryCareSliderUpdateTimer);
             window.memoryCareSliderUpdateTimer = setTimeout(function() {
@@ -284,6 +302,9 @@
             // Update display value for all sliders
             $('.year-of-passing-slider').val(newYear);
             $('.year-of-passing-value').text(newYear);
+
+            // Update timeline summary
+            updateTimelineSummary();
 
             // Constrain LTC trigger year if needed
             const currentLtcTrigger = parseInt($('.ltc-slider').first().val());
