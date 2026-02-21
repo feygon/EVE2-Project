@@ -399,10 +399,6 @@ exports.formatIncomeTooltip = function(income, projection) {
         lines.push(`LTC Savings Spending: $${formatNum(income.ltc_spending)}`);
     }
 
-    if (income.rental) {
-        lines.push(`Rental Income: $${formatNum(income.rental)}`);
-    }
-
     if (income.ltc_payout) {
         lines.push(`LTC Policy Payout: $${formatNum(income.ltc_payout)}`);
     }
@@ -414,8 +410,10 @@ exports.formatIncomeTooltip = function(income, projection) {
     lines.push('────────────────────────');
     lines.push(`Total Budget: $${formatNum(income.total)}`);
 
-    // Note about rental income earmarking
+    // Rental income below total budget with divider
     if (income.rental && income.rental > 0) {
+        lines.push('────────────────────────');
+        lines.push(`Rental Income: $${formatNum(income.rental)}`);
         lines.push('');
         lines.push('Note: Rental income is earmarked for');
         lines.push('condo expenses (mortgage, management,');
