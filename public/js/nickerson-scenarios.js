@@ -129,6 +129,29 @@
     }
 
     /**
+     * Update all scenarios with a parameter value
+     */
+    function updateAllScenariosParameter(paramName, paramValue) {
+        console.log('[Nickerson] Updating all scenarios', paramName, ':', paramValue);
+
+        const scenarioIds = Object.values(scenarioMap);
+        const updatePromises = scenarioIds.map(scenarioId => {
+            return $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-parameter',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ paramName: paramName, paramValue: paramValue }),
+                xhrFields: { withCredentials: true }
+            });
+        });
+
+        Promise.all(updatePromises).then(() => {
+            console.log('[Nickerson] Parameter', paramName, 'updated, reloading metrics');
+            loadMetricsForAllCards();
+        });
+    }
+
+    /**
      * Update all scenarios with new year of passing
      */
     function updateAllScenariosYearOfPassing(year) {
@@ -302,16 +325,26 @@
                 updateParamDisplay($(this), param, value);
             });
 
-            // Special handling for ManagedIRA starting balance - update backend
-            if (param === 'managed_ira_start') {
-                clearTimeout(window.managedIraSliderUpdateTimer);
-                window.managedIraSliderUpdateTimer = setTimeout(function() {
-                    updateAllScenariosManagedIra(value);
+            // Update backend for all parameters
+            const paramMap = {
+                'ira_growth': 'ira_growth',
+                'managed_ira_start': 'managed_ira_start',
+                'lifestyle': 'lifestyle_annual',
+                'primary_appreciation': 'primary_appreciation',
+                'condo_appreciation': 'condo_appreciation',
+                'memory_care_inflation': 'memory_care_inflation',
+                'management_fee': 'management_fee',
+                'rental_income': 'rental_income_monthly',
+                'mortgage_rate': 'mortgage_rate',
+                'heloc_rate': 'heloc_rate'
+            };
+
+            if (paramMap[param]) {
+                clearTimeout(window.paramSliderUpdateTimer);
+                window.paramSliderUpdateTimer = setTimeout(function() {
+                    updateAllScenariosParameter(paramMap[param], value);
                 }, 300);  // 300ms debounce
             }
-
-            // Note: Other parameter updates are not yet persisted to backend in Phase 1
-            // Phase 2 will add backend storage and recalculation
         });
     }
 
