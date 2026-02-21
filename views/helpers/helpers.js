@@ -283,6 +283,10 @@ exports.formatIraTooltip = function(projection) {
 
     const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
 
+    const growthRate = projection.managed_ira_growth_rate
+        ? (projection.managed_ira_growth_rate * 100).toFixed(1) + '%'
+        : '4.0%';
+
     return `IRA Activity:
 
 SDIRA Checking Open: $${formatNum(projection.sdira_checking_open)}
@@ -293,7 +297,7 @@ Distributions Out: -$${formatNum(projection.sdira_distributions)}
 SDIRA Checking Close: $${formatNum(projection.sdira_checking_close)}
 
 ManagedIRA Open: $${formatNum(projection.managed_ira_open)}
-Growth (4%): +$${formatNum(projection.managed_ira_growth)}
+Growth (${growthRate}): +$${formatNum(projection.managed_ira_growth)}
 Distributions Out: -$${formatNum(projection.managed_ira_distributions)}
 ManagedIRA Close: $${formatNum(projection.managed_ira_close)}
 ────────────────────────
@@ -314,10 +318,16 @@ Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projec
 
     // Add debt information
     if (projection.heloc_balance && projection.heloc_balance > 0) {
-        tooltip += `\nHELOC Balance: -$${formatNum(projection.heloc_balance)} (7.25% interest)`;
+        const helocRate = projection.heloc_rate
+            ? (projection.heloc_rate * 100).toFixed(2) + '%'
+            : '7.50%';
+        tooltip += `\nHELOC Balance: -$${formatNum(projection.heloc_balance)} (${helocRate} interest)`;
     }
     if (projection.mortgage_balance && projection.mortgage_balance > 0) {
-        tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)} (6.75% interest)`;
+        const mortgageRate = projection.mortgage_rate
+            ? (projection.mortgage_rate * 100).toFixed(2) + '%'
+            : '6.00%';
+        tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)} (${mortgageRate} interest)`;
     }
     if ((projection.heloc_balance > 0 || projection.mortgage_balance > 0)) {
         const totalDebt = (projection.heloc_balance || 0) + (projection.mortgage_balance || 0);
