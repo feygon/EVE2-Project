@@ -381,6 +381,26 @@
 
                 if (response.success) {
                     console.log('[Nickerson] Success is true, updating cards...');
+
+                    // Get first scenario's configuration to sync sliders
+                    const firstScenarioId = Object.keys(response.metrics)[0];
+                    if (firstScenarioId && response.metrics[firstScenarioId]) {
+                        const config = response.metrics[firstScenarioId];
+
+                        // Update year of passing slider
+                        if (config.year_of_passing) {
+                            $('.year-of-passing-slider').val(config.year_of_passing);
+                            $('.year-of-passing-value').text(config.year_of_passing);
+                        }
+
+                        // Update memory care offset slider
+                        if (config.memory_care_offset !== undefined) {
+                            const yearsText = config.memory_care_offset === 1 ? '1 year' : config.memory_care_offset + ' years';
+                            $('.memory-care-slider').val(config.memory_care_offset);
+                            $('.memory-care-value').text(yearsText);
+                        }
+                    }
+
                     // Update each card's metrics
                     $('.scenario-card').each(function() {
                         const scenarioId = $(this).data('scenario-id');
