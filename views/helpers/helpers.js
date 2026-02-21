@@ -485,30 +485,137 @@ exports.formatTaxableIncomeTooltip = function(projection) {
     return lines.join('\n');
 };
 
-// Format Expenses tooltip (ALL expenses itemized)
+// Format Expenses tooltip - grouped by category
 exports.formatExpensesTooltip = function(expenses) {
     if (!expenses || typeof expenses !== 'object') return '';
 
     const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
     const lines = [];
 
-    lines.push('Expenses:');
+    lines.push('Base Expenses:');
+    lines.push('');
 
-    // Iterate ALL expense keys except 'total'
-    for (const [key, value] of Object.entries(expenses)) {
-        if (key === 'total') continue;
+    // Primary House expenses
+    const primaryExpenses = [];
+    let primaryTotal = 0;
+    if (expenses.primary_house_taxes) {
+        primaryExpenses.push(`  Property Taxes: $${formatNum(expenses.primary_house_taxes)}`);
+        primaryTotal += expenses.primary_house_taxes;
+    }
+    if (expenses.primary_house_utilities) {
+        primaryExpenses.push(`  Utilities: $${formatNum(expenses.primary_house_utilities)}`);
+        primaryTotal += expenses.primary_house_utilities;
+    }
+    if (expenses.primary_house_insurance) {
+        primaryExpenses.push(`  Insurance: $${formatNum(expenses.primary_house_insurance)}`);
+        primaryTotal += expenses.primary_house_insurance;
+    }
+    if (expenses.primary_house_maintenance) {
+        primaryExpenses.push(`  Maintenance: $${formatNum(expenses.primary_house_maintenance)}`);
+        primaryTotal += expenses.primary_house_maintenance;
+    }
+    if (primaryExpenses.length > 0) {
+        lines.push(`Primary House: $${formatNum(primaryTotal)}`);
+        lines.push(...primaryExpenses);
+    }
 
-        // Format key to readable label
-        const label = key.replace(/_/g, ' ')
-                         .split(' ')
-                         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                         .join(' ');
+    // Condo expenses
+    const condoExpenses = [];
+    let condoTotal = 0;
+    if (expenses.management_fee) {
+        condoExpenses.push(`  Management Fee: $${formatNum(expenses.management_fee)}`);
+        condoTotal += expenses.management_fee;
+    }
+    if (expenses.mortgage_payment_total) {
+        condoExpenses.push(`  Mortgage Payment Total: $${formatNum(expenses.mortgage_payment_total)}`);
+        condoTotal += expenses.mortgage_payment_total;
+    }
+    if (expenses.condo_hoa) {
+        condoExpenses.push(`  HOA Fee: $${formatNum(expenses.condo_hoa)}`);
+        condoTotal += expenses.condo_hoa;
+    }
+    if (expenses.condo_maintenance) {
+        condoExpenses.push(`  Maintenance: $${formatNum(expenses.condo_maintenance)}`);
+        condoTotal += expenses.condo_maintenance;
+    }
+    if (expenses.condo_property_tax) {
+        condoExpenses.push(`  Property Taxes: $${formatNum(expenses.condo_property_tax)}`);
+        condoTotal += expenses.condo_property_tax;
+    }
+    if (condoExpenses.length > 0) {
+        lines.push('');
+        lines.push(`Condo: $${formatNum(condoTotal)}`);
+        lines.push(...condoExpenses);
+    }
 
-        lines.push(`${label}: $${formatNum(value)}`);
+    // Other expenses
+    if (expenses.memory_care) {
+        lines.push('');
+        lines.push(`Memory Care: $${formatNum(expenses.memory_care)}`);
+    }
+    if (expenses.heloc_interest) {
+        lines.push(`HELOC Interest: $${formatNum(expenses.heloc_interest)}`);
+    }
+    if (expenses.federal_income_tax) {
+        lines.push(`Federal Income Tax: $${formatNum(expenses.federal_income_tax)}`);
+    }
+    if (expenses.lifestyle) {
+        lines.push(`Lifestyle: $${formatNum(expenses.lifestyle)}`);
     }
 
     lines.push('────────────────────────');
     lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
+
+    return lines.join('\n');
+};
+
+// Format Tax Deductions tooltip - shows standard vs itemized breakdown
+exports.formatDeductionsTooltip = function(projection) {
+    if (!projection || !projection.itemized_breakdown) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const breakdown = projection.itemized_breakdown;
+    const lines = [];
+
+    lines.push('Tax Deductions:');
+    lines.push('');
+
+    // Show itemized breakdown
+    lines.push('Itemized Deductions:');
+
+    if (breakdown.medical_deductible > 0) {
+        lines.push(`  Medical Expenses: $${formatNum(breakdown.medical_deductible)}`);
+        lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
+        lines.push(`    AGI Threshold (7.5%): -$${formatNum(breakdown.medical_threshold)}`);
+        lines.push(`    Deductible: $${formatNum(breakdown.medical_deductible)}`);
+    } else if (breakdown.medical_total > 0) {
+        lines.push(`  Medical Expenses: $0 (below AGI threshold)`);
+        lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
+        lines.push(`    AGI Threshold (7.5%): $${formatNum(breakdown.medical_threshold)}`);
+    }
+
+    if (breakdown.property_tax_deductible > 0) {
+        lines.push(`  Property Tax: $${formatNum(breakdown.property_tax_deductible)}`);
+        if (breakdown.property_tax_total > breakdown.property_tax_deductible) {
+            lines.push(`    (SALT capped at $10,000)`);
+        }
+    }
+
+    if (breakdown.mortgage_interest > 0) {
+        lines.push(`  Mortgage Interest: $${formatNum(breakdown.mortgage_interest)}`);
+    }
+
+    lines.push('');
+    lines.push(`Total Itemized: $${formatNum(breakdown.itemized_total)}`);
+    lines.push(`Standard Deduction: $${formatNum(breakdown.standard_deduction)}`);
+    lines.push('────────────────────────');
+    lines.push(`Using: $${formatNum(projection.deduction_amount)} (${projection.deduction_type})`);
+
+    // Add AGI reference
+    if (projection.agi !== undefined) {
+        lines.push('');
+        lines.push(`AGI: $${formatNum(projection.agi)}`);
+    }
 
     return lines.join('\n');
 };
