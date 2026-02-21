@@ -79,10 +79,35 @@
     }
 
     /**
+     * Update memory care slider max value based on LTC trigger year
+     */
+    function updateMemoryCareMax(triggerYear) {
+        const maxOffset = 2040 - triggerYear;
+
+        $('.memory-care-slider').each(function() {
+            const $slider = $(this);
+            const currentValue = parseInt($slider.val());
+
+            // Update max attribute
+            $slider.attr('max', maxOffset);
+
+            // If current value exceeds new max, adjust it
+            if (currentValue > maxOffset) {
+                $slider.val(maxOffset);
+                const yearsText = maxOffset === 1 ? '1 year' : maxOffset + ' years';
+                $slider.siblings('.memory-care-value').text(yearsText);
+            }
+        });
+
+        console.log('[Nickerson] Memory care max updated to', maxOffset, 'years (trigger:', triggerYear, ')');
+    }
+
+    /**
      * Initialize scenario cards with proper scenario IDs
      */
     function initializeCards() {
         console.log('[Nickerson] Initializing cards for trigger year:', currentTriggerYear);
+        updateMemoryCareMax(currentTriggerYear);  // Set initial max value
         updateCardsForTriggerYear(currentTriggerYear);
     }
 
@@ -114,6 +139,9 @@
             // Update display value for all sliders
             $('.ltc-slider').val(newYear);
             $('.ltc-value').text(newYear);
+
+            // Update memory care slider max based on new trigger year
+            updateMemoryCareMax(newYear);
 
             // Debounced update to avoid too many API calls while dragging
             clearTimeout(window.ltcSliderUpdateTimer);
