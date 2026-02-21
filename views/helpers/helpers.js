@@ -660,8 +660,8 @@ exports.formatDeductionsTooltip = function(projection) {
     if (breakdown.medical_deductible > 0) {
         lines.push(`  Medical Expenses: $${formatNum(breakdown.medical_deductible)}`);
         lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
-        lines.push(`    AGI Threshold (7.5%): -$${formatNum(breakdown.medical_threshold)}`);
-        lines.push(`    Deductible: $${formatNum(breakdown.medical_deductible)}`);
+        lines.push(`    AGI Threshold (7.5% of AGI): $${formatNum(breakdown.medical_threshold)}`);
+        lines.push(`    Deductible: $${formatNum(breakdown.medical_deductible)} (Total - Threshold)`);
     } else if (breakdown.medical_total > 0) {
         lines.push(`  Medical Expenses: $0 (below AGI threshold)`);
         lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
