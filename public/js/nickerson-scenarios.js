@@ -79,6 +79,31 @@
     }
 
     /**
+     * Update all scenarios with new memory care offset
+     */
+    function updateAllScenariosMemoryCare(offset) {
+        console.log('[Nickerson] Updating all scenarios memory care offset:', offset);
+
+        // Update all scenarios to the new offset
+        const scenarioIds = Object.values(scenarioMap);
+        const updatePromises = scenarioIds.map(scenarioId => {
+            return $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-memory-care',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ memoryCareOffset: offset }),
+                xhrFields: { withCredentials: true }
+            });
+        });
+
+        // Wait for all updates to complete
+        Promise.all(updatePromises).then(() => {
+            console.log('[Nickerson] Memory care offset updated, reloading metrics');
+            loadMetricsForAllCards();
+        });
+    }
+
+    /**
      * Update memory care slider max value based on LTC trigger year
      */
     function updateMemoryCareMax(triggerYear) {
@@ -156,15 +181,15 @@
             const offset = parseInt($(this).val());
             const yearsText = offset === 1 ? '1 year' : offset + ' years';
 
-            // Update display value for this card
-            $(this).siblings('.memory-care-value').text(yearsText);
+            // Update display value for all sliders
+            $('.memory-care-slider').val(offset);
+            $('.memory-care-value').text(yearsText);
 
-            // Sync all other memory care sliders
-            $('.memory-care-slider').not(this).val(offset);
-            $('.memory-care-slider').not(this).siblings('.memory-care-value').text(yearsText);
-
-            // TODO: Update backend when memory care offset is implemented
-            // For now, this is UI-only (Phase 1)
+            // Debounced update to avoid too many API calls while dragging
+            clearTimeout(window.memoryCareSliderUpdateTimer);
+            window.memoryCareSliderUpdateTimer = setTimeout(function() {
+                updateAllScenariosMemoryCare(offset);
+            }, 300);  // 300ms debounce
         });
 
         // Advanced parameters toggle
