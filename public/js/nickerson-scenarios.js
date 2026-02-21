@@ -436,6 +436,11 @@
                             $('.memory-care-slider').val(config.memory_care_year);
                             $('.memory-care-value').text(config.memory_care_year);
                         }
+
+                        // Update memory care slider range based on loaded values
+                        if (config.ltc_trigger_year && config.year_of_passing) {
+                            updateMemoryCareRange(config.ltc_trigger_year, config.year_of_passing);
+                        }
                     }
 
                     // Update each card's metrics
