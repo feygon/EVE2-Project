@@ -579,13 +579,14 @@ exports.formatExpensesTooltip = function(expenses) {
         lines.push(`  Total Tax: $${formatNum(totalTax)}`);
     }
 
-    if (expenses.lifestyle) {
-        lines.push('');
-        lines.push(`Lifestyle: $${formatNum(expenses.lifestyle)}`);
-    }
-
     lines.push('────────────────────────');
     lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
+
+    // Lifestyle below total with divider (user's personal budget slider)
+    if (expenses.lifestyle) {
+        lines.push('────────────────────────');
+        lines.push(`Lifestyle: $${formatNum(expenses.lifestyle)}`);
+    }
 
     return lines.join('\n');
 };
