@@ -282,6 +282,12 @@ exports.multiply = function(a, b) {
     return (a || 0) * (b || 0);
 };
 
+// Format percentage (decimal to percent string)
+exports.formatPercentage = function(decimal) {
+    const percent = (decimal || 0) * 100;
+    return percent.toFixed(1) + '%';
+};
+
 // Format IRA tooltip with comprehensive breakdown
 exports.formatIraTooltip = function(projection) {
     if (!projection) return '';
