@@ -56,6 +56,10 @@ jobs:
             --exclude='dbcon_nickerson.js' \
             --exclude='dbcon_nickerson.local.js' \
             --exclude='scripts/NickersonCallbacks.js' \
+            --exclude='scripts/_decideWithdrawalStrategy.js' \
+            --exclude='scripts/_calculateMedicalDeduction.js' \
+            --exclude='scripts/_calculateSSDITaxability.js' \
+            --exclude='scripts/_calculateEffectiveTaxRate.js' \
             --exclude='views/nickerson' \
             --exclude='views/layouts/nickerson.handlebars' \
             --exclude='data' \
