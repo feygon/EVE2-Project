@@ -214,9 +214,13 @@ exports.range = function(start, end) {
 
 // Check if value exists (for conditional rendering)
 exports.or = function(...args) {
-    // Remove the options object (last argument)
+    // Remove the Handlebars options object (last argument)
     const options = args.pop();
-    return args.some(arg => !!arg);
+    // Return the first truthy value, or the last value as fallback
+    for (const arg of args) {
+        if (arg) return arg;
+    }
+    return args[args.length - 1];
 };
 
 // JSON stringify helper for passing data to JavaScript
