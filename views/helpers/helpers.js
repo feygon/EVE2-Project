@@ -585,8 +585,11 @@ exports.formatExpensesTooltip = function(expenses) {
     }
 
     // Other expenses
-    if (expenses.memory_care) {
+    if (expenses.medical) {
         lines.push('');
+        lines.push(`Medical: $${formatNum(expenses.medical)}`);
+    }
+    if (expenses.memory_care) {
         lines.push(`Memory Care: $${formatNum(expenses.memory_care)}`);
     }
     if (expenses.heloc_interest) {
