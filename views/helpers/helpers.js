@@ -339,10 +339,22 @@ Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projec
         tooltip += `\nHELOC Balance: -$${formatNum(projection.heloc_balance)} (${helocRate} interest)`;
     }
     if (projection.mortgage_balance && projection.mortgage_balance > 0) {
-        const mortgageRate = projection.mortgage_rate
-            ? (projection.mortgage_rate * 100).toFixed(2) + '%'
-            : '6.00%';
-        tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)} (${mortgageRate} interest)`;
+        if (projection.primary_mortgage_balance > 0 || projection.snt_mortgage_balance > 0) {
+            const primaryRate = projection.primary_mortgage_rate
+                ? (projection.primary_mortgage_rate * 100).toFixed(1) + '%'
+                : '5.7%';
+            const sntRate = projection.snt_mortgage_rate
+                ? (projection.snt_mortgage_rate * 100).toFixed(1) + '%'
+                : '6.5%';
+            if (projection.primary_mortgage_balance > 0) {
+                tooltip += `\nPrimary Mortgage (IO): -$${formatNum(projection.primary_mortgage_balance)} (${primaryRate})`;
+            }
+            if (projection.snt_mortgage_balance > 0) {
+                tooltip += `\nSNT Mortgage (P&I): -$${formatNum(projection.snt_mortgage_balance)} (${sntRate})`;
+            }
+        } else {
+            tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)}`;
+        }
     }
     if ((projection.heloc_balance > 0 || projection.mortgage_balance > 0)) {
         const totalDebt = (projection.heloc_balance || 0) + (projection.mortgage_balance || 0);
@@ -695,6 +707,14 @@ exports.formatDeductionsTooltip = function(projection) {
 
     if (breakdown.mortgage_interest > 0) {
         lines.push(`  Mortgage Interest: $${formatNum(breakdown.mortgage_interest)}`);
+        if (breakdown.primary_mortgage_interest > 0 || breakdown.snt_mortgage_interest > 0) {
+            if (breakdown.primary_mortgage_interest > 0) {
+                lines.push(`    Primary (IO): $${formatNum(breakdown.primary_mortgage_interest)}`);
+            }
+            if (breakdown.snt_mortgage_interest > 0) {
+                lines.push(`    SNT (P&I): $${formatNum(breakdown.snt_mortgage_interest)}`);
+            }
+        }
     }
 
     if (breakdown.depreciation > 0) {

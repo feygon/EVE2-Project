@@ -361,15 +361,20 @@
                 'memory_care_inflation': 'memory_care_inflation',
                 'management_fee': 'management_fee',
                 'rental_income': 'rental_income_monthly',
-                'mortgage_rate': 'mortgage_rate',
+                'total_mortgage_amount': 'total_mortgage_amount',
+                'mortgage_split_pct': 'mortgage_split_pct',
+                'primary_mortgage_rate': 'primary_mortgage_rate',
+                'snt_mortgage_rate': 'snt_mortgage_rate',
                 'heloc_rate': 'heloc_rate',
                 'medical_base_monthly': 'medical_base_monthly',
                 'memory_care_cost': 'memory_care_cost'
             };
 
-            // Percentage parameters need to be converted from slider value (6.0) to decimal (0.06)
+            // Percentage parameters: slider value (6.0) → decimal (0.06) for backend
             const percentageParams = ['ira_growth', 'primary_appreciation', 'condo_appreciation',
-                                       'memory_care_inflation', 'management_fee', 'mortgage_rate', 'heloc_rate'];
+                                       'memory_care_inflation', 'management_fee',
+                                       'primary_mortgage_rate', 'snt_mortgage_rate', 'heloc_rate',
+                                       'mortgage_split_pct'];
 
             if (paramMap[param]) {
                 clearTimeout(window.paramSliderUpdateTimer);
@@ -395,10 +400,12 @@
             displayText = '$' + formatNumber(value) + '/mo';
         } else if (param === 'medical_base_monthly') {
             displayText = '$' + formatNumber(value) + '/mo';
-        } else if (param === 'managed_ira_start') {
+        } else if (param === 'managed_ira_start' || param === 'total_mortgage_amount') {
             displayText = '$' + formatNumber(value);
         } else if (param === 'memory_care_cost') {
             displayText = '$' + formatNumber(value) + '/yr';
+        } else if (param === 'mortgage_split_pct') {
+            displayText = value + '% / ' + (100 - value) + '%';
         } else {
             displayText = value.toFixed(1) + '%';
         }
@@ -581,9 +588,14 @@
             realEstateTooltipParts.push('Peak HELOC balance: ' + formatCurrency(metrics.heloc_max_balance) + ' in ' + metrics.heloc_year);
         }
 
-        // Show final mortgage balance if any (SNT scenarios)
-        if (metrics.mortgage_final && metrics.mortgage_final > 0) {
-            realEstateLiqLines.push('Refi: ' + formatCurrency(metrics.mortgage_final));
+        // Show final mortgage balances (dual mortgage system)
+        if (metrics.primary_mortgage_final > 0 || metrics.snt_mortgage_final > 0) {
+            var mortgageTotal = (metrics.primary_mortgage_final || 0) + (metrics.snt_mortgage_final || 0);
+            realEstateLiqLines.push('Mortgage: ' + formatCurrency(mortgageTotal));
+            realEstateTooltipParts.push('Primary (IO): ' + formatCurrency(metrics.primary_mortgage_final || 0));
+            realEstateTooltipParts.push('SNT (P&I): ' + formatCurrency(metrics.snt_mortgage_final || 0));
+        } else if (metrics.mortgage_final && metrics.mortgage_final > 0) {
+            realEstateLiqLines.push('Mortgage: ' + formatCurrency(metrics.mortgage_final));
             realEstateTooltipParts.push('Final mortgage balance: ' + formatCurrency(metrics.mortgage_final));
         }
 
