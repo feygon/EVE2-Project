@@ -228,10 +228,31 @@ exports.json = function(context) {
     return JSON.stringify(context);
 };
 
-// Format number with commas (e.g., 1234567 -> 1,234,567)
+// Format number rounded to nearest $1k, displayed with 'k' suffix (e.g., 95000 -> 95k, 1235000 -> 1,235k)
+// Actual values preserved in tooltips; this is display-only rounding
 exports.formatNumber = function(num) {
     if (typeof num === 'undefined' || num === null) return '0';
+    var k = Math.round(num / 1000);
+    if (k === 0 && num !== 0) return Math.round(num).toLocaleString('en-US');
+    return k.toLocaleString('en-US') + 'k';
+};
+
+// Format number with exact precision (for tooltips and detail views)
+exports.formatNumberExact = function(num) {
+    if (typeof num === 'undefined' || num === null) return '0';
     return Math.round(num).toLocaleString('en-US');
+};
+
+// Format large asset values: 3 significant digits with M suffix if >= $1M, otherwise k
+exports.formatAssets = function(num) {
+    if (typeof num === 'undefined' || num === null) return '0';
+    if (Math.abs(num) >= 1000000) {
+        var m = num / 1000000;
+        return m.toFixed(2) + 'M';
+    }
+    var k = Math.round(num / 1000);
+    if (k === 0) return '0';
+    return k.toLocaleString('en-US') + 'k';
 };
 
 // Format breakdown object into tooltip string (e.g., "SS: $27,000\nSMA: $5,000\nRental: $21,000")
@@ -263,7 +284,7 @@ exports.countItems = function(obj) {
 
     let count = 0;
     for (const key in obj) {
-        if (key !== 'total') count++;
+        if (key !== 'total' && key !== 'lifestyle') count++;
     }
 
     return count;
@@ -535,7 +556,7 @@ exports.formatExpensesTooltip = function(expenses) {
     const primaryExpenses = [];
     let primaryTotal = 0;
     if (expenses.primary_house_taxes) {
-        primaryExpenses.push(`  Property Taxes: $${formatNum(expenses.primary_house_taxes)}`);
+        primaryExpenses.push(`  Property Taxes: $${formatNum(expenses.primary_house_taxes)}*`);
         primaryTotal += expenses.primary_house_taxes;
     }
     if (expenses.primary_house_utilities) {
@@ -550,6 +571,18 @@ exports.formatExpensesTooltip = function(expenses) {
         primaryExpenses.push(`  Maintenance: $${formatNum(expenses.primary_house_maintenance)}`);
         primaryTotal += expenses.primary_house_maintenance;
     }
+    if (expenses.primary_mortgage_interest) {
+        primaryExpenses.push(`  Mortgage Interest: $${formatNum(expenses.primary_mortgage_interest)}*`);
+        primaryTotal += expenses.primary_mortgage_interest;
+    }
+    if (expenses.snt_mortgage_interest) {
+        primaryExpenses.push(`  SNT Mortgage Interest: $${formatNum(expenses.snt_mortgage_interest)}*`);
+        primaryTotal += expenses.snt_mortgage_interest;
+    }
+    if (expenses.snt_mortgage_principal) {
+        primaryExpenses.push(`  SNT Mortgage Principal: $${formatNum(expenses.snt_mortgage_principal)}`);
+        primaryTotal += expenses.snt_mortgage_principal;
+    }
     if (primaryExpenses.length > 0) {
         lines.push(`Primary House: $${formatNum(primaryTotal)}`);
         lines.push(...primaryExpenses);
@@ -559,24 +592,28 @@ exports.formatExpensesTooltip = function(expenses) {
     const condoExpenses = [];
     let condoTotal = 0;
     if (expenses.management_fee) {
-        condoExpenses.push(`  Management Fee: $${formatNum(expenses.management_fee)}`);
+        condoExpenses.push(`  Management Fee: $${formatNum(expenses.management_fee)}\u2020`);
         condoTotal += expenses.management_fee;
     }
-    if (expenses.mortgage_payment_total) {
-        condoExpenses.push(`  Mortgage Payment Total: $${formatNum(expenses.mortgage_payment_total)}`);
-        condoTotal += expenses.mortgage_payment_total;
-    }
     if (expenses.condo_hoa) {
-        condoExpenses.push(`  HOA Fee: $${formatNum(expenses.condo_hoa)}`);
+        condoExpenses.push(`  HOA Fee: $${formatNum(expenses.condo_hoa)}\u2020`);
         condoTotal += expenses.condo_hoa;
     }
     if (expenses.condo_maintenance) {
-        condoExpenses.push(`  Maintenance: $${formatNum(expenses.condo_maintenance)}`);
+        condoExpenses.push(`  Maintenance: $${formatNum(expenses.condo_maintenance)}\u2020`);
         condoTotal += expenses.condo_maintenance;
     }
     if (expenses.condo_property_tax) {
-        condoExpenses.push(`  Property Taxes: $${formatNum(expenses.condo_property_tax)}`);
+        condoExpenses.push(`  Property Taxes: $${formatNum(expenses.condo_property_tax)}\u2020`);
         condoTotal += expenses.condo_property_tax;
+    }
+    if (expenses.condo_insurance) {
+        condoExpenses.push(`  Insurance: $${formatNum(expenses.condo_insurance)}\u2020`);
+        condoTotal += expenses.condo_insurance;
+    }
+    if (expenses.condo_deferred_maintenance) {
+        condoExpenses.push(`  Deferred Maintenance: $${formatNum(expenses.condo_deferred_maintenance)}\u2020`);
+        condoTotal += expenses.condo_deferred_maintenance;
     }
     if (condoExpenses.length > 0) {
         lines.push('');
@@ -584,16 +621,39 @@ exports.formatExpensesTooltip = function(expenses) {
         lines.push(...condoExpenses);
     }
 
-    // Other expenses
+    // C3 Condo (separate property)
+    if (expenses.c3_condo_carrying_costs) {
+        lines.push('');
+        lines.push(`C3 Condo: $${formatNum(expenses.c3_condo_carrying_costs)}`);
+    }
+
+    // Other fixed expenses
+    const otherExpenses = [];
+    let otherTotal = 0;
+    if (expenses.snt_trust_administration) {
+        otherExpenses.push(`  SNT Trust Admin: $${formatNum(expenses.snt_trust_administration)}`);
+        otherTotal += expenses.snt_trust_administration;
+    }
+    if (expenses['legal/setup_costs']) {
+        otherExpenses.push(`  Legal/Setup: $${formatNum(expenses['legal/setup_costs'])}`);
+        otherTotal += expenses['legal/setup_costs'];
+    }
+    if (otherExpenses.length > 0) {
+        lines.push('');
+        lines.push(`Other: $${formatNum(otherTotal)}`);
+        lines.push(...otherExpenses);
+    }
+
+    // Medical & Care
     if (expenses.medical) {
         lines.push('');
-        lines.push(`Medical: $${formatNum(expenses.medical)}`);
+        lines.push(`Medical: $${formatNum(expenses.medical)}*`);
     }
     if (expenses.memory_care) {
-        lines.push(`Memory Care: $${formatNum(expenses.memory_care)}`);
+        lines.push(`Memory Care: $${formatNum(expenses.memory_care)}*`);
     }
     if (expenses.heloc_interest) {
-        lines.push(`HELOC Interest: $${formatNum(expenses.heloc_interest)}`);
+        lines.push(`HELOC Interest: $${formatNum(expenses.heloc_interest)}*`);
     }
 
     // Taxes
@@ -619,6 +679,10 @@ exports.formatExpensesTooltip = function(expenses) {
         lines.push('────────────────────────');
         lines.push(`Lifestyle: $${formatNum(expenses.lifestyle)}`);
     }
+
+    lines.push('');
+    lines.push('* Itemized deduction (Sch A)');
+    lines.push('\u2020 Rental deduction (Sch E)');
 
     return lines.join('\n');
 };
@@ -660,20 +724,34 @@ exports.formatNetCashflowTooltip = function(income, expenses, projection) {
 exports.formatDeductionDisplay = function(projection) {
     if (!projection) return '';
 
-    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const formatNum = (num) => {
+        var k = Math.round((num || 0) / 1000);
+        if (k === 0 && num !== 0) return Math.round(num).toLocaleString('en-US');
+        return k.toLocaleString('en-US') + 'k';
+    };
     const fedAmt = projection.deduction_amount;
     const fedType = projection.deduction_type;
     const orAmt = projection.oregon_deduction_amount;
     const orType = projection.oregon_deduction_type;
+    const breakdown = projection.itemized_breakdown;
+
+    // Yellow triangle if standard deduction was used (unusual)
+    const fedWarn = fedType === 'standard' ? ' \u26A0' : '';
+    const orWarn = orType === 'standard' ? ' \u26A0' : '';
+
+    // Schedule A/E split line (if itemized breakdown available)
+    let splitLine = '';
+    if (breakdown && breakdown.schedule_a_total != null) {
+        splitLine = `<div style="font-size: 0.8em; color: #aaa;">(${formatNum(breakdown.schedule_a_total)} A / ${formatNum(breakdown.schedule_e_total)} E)</div>`;
+    }
 
     // If both use the same deduction type and amount
     if (fedType === orType && Math.abs(fedAmt - orAmt) < 1) {
-        return `$${formatNum(fedAmt)} (${fedType})`;
+        return `$${formatNum(fedAmt)}${fedWarn}${splitLine}`;
     }
 
     // Different deductions for federal and Oregon
-    // Return as separate divs for proper line breaks
-    return `<div>Fed: $${formatNum(fedAmt)}</div><div style="font-size: 0.85em;">(${fedType})</div><div style="margin-top: 4px;">OR: $${formatNum(orAmt)}</div><div style="font-size: 0.85em;">(${orType})</div>`;
+    return `<div>Fed: $${formatNum(fedAmt)}${fedWarn}</div><div>OR: $${formatNum(orAmt)}${orWarn}</div>${splitLine}`;
 };
 
 // Format Tax Deductions tooltip - shows standard vs itemized breakdown
@@ -685,20 +763,22 @@ exports.formatDeductionsTooltip = function(projection) {
     const lines = [];
 
     lines.push('Tax Deductions:');
+
+    if (projection.deduction_type === 'standard') {
+        lines.push('\u26A0 Standard deduction used ($' + formatNum(breakdown.standard_deduction) + ')');
+        lines.push('  Itemized total ($' + formatNum(breakdown.itemized_total) + ') was lower.');
+    }
     lines.push('');
 
-    // Show itemized breakdown
-    lines.push('Itemized Deductions:');
+    // Schedule A: Personal itemized deductions
+    lines.push('Schedule A (Personal):');
 
     if (breakdown.medical_deductible > 0) {
         lines.push(`  Medical Expenses: $${formatNum(breakdown.medical_deductible)}`);
         lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
-        lines.push(`    AGI Threshold (7.5% of AGI): $${formatNum(breakdown.medical_threshold)}`);
-        lines.push(`    Deductible: $${formatNum(breakdown.medical_deductible)} (Total - Threshold)`);
+        lines.push(`    AGI Threshold (7.5%): -$${formatNum(breakdown.medical_threshold)}`);
     } else if (breakdown.medical_total > 0) {
-        lines.push(`  Medical Expenses: $0 (below AGI threshold)`);
-        lines.push(`    Total Medical: $${formatNum(breakdown.medical_total)}`);
-        lines.push(`    AGI Threshold (7.5%): $${formatNum(breakdown.medical_threshold)}`);
+        lines.push(`  Medical Expenses: $0 (below 7.5% AGI)`);
     }
 
     if (breakdown.property_tax_deductible > 0) {
@@ -710,22 +790,34 @@ exports.formatDeductionsTooltip = function(projection) {
 
     if (breakdown.mortgage_interest > 0) {
         lines.push(`  Mortgage Interest: $${formatNum(breakdown.mortgage_interest)}`);
-        if (breakdown.primary_mortgage_interest > 0 || breakdown.snt_mortgage_interest > 0) {
-            if (breakdown.primary_mortgage_interest > 0) {
-                lines.push(`    Primary (IO): $${formatNum(breakdown.primary_mortgage_interest)}`);
-            }
-            if (breakdown.snt_mortgage_interest > 0) {
-                lines.push(`    SNT (P&I): $${formatNum(breakdown.snt_mortgage_interest)}`);
-            }
+        if (breakdown.primary_mortgage_interest > 0) {
+            lines.push(`    Primary (IO): $${formatNum(breakdown.primary_mortgage_interest)}`);
+        }
+        if (breakdown.snt_mortgage_interest > 0) {
+            lines.push(`    SNT (P&I): $${formatNum(breakdown.snt_mortgage_interest)}`);
         }
     }
 
-    if (breakdown.depreciation > 0) {
-        lines.push(`  Rental Property Depreciation: $${formatNum(breakdown.depreciation)}`);
-        if (breakdown.condo_value > 0) {
-            lines.push(`    Building value (80%): $${formatNum(breakdown.condo_value * 0.8)}`);
-            lines.push(`    Depreciation schedule: 27.5 years`);
+    lines.push(`  Subtotal A: $${formatNum(breakdown.schedule_a_total)}`);
+
+    // Schedule E: Rental property deductions
+    if (breakdown.schedule_e_total > 0) {
+        lines.push('');
+        lines.push('Schedule E (Rental):');
+
+        if (breakdown.rental_expenses > 0) {
+            lines.push(`  Rental Expenses: $${formatNum(breakdown.rental_expenses)}`);
+            lines.push(`    (See Base Expenses)`);
         }
+
+        if (breakdown.depreciation > 0) {
+            lines.push(`  Depreciation: $${formatNum(breakdown.depreciation)}`);
+            if (breakdown.condo_value > 0) {
+                lines.push(`    (80% of $${formatNum(breakdown.condo_value)} / 27.5yr)`);
+            }
+        }
+
+        lines.push(`  Subtotal E: $${formatNum(breakdown.schedule_e_total)}`);
     }
 
     lines.push('');

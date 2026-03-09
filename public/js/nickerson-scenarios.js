@@ -367,7 +367,8 @@
                 'snt_mortgage_rate': 'snt_mortgage_rate',
                 'heloc_rate': 'heloc_rate',
                 'medical_base_monthly': 'medical_base_monthly',
-                'memory_care_cost': 'memory_care_cost'
+                'memory_care_cost': 'memory_care_cost',
+                'condo_maintenance': 'condo_maintenance'
             };
 
             // Percentage parameters: slider value (6.0) → decimal (0.06) for backend
@@ -402,7 +403,7 @@
             displayText = '$' + formatNumber(value) + '/mo';
         } else if (param === 'managed_ira_start' || param === 'total_mortgage_amount') {
             displayText = '$' + formatNumber(value);
-        } else if (param === 'memory_care_cost') {
+        } else if (param === 'memory_care_cost' || param === 'condo_maintenance') {
             displayText = '$' + formatNumber(value) + '/yr';
         } else if (param === 'mortgage_split_pct') {
             displayText = value + '% / ' + (100 - value) + '%';
