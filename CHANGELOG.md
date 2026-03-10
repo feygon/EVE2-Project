@@ -17,6 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2026-03-09
+
+### Added
+- **Condo maintenance slider**: Added to advanced parameters ($0-$6,000/yr, step $100)
+- **Tax Deductions column**: Shows Schedule A/E split "(Xk A / Yk E)". Yellow warning triangle when standard deduction used.
+- **Tax Deductions tooltip**: Reorganized into "Schedule A (Personal)" and "Schedule E (Rental)" sections with subtotals. Standard deduction warning at top when applicable. "See Base Expenses" reference for rental expenses.
+- **countItems helper**: Excludes `lifestyle` from count (shown separately below total line)
+- **Slider JS**: Added condo_maintenance to paramMap and updateParamDisplay
+
+### Changed
+- **Expenses tooltip overhaul**: Added condo HOA/tax/insurance/maintenance/deferred maintenance, C3 condo, SNT trust admin, legal/setup costs sections. Tax deductibility markers: * for Schedule A, † for Schedule E. Legend at bottom.
+- **Tax Deductions column**: Removed redundant "(itemized)" label.
+
+---
+
 ## [2.1.2] - 2025-01-07
 
 ### Fixed
