@@ -190,6 +190,35 @@ body {
     border-top: 1px solid #444;
 }
 
+.param-group {
+    margin-bottom: 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #252525;
+}
+
+.param-group summary {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #aac8e4;
+    user-select: none;
+}
+
+.param-group summary:hover {
+    color: #82b1ff;
+    background: #2e2e2e;
+}
+
+.param-group[open] summary {
+    border-bottom: 1px solid #444;
+}
+
+.param-group-body {
+    padding: 10px 12px 4px;
+}
+
 .param-row {
     margin-bottom: 15px;
 }

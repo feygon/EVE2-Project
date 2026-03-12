@@ -360,18 +360,18 @@ Condo (Arbor Roses): $${formatNum(projection.condo_value)} (+$${formatNum(projec
         tooltip += `\nHELOC Balance: -$${formatNum(projection.heloc_balance)} (${helocRate} interest)`;
     }
     if (projection.mortgage_balance && projection.mortgage_balance > 0) {
-        if (projection.primary_mortgage_balance > 0 || projection.snt_mortgage_balance > 0) {
+        if (projection.primary_mortgage_balance > 0 || projection.condo_mortgage_balance > 0) {
             const primaryRate = projection.primary_mortgage_rate
                 ? (projection.primary_mortgage_rate * 100).toFixed(1) + '%'
                 : '5.7%';
-            const sntRate = projection.snt_mortgage_rate
-                ? (projection.snt_mortgage_rate * 100).toFixed(1) + '%'
+            const condoRate = projection.condo_mortgage_rate
+                ? (projection.condo_mortgage_rate * 100).toFixed(1) + '%'
                 : '6.5%';
             if (projection.primary_mortgage_balance > 0) {
                 tooltip += `\nPrimary Mortgage (IO): -$${formatNum(projection.primary_mortgage_balance)} (${primaryRate})`;
             }
-            if (projection.snt_mortgage_balance > 0) {
-                tooltip += `\nSNT Mortgage (P&I): -$${formatNum(projection.snt_mortgage_balance)} (${sntRate})`;
+            if (projection.condo_mortgage_balance > 0) {
+                tooltip += `\nCondo Mortgage (P&I): -$${formatNum(projection.condo_mortgage_balance)} (${condoRate})`;
             }
         } else {
             tooltip += `\nMortgage Balance: -$${formatNum(projection.mortgage_balance)}`;
@@ -575,13 +575,13 @@ exports.formatExpensesTooltip = function(expenses) {
         primaryExpenses.push(`  Mortgage Interest: $${formatNum(expenses.primary_mortgage_interest)}*`);
         primaryTotal += expenses.primary_mortgage_interest;
     }
-    if (expenses.snt_mortgage_interest) {
-        primaryExpenses.push(`  SNT Mortgage Interest: $${formatNum(expenses.snt_mortgage_interest)}*`);
-        primaryTotal += expenses.snt_mortgage_interest;
+    if (expenses.condo_mortgage_interest) {
+        primaryExpenses.push(`  Condo Mortgage Interest: $${formatNum(expenses.condo_mortgage_interest)}*`);
+        primaryTotal += expenses.condo_mortgage_interest;
     }
-    if (expenses.snt_mortgage_principal) {
-        primaryExpenses.push(`  SNT Mortgage Principal: $${formatNum(expenses.snt_mortgage_principal)}`);
-        primaryTotal += expenses.snt_mortgage_principal;
+    if (expenses.condo_mortgage_principal) {
+        primaryExpenses.push(`  Condo Mortgage Principal: $${formatNum(expenses.condo_mortgage_principal)}`);
+        primaryTotal += expenses.condo_mortgage_principal;
     }
     if (primaryExpenses.length > 0) {
         lines.push(`Primary House: $${formatNum(primaryTotal)}`);
@@ -793,8 +793,8 @@ exports.formatDeductionsTooltip = function(projection) {
         if (breakdown.primary_mortgage_interest > 0) {
             lines.push(`    Primary (IO): $${formatNum(breakdown.primary_mortgage_interest)}`);
         }
-        if (breakdown.snt_mortgage_interest > 0) {
-            lines.push(`    SNT (P&I): $${formatNum(breakdown.snt_mortgage_interest)}`);
+        if (breakdown.condo_mortgage_interest > 0) {
+            lines.push(`    Condo (P&I): $${formatNum(breakdown.condo_mortgage_interest)}`);
         }
     }
 

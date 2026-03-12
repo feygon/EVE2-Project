@@ -364,7 +364,7 @@
                 'total_mortgage_amount': 'total_mortgage_amount',
                 'mortgage_split_pct': 'mortgage_split_pct',
                 'primary_mortgage_rate': 'primary_mortgage_rate',
-                'snt_mortgage_rate': 'snt_mortgage_rate',
+                'condo_mortgage_rate': 'condo_mortgage_rate',
                 'heloc_rate': 'heloc_rate',
                 'medical_base_monthly': 'medical_base_monthly',
                 'memory_care_cost': 'memory_care_cost',
@@ -374,7 +374,7 @@
             // Percentage parameters: slider value (6.0) → decimal (0.06) for backend
             const percentageParams = ['ira_growth', 'primary_appreciation', 'condo_appreciation',
                                        'memory_care_inflation', 'management_fee',
-                                       'primary_mortgage_rate', 'snt_mortgage_rate', 'heloc_rate',
+                                       'primary_mortgage_rate', 'condo_mortgage_rate', 'heloc_rate',
                                        'mortgage_split_pct'];
 
             if (paramMap[param]) {
@@ -443,7 +443,7 @@
             'total_mortgage_amount':   { val: data.total_mortgage_amount },
             'mortgage_split_pct':      { val: data.mortgage_split_pct * 100 },
             'primary_mortgage_rate':   { val: data.primary_mortgage_rate * 100 },
-            'snt_mortgage_rate':       { val: data.snt_mortgage_rate * 100 },
+            'condo_mortgage_rate':       { val: data.condo_mortgage_rate * 100 },
             'condo_maintenance':       { val: data.condo_maintenance }
         };
 
@@ -648,11 +648,11 @@
         }
 
         // Show final mortgage balances (dual mortgage system)
-        if (metrics.primary_mortgage_final > 0 || metrics.snt_mortgage_final > 0) {
-            var mortgageTotal = (metrics.primary_mortgage_final || 0) + (metrics.snt_mortgage_final || 0);
+        if (metrics.primary_mortgage_final > 0 || metrics.condo_mortgage_final > 0) {
+            var mortgageTotal = (metrics.primary_mortgage_final || 0) + (metrics.condo_mortgage_final || 0);
             realEstateLiqLines.push('Mortgage: ' + formatCurrency(mortgageTotal));
             realEstateTooltipParts.push('Primary (IO): ' + formatCurrency(metrics.primary_mortgage_final || 0));
-            realEstateTooltipParts.push('SNT (P&I): ' + formatCurrency(metrics.snt_mortgage_final || 0));
+            realEstateTooltipParts.push('Condo (P&I): ' + formatCurrency(metrics.condo_mortgage_final || 0));
         } else if (metrics.mortgage_final && metrics.mortgage_final > 0) {
             realEstateLiqLines.push('Mortgage: ' + formatCurrency(metrics.mortgage_final));
             realEstateTooltipParts.push('Final mortgage balance: ' + formatCurrency(metrics.mortgage_final));
