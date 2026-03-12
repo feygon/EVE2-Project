@@ -415,9 +415,67 @@
     }
 
     /**
+     * Initialize slider values from DB scenario data (injected as window.scenarioData)
+     * Fixes: sliders resetting to hardcoded HTML defaults on page load
+     */
+    function initializeSliderValues() {
+        if (!window.scenarioData) return;
+
+        // Use first scenario's values (sliders are synced across all cards)
+        const firstId = Object.keys(window.scenarioData)[0];
+        if (!firstId) return;
+        const data = window.scenarioData[firstId];
+
+        // Map: data-param attribute → { dbKey, toSlider transform }
+        // Percentage params are stored as decimals (0.06) but sliders use display values (6.0)
+        const paramInit = {
+            'ira_growth':              { val: data.ira_growth * 100 },
+            'managed_ira_start':       { val: data.managed_ira_start },
+            'lifestyle':               { val: data.lifestyle_annual },
+            'primary_appreciation':    { val: data.primary_appreciation * 100 },
+            'condo_appreciation':      { val: data.condo_appreciation * 100 },
+            'memory_care_inflation':   { val: data.memory_care_inflation * 100 },
+            'management_fee':          { val: data.management_fee * 100 },
+            'rental_income':           { val: data.rental_income_monthly },
+            'heloc_rate':              { val: data.heloc_rate * 100 },
+            'medical_base_monthly':    { val: data.medical_base_monthly },
+            'memory_care_cost':        { val: data.memory_care_cost },
+            'total_mortgage_amount':   { val: data.total_mortgage_amount },
+            'mortgage_split_pct':      { val: data.mortgage_split_pct * 100 },
+            'primary_mortgage_rate':   { val: data.primary_mortgage_rate * 100 },
+            'snt_mortgage_rate':       { val: data.snt_mortgage_rate * 100 },
+            'condo_maintenance':       { val: data.condo_maintenance }
+        };
+
+        Object.keys(paramInit).forEach(function(param) {
+            var val = paramInit[param].val;
+            if (val === undefined || val === null) return;
+            $('.param-slider[data-param="' + param + '"]').each(function() {
+                $(this).val(val);
+                updateParamDisplay($(this), param, val);
+            });
+        });
+
+        // Timeline sliders
+        if (data.ltc_trigger_year) {
+            $('.ltc-slider').val(data.ltc_trigger_year);
+            $('.ltc-slider').siblings('.ltc-value, .trigger-value').text(data.ltc_trigger_year);
+        }
+        if (data.memory_care_year) {
+            $('.memory-care-slider').val(data.memory_care_year);
+            $('.memory-care-slider').siblings('.memory-care-value').text(data.memory_care_year);
+        }
+        if (data.year_of_passing) {
+            $('.year-of-passing-slider').val(data.year_of_passing);
+            $('.year-of-passing-slider').siblings('.passing-value').text(data.year_of_passing);
+        }
+    }
+
+    /**
      * Load initial metrics for all cards
      */
     function loadInitialMetrics() {
+        initializeSliderValues();
         loadMetricsForAllCards();
     }
 
