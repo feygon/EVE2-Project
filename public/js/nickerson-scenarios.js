@@ -10,7 +10,7 @@
     const scenarioMap = {
         baseline: 'ScA_Baseline',
         rental: 'ScA_Rental',
-        sale: 'ScA_SNT'
+        mapt: 'ScA_MAPT'
     };
 
     let currentTriggerYear = 2028;
@@ -336,6 +336,26 @@
             }
         });
 
+        // Sell-condo checkbox (per-card, NOT synced)
+        $('.sell-condo-toggle').on('change', function() {
+            const $card = $(this).closest('.scenario-card');
+            const disposition = $card.data('disposition');
+            const scenarioId = scenarioMap[disposition];
+            const checked = this.checked ? 1 : 0;
+
+            if (!scenarioId) return;
+
+            $.ajax({
+                url: '/Nickerson/scenario/' + scenarioId + '/update-parameter',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ paramName: 'sell_condo_upfront', paramValue: checked }),
+                xhrFields: { withCredentials: true }
+            }).then(() => {
+                loadMetricsForAllCards();
+            });
+        });
+
         // Parameter sliders (Phase 1: synchronized across all cards)
         $('.param-slider').on('input', function() {
             const param = $(this).data('param');
@@ -469,6 +489,16 @@
             $('.year-of-passing-slider').val(data.year_of_passing);
             $('.year-of-passing-slider').siblings('.passing-value').text(data.year_of_passing);
         }
+
+        // Sell-condo checkbox (per-scenario, not synced)
+        $('.sell-condo-toggle').each(function() {
+            var $card = $(this).closest('.scenario-card');
+            var disposition = $card.data('disposition');
+            var scenarioId = scenarioMap[disposition];
+            if (scenarioId && window.scenarioData[scenarioId]) {
+                this.checked = window.scenarioData[scenarioId].sell_condo_upfront === 1;
+            }
+        });
     }
 
     /**

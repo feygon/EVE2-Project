@@ -36,6 +36,15 @@
         </div>
     </div>
 
+    {{#unless isBaseline}}
+    <div class="sell-condo-control">
+        <label class="sell-condo-label">
+            <input type="checkbox" class="sell-condo-toggle" data-card="{{cardNumber}}">
+            Sell condo upfront (no rental income)
+        </label>
+    </div>
+    {{/unless}}
+
     <div class="advanced-params-section">
         <label class="param-toggle-label">
             <input type="checkbox" class="param-toggle" data-card="{{cardNumber}}">

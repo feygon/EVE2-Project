@@ -159,6 +159,34 @@ body {
     color: #66ccff;
 }
 
+/* Sell Condo Checkbox */
+.sell-condo-control {
+    margin-bottom: 12px;
+    padding: 10px 15px;
+    background: #2a2a2a;
+    border-radius: 4px;
+    border-left: 3px solid #e6a040;
+}
+
+.sell-condo-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #dcdcdc;
+}
+
+.sell-condo-label:hover {
+    color: #e6a040;
+}
+
+.sell-condo-toggle {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
 /* Advanced Parameters */
 .advanced-params-section {
     background-color: #2a2a2a;
