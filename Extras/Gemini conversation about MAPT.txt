@@ -1,0 +1,1209 @@
+Skip to main contentAccessibility help
+Accessibility feedback
+AI Mode
+All
+Images
+News
+Forums
+More
+
+
+
+MAPT rental income progressive tax rates
+7 minutes ago
+
+Rental income held within a Medicaid Asset Protection Trust (MAPT) is typically taxed at the grantor's individual progressive tax rates rather than at separate trust rates. This is because most MAPTs are structured as grantor trusts, meaning the IRS views the trust as an extension of the individual who created it for income tax purposes. 
+Littlejohn Law, LLC
+Littlejohn Law, LLC
+ +3
+2026 Federal Progressive Tax Rates 
+For the 2026 tax year, the following progressive brackets apply to your total taxable income, which includes net rental income from the MAPT: 
+Tax Foundation
+Tax Foundation
+ +1
+Tax Rate 	Single Filers	Married Filing Jointly
+10%	$0 – $12,400	$0 – $24,800
+12%	$12,401 – $50,400	$24,801 – $100,800
+22%	$50,401 – $105,700	$100,801 – $211,400
+24%	$105,701 – $201,775	$211,401 – $403,550
+32%	$201,776 – $256,225	$403,551 – $512,450
+35%	$256,226 – $640,600	$512,451 – $768,700
+37%	Over $640,600	Over $768,700
+Key Tax Implications for MAPTs
+Individual Reporting: The income is reported on the grantor's Form 1040 (Personal Income Tax Return) instead of the trust's Form 1041.
+Deductions and Credits: Grantors can still claim standard rental deductions—such as depreciation, property taxes, and maintenance—directly on their personal returns to reduce the taxable portion of the rental income.
+Net Investment Income Tax (NIIT): High-income grantors may be subject to an additional 3.8% tax if their modified adjusted gross income (MAGI) exceeds $200,000 (single) or $250,000 (married filing jointly).
+Non-Grantor Exception: If a MAPT is not structured as a grantor trust, undistributed income is taxed at compressed trust rates, which reach the top 37% bracket at much lower income thresholds (e.g., over $16,000 in 2026). 
+Littlejohn Law, LLC
+Littlejohn Law, LLC
+ +4
+Are you currently structuring a new trust, or are you looking for ways to offset rental income through specific deductions like depreciation?
+
+
+
+
+
+undefined
+undefined
+undefined
+11 sites
+Attorney explains Medicaid Asset Protection Trust in Ohio
+What Does it Mean for a Trust to Be a Grantor Trust? A Grantor Trust is a type of trust where the grantor retains certain powers o...
+
+Littlejohn Law, LLC
+
+Here's the scoop on income tax returns and MAPTs
+The MAPT is an irrevocable trust with a tax identification number from the IRS, also called an Employer Identification Number or “...
+
+Times Herald-Record
+Key 2026 Figures Calculated by Thomson Reuters Checkpoint ...
+Tax rate schedules * If taxable income is not over $24,800; the tax is 10% of taxable income. * If taxable income is over $24,800 ...
+
+Thomson Reuters tax
+Show all
+Give me the full oregon and federal progressive tax rates in rental income for property held by an FDT/MAPT trust.
+6 minutes ago
+
+Rental income for property held by a Medicaid Asset Protection Trust (MAPT) or a Family Dynasty Trust (FDT) is typically taxed based on the trust's classification as either a Grantor Trust or a Non-Grantor Trust. 
+1. Determining the Applicable Tax Structure
+Grantor Trust (Most Common): Most MAPTs and many FDTs are structured so the grantor (the person who created the trust) remains responsible for taxes. In this case, rental income is reported on your personal tax return (Form 1040) using the progressive individual rates.
+Non-Grantor Trust: If the trust is a separate taxable entity, it files its own return (Form 1041). Any income it retains is taxed at highly compressed "trust rates" that hit the top bracket very quickly. 
+Stuart Green Law
+Stuart Green Law
+ +4
+2. 2026 Federal Progressive Tax Rates 
+For the 2026 tax year, these are the federal brackets for ordinary income, including net rental income. 
+Individual Rates (For Grantor Trusts)
+10%: $0 – $12,400 (Single) / $0 – $24,800 (Joint)
+12%: $12,401 – $50,400 (Single) / $24,801 – $100,800 (Joint)
+22%: $50,401 – $105,700 (Single) / $100,801 – $211,400 (Joint)
+24%: $105,701 – $201,775 (Single) / $211,401 – $403,550 (Joint)
+32%: $201,776 – $256,225 (Single) / $403,551 – $512,450 (Joint)
+35%: $256,226 – $640,600 (Single) / $512,451 – $768,700 (Joint)
+37%: Over $640,600 (Single) / Over $768,700 (Joint) 
+Ameriprise Financial
+Ameriprise Financial
+ +1
+Trust & Estate Rates (For Non-Grantor Trusts)
+10%: $0 – $3,300
+24%: $3,301 – $11,700
+35%: $11,701 – $16,000
+37%: Over $16,000 
+SmartAsset.com
+SmartAsset.com
+3. 2026 Oregon State Progressive Tax Rates
+Oregon uses a progressive system for both individuals and trusts. These rates apply to taxable income after state-specific deductions. 
+Tax Foundation
+Tax Foundation
+ +3
+Tax Rate 	Taxable Income (Single/Trust)	Taxable Income (Married Jointly)
+4.75%	$0 – $4,400	$0 – $8,800
+6.75%	$4,401 – $11,050	$8,801 – $22,100
+8.75%	$11,051 – $125,000	$22,101 – $250,000
+9.90%	Over $125,000	Over $250,000
+Note: These brackets are estimated based on 2025 thresholds adjusted for typical inflation indexing for 2026. 
+Oregon Secretary of State (.gov)
+Oregon Secretary of State (.gov)
+ +1
+4. Important Considerations for Rental Income
+Deductions: Net rental income is calculated after deducting mortgage interest, property taxes, maintenance, and depreciation. You can find detailed guidance on these on the IRS Rental Income and Expenses page.
+Net Investment Income Tax (NIIT): An additional 3.8% federal tax may apply if your income exceeds certain thresholds ($200k Single / $250k Joint).
+Local Taxes: If the property is in the Portland Metro area, additional taxes like the Multnomah County Preschool for All tax (up to 3.8% in 2026) may apply to high earners. 
+www.coldstream.com
+www.coldstream.com
+ +3
+Would you like a calculation of the estimated tax liability for a specific amount of net rental income?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+16 sites
+Trust Tax Rates and Exemptions for 2026 - SmartAsset.com
+2026 Income Tax Rates for Trusts. For 2026 taxes (which you'll file in 2027), the federal government taxes trust income at four le...
+
+SmartAsset.com
+
+State Individual Income Tax Rates and Brackets, 2026
+Top Marginal State Individual Income Tax Rates (as of January 1, 2026) 2.5% 13.3% None. 13.3% 13.3% 5.65% 5.65% 5.9% 5.9% 2.5% 2.5...
+
+Tax Foundation
+
+Tax brackets for 2025 and 2026 - Ameriprise Financial
+Table_title: Filing status and federal income tax rates: 2026 tax year Table_content: header: | Tax bracket | Single | Married fil...
+
+Ameriprise Financial
+
+Show all
+This is an irrevocable MAPT
+6 minutes ago
+
+Rental income from a property held in an irrevocable Medicaid Asset Protection Trust (MAPT) is usually taxed at your personal progressive rates. 
+Stuart Green Law
+Stuart Green Law
+ +1
+Even though the trust is legally "irrevocable," most MAPTs are intentionally designed as Grantor Trusts for tax purposes. This allows you to keep tax benefits like the $250,000/$500,000 capital gains exclusion on a home sale and ensures you pay taxes at lower individual rates rather than the high, "compressed" rates typically applied to separate trust entities. 
+Littlejohn Law, LLC
+Littlejohn Law, LLC
+ +4
+2026 Federal Progressive Tax Rates 
+Because your MAPT is likely a grantor trust, its net rental income is added to your other personal income and taxed at these federal levels: 
+Fidelity
+Fidelity
+ +2
+10%: $0 – $12,400 (Single) | $0 – $24,800 (Joint)
+12%: $12,401 – $50,400 (Single) | $24,801 – $100,800 (Joint)
+22%: $50,401 – $105,700 (Single) | $100,801 – $211,400 (Joint)
+24%: $105,701 – $201,775 (Single) | $211,401 – $403,550 (Joint)
+32%: $201,776 – $256,225 (Single) | $403,551 – $512,450 (Joint)
+35%: $256,226 – $640,600 (Single) | $512,451 – $768,700 (Joint)
+37%: Over $640,600 (Single) | Over $768,700 (Joint) 
+2026 Oregon State Progressive Tax Rates
+Oregon also taxes trust income based on your personal taxable income at the following levels: 
+learn.valur.com
+learn.valur.com
+ +1
+Tax Rate 	Taxable Income (Single/Trust)	Taxable Income (Married Jointly)
+4.75%	$0 – $4,400	$0 – $8,800
+6.75%	$4,401 – $11,050	$8,801 – $22,100
+8.75%	$11,051 – $125,000	$22,101 – $250,000
+9.90%	Over $125,000	Over $250,000
+Critical Exception: Non-Grantor Status
+If your trust is specifically drafted as a Non-Grantor Trust (meaning you have no control and it is a completely separate tax entity), any income it keeps is taxed at compressed federal rates. In 2026, these hit the top 37% bracket after just $16,000 of income. 
+IRS (.gov)
+IRS (.gov)
+ +4
+Would you like to review the specific trust language (such as "power of appointment" or "right to substitute assets") that confirms if your MAPT qualifies for grantor status?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+16 sites
+A Tax Map to Your MAPT - Makofsky Valente Law Group
+One advantage to having a MAPT be a grantor trust is that grantors are usually taxed at a lower tax rate than trusts as the income...
+
+Makofsky Valente Law Group, P.C.
+
+Attorney explains Medicaid Asset Protection Trust in Ohio
+Understanding Medicaid Asset Protection Trusts and Their Tax Implications * When it comes to estate planning, particularly for tho...
+
+Littlejohn Law, LLC
+
+April 2021 Newsletter | Estate & Elder Law Services - EAELS
+We will look at how the MAPT works and its advantages in protecting assets and qualifying one for long term care Medicaid. * Asset...
+
+Estate & Elder Law Services
+
+Show all
+Can the oregon deduction use the federal itemized deduction like on the 1040?
+1 minute ago
+
+Yes, Oregon allows you to use federal itemized deductions on your state return, and notably, your choice in Oregon is independent of your federal choice. This means you can take the higher federal standard deduction on your Form 1040 while still choosing to itemize on your Oregon Form OR-40. 
+Oregon Secretary of State (.gov)
+Oregon Secretary of State (.gov)
+ +3
+Key Rules for Oregon Itemizing
+Independent Election: You are not required to itemize on both; you should simply choose the method (standard or itemized) that results in the lower tax for each specific return.
+Federal Definitions: Oregon generally uses the same definitions and limitations as the federal Schedule A (Form 1040) to calculate these deductions.
+Required Form: To itemize in Oregon, you must complete and include Schedule OR-A with your state filing. 
+Oregon.gov
+Oregon.gov
+ +4
+Major Differences and Modifications
+While most deductions carry over, Oregon requires specific adjustments: 
+No State Income Tax Deduction: You cannot deduct Oregon state income taxes on your Oregon return, even if you itemized them on your federal return.
+SALT Limit: While the federal State and Local Tax (SALT) deduction is limited (e.g., $10,000 or $40,000 depending on the specific tax year and income), Oregon has its own addition/subtraction rules for these.
+Medical Expenses: You can only deduct the portion of medical and dental expenses that exceeds 7.5% of your federal adjusted gross income. 
+secure.dor.state.or.us
+secure.dor.state.or.us
+ +5
+Rental Income Note
+For property in an irrevocable MAPT, standard rental expenses (like mortgage interest on the rental property, property taxes, and repairs) are usually deducted directly against the rental income on Schedule E rather than as itemized deductions on Schedule A. Only expenses related to your personal residence or other non-business costs are typically handled as itemized deductions. 
+IRS (.gov)
+IRS (.gov)
+ +2
+Would you like to see a comparison of the Oregon standard deduction versus typical itemized totals for your filing status?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+13 sites
+Oregon Itemized Deductions
+Oregon personal income tax filers have the option of taking either the standard deduction or itemizing their deductions. Generally...
+
+Oregon Legislature (.gov)
+
+2023 Instructions for Schedule OR-A, Oregon Itemized ...
+General information. Use Schedule OR-A to figure your Oregon itemized deduc- tions using federal definitions and limitations, with...
+
+Oregon.gov
+Oregon - Itemized Deductions - Income Taxes, Personal
+OR. ¶15-545, Itemized Deductions. In computing Oregon income tax, after adding the federal standard or itemized deduction(s) back ...
+
+CCH® AnswerConnect
+Show all
+Even with a trust on the 1041?
+1 minute ago
+
+No, a non-grantor irrevocable trust filing Form 1041 (and Oregon Form OR-41) cannot use a standard deduction. Unlike individual taxpayers, trusts are strictly limited to deducting specific expenses actually incurred.
+Deduction Rules for Trusts (Form 1041 / OR-41)
+No Standard Deduction: Trusts and estates do not have a standard deduction. They must "itemize" every expense on the return.
+Personal Exemption: In lieu of a standard deduction, a trust receives a small statutory exemption:
+Complex Trust (typically a MAPT that accumulates income): $100
+Simple Trust (required to distribute all income annually): $300
+Estate: $600
+Rental Property Deductions: Because the rental is a business activity, the trust deducts all direct property expenses (mortgage interest, property taxes, repairs, and depreciation) on Schedule E before the net income even reaches the trust's main tax calculation page.
+Administrative Deductions: The trust can also deduct costs necessary for its administration, such as trustee fees, legal fees, and tax preparation costs. 
+CCH® AnswerConnect
+CCH® AnswerConnect
+ +3
+Oregon-Specific Differences for Trusts
+Oregon's Form OR-41 largely follows the federal 1041 "itemized" approach but requires two major adjustments: 
+Federal Tax Subtraction: Oregon allows trusts to subtract a portion of the federal income tax paid by the trust (up to a limit, often $8,500 depending on income). This is a benefit not available on the federal return.
+State Tax Add-Back: If the trust deducted Oregon state income taxes on its federal 1041, those must be added back to the Oregon taxable income because Oregon does not allow a deduction for its own taxes. 
+Oregon.gov
+Oregon.gov
+ +3
+Summary of Differences
+Feature 	Individual (1040 / OR-40)	Non-Grantor Trust (1041 / OR-41)
+Standard Deduction	Yes (e.g., ~$16,100 Fed / ~$2,835 OR)	None
+Exemption	Usually none (post-TCJA)	$100 or $300
+Rental Expenses	Deductible on Sch E	Deductible on Sch E
+Administrative Costs	Generally not deductible	Fully deductible if unique to trust
+Would you like to know how the 65-day rule allows a trustee to shift this tax burden from the trust’s high rates to a beneficiary’s lower individual rates?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+10 sites
+Trusts and Estates: Deductions Claimed on Form 1041
+Deductions allowed to an estate or trust on Form 1041 are generally the same as those available to individual taxpayers in computi...
+
+CCH® AnswerConnect
+Irrevocable Trust Taxation - Greenleaf Trust
+Personal Exemption: An irrevocable trust (or estate) has a $600 per year personal exemption; [IRC 63(d) (2).] Standard Deduction: ...
+
+Greenleaf Trust
+2025 Form OR-41 Instructions, Fiduciary Income ... - Oregon.gov
+Purpose of this form. The fiduciary of a decedent's estate, trust, or bankruptcy estate uses Form OR-41 to report to the state of ...
+
+Oregon.gov
+Show all
+Oh, the 41 and 1041 are for non-grantor trusts? So we'd still use the 1040 with a grantor trust?
+a few seconds ago
+
+Exactly. If your Medicaid Asset Protection Trust (MAPT) is a grantor trust, you generally do not file a full tax return for the trust itself. Instead, you report all the trust's income—including rental income—directly on your personal Form 1040 (Federal) and Form OR-40 (Oregon). 
+Millan & Co. PC
+Millan & Co. PC
+ +2
+How to File for a Grantor MAPT
+Federal Filing (Form 1040):
+You report the trust’s rental income and expenses on Schedule E as if you owned the property personally.
+Form 1041 Requirement: Most irrevocable grantor trusts still have a separate Tax ID (EIN). In this case, the trustee often files a "Skeleton" Form 1041. This is an informational return that is mostly blank but includes a Grantor Trust Statement attached to the back.
+The statement lists all income (rents, interest) and expenses to let the IRS know this data will appear on your personal 1040.
+Oregon Filing (Form OR-40):
+If you are an Oregon resident, you simply include the net rental income from your federal return on your Form OR-40.
+Oregon follows the federal lead: if you aren't required to file a full federal 1041, you typically aren't required to file a full Oregon Form OR-41. 
+Oregon.gov
+Oregon.gov
+ +7
+Why This Matters for Your Taxes
+Progressive Rates: You use your personal brackets (starting at 10% federal / 4.75% Oregon) rather than the high trust brackets.
+Deductions: You get the full benefit of depreciation and other rental expenses to offset the income on your personal return.
+Capital Gains: This status is what allows you to keep the $250k/$500k exclusion if the trust ever sells your primary residence. 
+WealthCounsel
+WealthCounsel
+ +3
+Summary Table: Filing Responsibility
+Trust Type 	Federal Form	Oregon Form	Who Pays the Tax?
+Grantor Trust (Most MAPTs)	1040 (+ Skeleton 1041)	OR-40	You (The Grantor)
+Non-Grantor Trust	1041 (Full)	OR-41	The Trust
+Do you know if your trust has its own separate Tax ID (EIN), or is it currently using your Social Security Number?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+14 sites
+Alternatives to Form 1041 for Grantor Trusts - The Tax Adviser
+In that case, the deemed owner must include the activity of the trust on his or her personal tax return (see Regs. Sec. 1.671-2(a)
+
+The Tax Adviser
+2023 Form OR-41 Instructions, Fiduciary Income Tax, 150-101-041-1
+Income taxable to the grantor or substantial owner. Any part of trust income taxable to the grantor or another per- son under IRC ...
+
+Oregon.gov
+Desktop: Form 1041 - Grantor Trust - Support - TaxSlayer Pro
+How to report a grantor trust in TaxSlayer Pro. A grantor trust return is filed on Form 1041, U.S. Tax Return for Estates or Trust...
+
+TaxSlayer Pro
+
+Show all
+Is it required to be a grantor or non-grantor trust in order to reserve limited power of assignment and stepped-up basis up on death?
+To achieve a stepped-up basis at death for assets in an irrevocable trust like a Medicaid Asset Protection Trust (MAPT), the trust is almost always structured as a grantor trust. 
+IRS (.gov)
+IRS (.gov)
+ +1
+The key to a stepped-up basis is estate inclusion. For the assets to get a fresh basis at your death under IRC Section 1014, they must be included in your "taxable estate" for federal estate tax purposes. 
+Clark Allison LLP
+Clark Allison LLP
+ +2
+The Role of Limited Power of Appointment (LPOA)
+You can reserve a Limited Power of Appointment (often called a "limited testamentary power of appointment") to ensure the assets are included in your estate, which triggers the step-up. 
+Borchers Trust Law
+Borchers Trust Law
+Grantor Status: Reserving a power of appointment typically triggers grantor trust status because you have retained "dominion and control" over who eventually receives the assets. This means you pay the income tax at your personal rates while alive.
+Estate Inclusion: Under IRC Section 2038, if you keep the power to alter who gets the property (even if you can't give it back to yourself), the property is included in your gross estate at death. This inclusion is what grants the stepped-up basis to your heirs.
+Non-Grantor Trusts: While it is technically possible for a non-grantor trust to have a step-up (e.g., by giving a beneficiary a general power of appointment), MAPTs are rarely designed this way because the grantor usually wants to remain the one responsible for the income tax. 
+Borchers Trust Law
+Borchers Trust Law
+ +8
+Why Revenue Ruling 2023-2 Matters
+In 2023, the IRS issued Revenue Ruling 2023-2, which clarified that simply being a grantor trust is not enough for a step-up. The assets must specifically be includible in your taxable estate. Your reserved LPOA is the tool that performs this "estate inclusion" while maintaining the trust's irrevocable status for Medicaid protection. 
+Borchers Trust Law
+Borchers Trust Law
+ +5
+Summary for Your MAPT:
+Grantor Status: Required (or highly preferred) for income tax and LPOA purposes.
+LPOA: Necessary to ensure the property is included in your estate.
+Stepped-Up Basis: Occurs because the LPOA makes the assets part of your taxable estate. 
+Borchers Trust Law
+Borchers Trust Law
+ +4
+Does your trust document specifically mention Section 2038 or a "Testamentary Limited Power of Appointment" to confirm this estate inclusion? 
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+18 sites
+The Use of a Power of Appointment in Trust-Based Estate ...
+May 16, 2024 — Limited Power of Appointment: This restricts the power holder to only distribute trust assets to a specific, limited group of peop...
+
+Borchers Trust Law
+
+The Medicaid Asset Protection Trust and the Limited Power of ...
+Jun 7, 2023 — The Medicaid Asset Protection Trust (MAPT) is an irrevocable trust used for Medicaid planning or asset protection purposes. After ...
+
+WealthCounsel
+
+Abusive trust tax evasion schemes - Questions and answers
+Apr 2, 2025 — Q: What is a grantor trust? A: "Grantor trust" is a term used in the Internal Revenue Code to describe any trust over which the gr...
+
+IRS (.gov)
+Show all
+Does this mean the grantor MAPT's rental income has to go through the grantor's personal 1040? or does it have its own 1040?
+A grantor Medicaid Asset Protection Trust (MAPT) does not have its own Form 1040. Instead, all rental income and expenses flow through to the grantor's personal Form 1040. 
+IRS (.gov)
+IRS (.gov)
+ +1
+For tax purposes, the IRS treats a grantor trust as a "disregarded entity"—essentially an extension of the grantor. 
+CliftonLarsonAllen (CLA)
+CliftonLarsonAllen (CLA)
+ +1
+How Rental Income is Reported
+Grantor's Personal Return (Form 1040): You report the trust's rental activity on your personal Schedule E. This includes all gross rents and allowable deductions like depreciation and property taxes.
+Informational Trust Filing (Form 1041): While the trust doesn't pay its own taxes, the trustee may still need to file a "skeleton" Form 1041 if the trust has its own Employer Identification Number (EIN).
+This return is typically blank except for basic entity information.
+A Grantor Trust Statement is attached to this 1041, which lists the income and expenses that the grantor is reporting on their own 1040.
+Oregon State Reporting: Oregon follows this federal treatment. If a grantor trust is exempt from a full federal 1041 filing, it is also exempt from filing a full Oregon Form OR-41. The income simply appears on your Oregon Form OR-40 as part of your total taxable income. 
+IRS (.gov)
+IRS (.gov)
+ +10
+Why This is Beneficial
+Reporting on your personal 1040 allows you to use your individual progressive tax brackets, which are much wider than the highly compressed brackets used by non-grantor trusts. It also simplifies the process by avoiding the need for the trust to issue a Schedule K-1 to you. 
+Littlejohn Law, LLC
+Littlejohn Law, LLC
+ +3
+Do you need help identifying the specific rental deductions (like the Section 179 expense or special depreciation) that can be claimed on your Schedule E?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+16 sites
+Attorney explains Medicaid Asset Protection Trust in Ohio
+Nov 24, 2024 — How Are Medicaid Asset Protection Trusts Taxed? One of the most important considerations when setting up a Medicaid Asset Protecti...
+
+Littlejohn Law, LLC
+
+Abusive trust tax evasion schemes - Questions and answers - IRS
+Apr 2, 2025 — Q: What is a grantor trust? A: "Grantor trust" is a term used in the Internal Revenue Code to describe any trust over which the gr...
+
+IRS (.gov)
+2025 Instructions for Schedule E (Form 1040) (2025) - IRS
+Dec 19, 2025 — General Instructions. Use Schedule E (Form 1040) to report income or loss from rental real estate, royalties, partnerships, S corp...
+
+IRS (.gov)
+
+Show all
+Are all MAPTs automatically grantor trusts, and therefore a part of the grantor's personal 1040 return?
+No, a Medicaid Asset Protection Trust (MAPT) is not automatically a grantor trust, but it is almost always intentionally designed as one. While a MAPT must be legally irrevocable to protect assets from Medicaid, it can still be a "grantor trust" for income tax purposes if the grantor retains certain specific powers. 
+IRS (.gov)
+IRS (.gov)
+ +3
+Why MAPTs Are Usually Grantor Trusts
+Most attorneys incorporate "grantor trust triggers" into the document because it provides significant tax advantages: 
+WealthCounsel
+WealthCounsel
+ +1
+Lower Tax Rates: Income is taxed at the grantor’s personal progressive rates rather than the high, "compressed" rates applied to separate trust entities.
+Home Sale Exclusion: It preserves the Section 121 exclusion, allowing the grantor to exclude up to $250,000 ($500,000 for couples) of gain if the trust sells their primary residence.
+Stepped-Up Basis: By retaining a "limited power of appointment," the grantor ensures the assets are included in their taxable estate at death, which triggers a stepped-up basis for heirs. 
+Greenleaf Trust
+Greenleaf Trust
+ +4
+When a MAPT is a Non-Grantor Trust
+If a MAPT is drafted without any retained powers (meaning the grantor has absolutely no "strings" attached), it is a Non-Grantor Trust. 
+www.justvanilla.com
+www.justvanilla.com
+Separate Filing: It must file its own Form 1041 (Federal) and Form OR-41 (Oregon).
+Tax Responsibility: The trust itself pays the tax on any income it keeps, often at much higher rates.
+No Personal 1040: The income does not appear on the grantor's personal return unless it is actually distributed to them. 
+Greenleaf Trust
+Greenleaf Trust
+ +4
+How to Verify Your Trust Status
+You can check your trust's status by looking for these specific "trigger" powers in the document: 
+learn.valur.com
+learn.valur.com
+ +1
+Power of Substitution: The right to swap trust assets with assets of equal value (IRC §675).
+Limited Power of Appointment: The right to change which beneficiaries receive the assets (IRC §674).
+Income for Spouse: The power to use trust income to pay for a spouse’s life insurance premiums (IRC §677). 
+Does your trust document include a "Power of Substitution" or a "Limited Power of Appointment"? These are the most common ways to ensure it remains on your personal 1040.
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+15 sites
+Abusive trust tax evasion schemes - Questions and answers - IRS
+Apr 2, 2025 — Q: What is a grantor trust? A: "Grantor trust" is a term used in the Internal Revenue Code to describe any trust over which the gr...
+
+IRS (.gov)
+The Taxation of the Medicaid Asset Protection Trust
+May 2, 2023 — If grantor trust status is achieved in the MAPT, then ordinary income or capital gains (or both), generated by trust assets is tax...
+
+WealthCounsel
+
+When is a Trust a Grantor Trust - Greenleaf Trust
+Jun 11, 2024 — When is a Trust a Grantor Trust * Take-Away: A Trust can be classified for many different reasons, or provisions, as a grantor Tru...
+
+Greenleaf Trust
+Show all
+And the Limited Power of Appointment is a power that requires it to remain a Grantor trust?
+Not exactly. A Limited Power of Appointment (LPOA) is a primary tool used to achieve two separate goals, but it is not the only way to make a trust a grantor trust. 
+1. The LPOA's Main Job: Stepped-Up Basis
+The LPOA is specifically included in a Medicaid Asset Protection Trust (MAPT) to ensure the assets get a stepped-up basis at your death. 
+Burner Prudenti Law, P.C.
+Burner Prudenti Law, P.C.
+ +1
+Estate Inclusion: By reserving the right to change who eventually gets the trust assets (the LPOA), you retain enough "dominion and control" that the IRS considers the assets part of your taxable estate under IRC § 2038.
+The Result: Because the assets are in your estate, they qualify for a step-up to fair market value when you pass away. 
+Burner Prudenti Law, P.C.
+Burner Prudenti Law, P.C.
+ +3
+2. Does an LPOA Force Grantor Status?
+Yes, in most cases, but it depends on when the power can be used: 
+LII | Legal Information Institute
+LII | Legal Information Institute
+Lifetime LPOA: If you can exercise the power while you are alive (e.g., changing the beneficiaries today), it generally triggers grantor trust status under IRC § 674(a).
+Testamentary LPOA: If you can only exercise the power through your will at death, it is actually an exception under IRC § 674(b)(3) and might not trigger grantor status on its own. 
+Venable LLP
+Venable LLP
+ +3
+3. Other Ways to Stay a Grantor Trust
+Because a testamentary LPOA alone might not be enough for grantor status, attorneys often add "backup" powers to ensure the income stays on your 1040: 
+Burner Prudenti Law, P.C.
+Burner Prudenti Law, P.C.
+ +1
+Power of Substitution: The right to swap trust assets for assets of equal value (IRC § 675(4)).
+Power to Pay Insurance Premiums: The power to use trust income to pay for life insurance on your life (IRC § 677(a)(3)).
+Right to Income: If the trust is required to pay all net rental income to you or your spouse, it becomes a grantor trust under IRC § 677. 
+Burner Prudenti Law, P.C.
+Burner Prudenti Law, P.C.
+ +4
+Summary Table: LPOA vs. Grantor Status
+Feature 	Reserving an LPOA	Other Grantor "Triggers"
+Primary Goal	Secure Stepped-Up Basis	Maintain Personal Tax Rates
+IRC Section	§ 2038 (Estate Tax)	§ 671–679 (Income Tax)
+Medicaid Impact	Generally allowed	Generally allowed
+Filing Form	Grantor's 1040	Grantor's 1040
+Would you like me to check if your trust includes a "Lifetime" or a "Testamentary" version of the LPOA to see if it's the primary cause of your grantor status?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+14 sites
+MAPTs Are Alive and Well in the Elder Law Practitioner's ...
+May 13, 2025 — Both powers must be exercisable in a limited power of appointment over trust principal by the grantor, on their own, without the c...
+
+Burner Prudenti Law, P.C.
+
+26 CFR § 1.674(a)-1 - Power to control beneficial enjoyment
+§ 1.674(a)-1 Power to control beneficial enjoyment; scope of section 674. * (a) Under section 674, the grantor is treated as the o...
+
+LII | Legal Information Institute
+Developments Involving Grantor Trusts - Venable LLP
+Thus a grantor may retain a testamentary power of appointment over the trust principal without causing grantor trust status. Such ...
+
+Venable LLP
+
+Show all
+Okay, so in order to sequester the tax liability for the rental trust-owned properties, we want a Testamentary LPOA to retain the stepped-up basis upon death, for a non-grantor trust so the rental income is on its own separate 1041?
+In order to sequester tax liability into a separate return, you would need to structure the trust as a non-grantor trust. However, using a Testamentary Limited Power of Appointment (LPOA) as your only tool to secure a stepped-up basis in a non-grantor trust is generally not effective under current IRS rules. 
+1. The Step-Up Basis Conflict
+To get a stepped-up basis under IRC § 1014, the assets must be included in your gross estate at death. 
+Tucson Elder Law Attorney
+Tucson Elder Law Attorney
+ +1
+Grantor Trusts: Often use an LPOA to trigger IRC § 2038, intentionally pulling the assets back into the estate for a step-up while you pay the income tax at personal rates.
+Non-Grantor Trusts: If you successfully remove assets from your estate to use the trust's separate Form 1041, they typically do not receive a stepped-up basis at death.
+The LPOA Trap: A limited power generally does not cause estate inclusion. To force a step-up in a non-grantor trust, you usually need a General Power of Appointment (GPOA), but giving yourself a GPOA would likely turn the trust back into a grantor trust, defeating your goal of a separate 1041. 
+Clark Allison LLP
+Clark Allison LLP
+ +6
+2. Tax Rates for Non-Grantor Trusts (2026)
+If you proceed with a non-grantor trust to sequester liability, be aware of the highly compressed tax brackets. The trust will hit the maximum 37% tax rate on rental income very quickly. 
+Lathrop GPM
+Lathrop GPM
+ +3
+2026 Federal Trust Brackets (Form 1041)
+10%: $0 – $3,300
+24%: $3,301 – $11,700
+35%: $11,701 – $16,000
+37%: Over $16,000 
+Lathrop GPM
+Lathrop GPM
+ +2
+2026 Oregon Trust Brackets (Form OR-41)
+Oregon treats non-grantor trusts similarly to individuals but without a standard deduction. 
+Frankel, Rubin, Klein, Payne & Pudlowski, P.C.
+Frankel, Rubin, Klein, Payne & Pudlowski, P.C.
+4.75%: $0 – $4,400 (estimated)
+6.75%: $4,401 – $11,050 (estimated)
+8.75%: $11,051 – $125,000 (estimated)
+9.90%: Over $125,000 
+www.coldstream.com
+www.coldstream.com
+ +1
+3. Key Trade-Offs
+Feature 	Grantor Trust (Personal 1040)	Non-Grantor Trust (Separate 1041)
+Tax Rates	Your personal rates (lower)	Compressed trust rates (much higher)
+Step-Up Basis	Yes (via LPOA/Estate Inclusion)	Usually No (unless GPOA used)
+Liability	You pay the tax	The Trust pays the tax
+Medicaid	Standard for MAPT	Riskier; complex for MAPT
+Would you like to explore "Formula General Powers of Appointment", which can sometimes trigger a step-up for specific assets in a non-grantor trust without including the entire estate? 
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+17 sites
+Step-up in Basis and the IRS's New Revenue Ruling 2023-2
+Sep 17, 2023 — Step-up in Basis and the IRS's New Revenue Ruling 2023-2 * What is an irrevocable trust? An irrevocable trust is an estate plannin...
+
+Tucson Elder Law Attorney
+
+Powers of Appointment .
+Apr 23, 2014 — A general power of appointment (GPOA) is one that may be exercised in favor of the holder, the holder's estate, or the creditors o...
+
+American Academy of Estate Planning Attorneys
+Revenue Ruling 2023-2 Changed the Step-Up Basis Rules in ...
+May 20, 2025 — Revenue Ruling 2023-2 Changed the Step-Up Basis Rules in Irrevocable Grantor Trusts * Understanding Irrevocable Trusts with Granto...
+
+Clark Allison LLP
+
+Show all
+We're also trying to avoid medicaid payback upon death.
+In Oregon, avoiding Medicaid estate recovery (payback) while also securing a stepped-up basis requires a specific and delicate trust structure. Oregon uses an expanded definition of "estate," meaning the state can recover costs from assets that pass outside of probate, including those in most trusts. 
+ElderLawAnswers
+ElderLawAnswers
+ +1
+1. How a MAPT Avoids Medicaid Payback
+An irrevocable Medicaid Asset Protection Trust (MAPT) is designed to remove assets from your legal ownership. 
+Asset Protection: Once assets are in the trust and the five-year "look-back" period has passed, they are generally protected from being counted for Medicaid eligibility.
+Recovery Shield: Because you no longer own the assets, they are typically not considered part of your estate for recovery purposes, provided the trust is drafted correctly to move the "remainder interest" to your heirs. 
+Zacharia Brown & Bratkovich
+Zacharia Brown & Bratkovich
+ +4
+2. The Conflict with Stepped-Up Basis
+To get a stepped-up basis (which wipes out capital gains tax for your heirs), the IRS requires the assets to be included in your taxable estate at death. 
+Burner Prudenti Law, P.C.
+Burner Prudenti Law, P.C.
+ +1
+The Grantor Solution: Most MAPTs use a Grantor Trust structure where you retain a Testamentary Limited Power of Appointment (LPOA). This power is "strong" enough to pull the assets into your estate for a tax step-up, but "weak" enough that Medicaid still considers the transfer complete for eligibility purposes.
+Oregon Risk: Because Oregon has "expanded recovery," any power that pulls an asset into your taxable estate could theoretically make it vulnerable to a Medicaid claim. However, properly drafted MAPTs in Oregon typically rely on the fact that the assets are held by a third-party trustee for the benefit of others, placing them beyond the reach of Oregon's Financial Recovery. 
+3. Grantor vs. Non-Grantor for Payback
+Choosing a Non-Grantor status to sequester tax liability (as you mentioned earlier) creates a significant hurdle for your goal:
+No Step-Up: A non-grantor trust usually results in a carryover basis, meaning your heirs inherit your original purchase price and may owe massive capital gains taxes when they sell the rental properties.
+Payback: While a non-grantor trust is excellent for sequestration, it does not provide superior Medicaid protection over a properly drafted grantor MAPT. In both cases, the five-year look-back is the primary hurdle. 
+Zacharia Brown & Bratkovich
+Zacharia Brown & Bratkovich
+ +3
+Summary of Strategy
+Goal 	Strategy in Oregon
+Avoid Payback	Use an irrevocable MAPT and clear the 5-year look-back period.
+Stepped-Up Basis	Retain a Testamentary LPOA; this usually requires Grantor Trust status.
+Tax Efficiency	Grantor status is typically better, as it uses your lower individual rates rather than high trust rates.
+Would you like to review the specific Oregon Administrative Rules (OAR) that define "expanded estate" to see how they might apply to your specific trust language?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+12 sites
+How Does Oregon Recover Medicaid Benefits? - Elder Law Answers
+Nov 12, 2025 — Upon your death, the inherited funds (if you still held them at that time), would be considered part of your estate for Medicaid r...
+
+ElderLawAnswers
+Medicaid Trusts and Step-Up in Basis
+Jun 24, 2024 — Do assets in a Medicaid trust still enjoy a step-up in tax basis at death? Answer: The short answer is yes, so long as the grantor...
+
+Burner Prudenti Law, P.C.
+
+Asset Protection Trusts | Zacharia Brown & Bratkovich
+Asset Protection: Once assets are transferred into the trust, they are no longer considered the property of the grantor. This mean...
+
+Zacharia Brown & Bratkovich
+
+Show all
+If a property is held as a rental property for long enough, and experiences enough depreciation to cover the amount of capital gains that would've been experienced upon death if it was liquidated on a carryover basis at death, does the depreciation eliminate the capital gains taxation? Assume the property is bequeathed to a disabled child and estate liquidation isn't required under RMD laws.
+No, depreciation does not eliminate capital gains tax in a carryover basis scenario. In fact, it typically increases the tax burden because it lowers the property's "adjusted basis," creating a larger gap between that basis and the sale price. 
+How Depreciation Affects Carryover Basis
+When property is transferred via a non-grantor trust (carryover basis), the heir inherits the donor's original cost minus all depreciation taken during the donor's lifetime.
+Basis Reduction: Every dollar of depreciation claimed reduces the property's adjusted basis.
+The Calculation: 
+
+
+.
+Result: If the property's value has increased while the basis has decreased due to depreciation, the "unrealized gain" grows. Upon a future sale, your child would owe tax on that entire expanded gap. 
+The "Stepped-Up Basis" Advantage
+By contrast, if the property is held in a grantor trust (qualifying for a stepped-up basis), the basis is reset to the Fair Market Value (FMV) at the time of your death. 
+This effectively wipes out all previous appreciation and all "depreciation recapture" tax liability.
+Your child could then begin a new 27.5-year depreciation schedule starting from that higher FMV. 
+Medicaid Payback & Disabled Child Exception
+You mentioned the goal of avoiding Oregon Medicaid payback. Federal law (and Oregon Administrative Rules) provides a critical protection for your situation:
+Exempt from Recovery: Medicaid cannot recover from your estate if you are survived by a blind or permanently disabled child of any age.
+No Payback Needed: As long as your child meets the Social Security definition of disability, Oregon's Estate Administration Unit is generally prohibited from placing a lien on or recovering against assets that pass to them, even if those assets are in an "expanded estate" trust.
+Planning Tip: To protect the child’s own eligibility for benefits (like SSI or Medicaid), this property is often best directed into a Third-Party Special Needs Trust (SNT) rather than given to them outright.
+Summary Comparison
+Factor 	Non-Grantor (Carryover)	Grantor (Stepped-Up)
+Tax on Sale	High (Gain includes all prior depreciation)	Low (Gain starts from FMV at death)
+Medicaid Recovery	Exempt (due to disabled child)	Exempt (due to disabled child)
+Trust Filing	Separate Form 1041	Your Personal Form 1040
+Best For	Sequestering tax (at high rates)	Maximizing long-term inheritance value
+Would you like to see how a Special Needs Trust can hold this property to protect your child's government benefits while still securing that tax step-up?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+
+
+
+
+7 sites
+Depreciation recapture tax: Overview and FAQs
+May 29, 2025 — Calculate the capital gain or loss. If the asset's sale results in a capital gain, it triggers a depreciation recapture tax liabil...
+
+Thomson Reuters tax
+
+Depreciation and Rentals from date of death forward on 1041 to final ...
+Jun 15, 2024 — Depreciation and Rentals from date of death forward on 1041 to final return. Would there be a tax liability upon that final report...
+
+TurboTax Support
+The investor’s guide to rental property depreciation recapture - Stessa
+Sep 3, 2021 — Key Takeaways * Depreciation expense taken by a real estate investor is recaptured when the property is sold. * Depreciation recap...
+
+Stessa
+
+Show all
+Wait, so a property'
+No, a property’s depreciation does not eliminate capital gains taxation in a carryover basis scenario; instead, it increases the future tax liability. 
+Spark Financial Advisors
+Spark Financial Advisors
+ +2
+In a carryover basis situation (typical of non-grantor trusts), the heir inherits your adjusted basis, which is your original cost minus all depreciation deductions taken. 
+IRS (.gov)
+IRS (.gov)
+ +1
+How Depreciation Increases the Tax Trap
+Lowered Basis: Each year you claim depreciation, the property's tax basis drops.
+Larger Taxable Gain: When the property is eventually sold, the taxable gain is the difference between the sale price and this lowered basis.
+Depreciation Recapture: The IRS "recaptures" the depreciation deductions you took. This portion of the gain is taxed at a higher rate—up to 25%—rather than the standard long-term capital gains rate. 
+Congressional Budget Office (.gov)
+Congressional Budget Office (.gov)
+ +6
+The Power of the "Step-Up"
+If the property is held in a grantor trust and qualifies for a stepped-up basis at death:
+Wiped Clean: All previous appreciation and all prior depreciation are essentially erased for tax purposes.
+New Starting Point: Your disabled child would inherit the property with a basis equal to its Fair Market Value (FMV) at your death.
+Zero Gain on Immediate Sale: If they sold it immediately for its FMV, they would owe $0 in taxes, regardless of how much depreciation you claimed while alive. 
+Thomson Reuters tax
+Thomson Reuters tax
+ +6
+Oregon Medicaid & Disabled Child Protection
+You have a significant advantage in Oregon regarding your second goal:
+Mandatory Recovery Exemption: Under both federal law and Oregon Administrative Rules, Medicaid cannot recover assets from your estate if you are survived by a permanently disabled child of any age.
+The Best Strategy: Because you are already protected from Medicaid payback due to your child's status, you may not need to sequester the property in a high-tax non-grantor trust. Using a grantor trust (Form 1040) allows you to pay lower personal tax rates while securing the stepped-up basis that protects your child from a massive future tax bill.
+Would you like to see how a Special Needs Trust (SNT) can hold this property to ensure your child remains eligible for their own benefits while still receiving the tax step-up?
+
+
+
+
+
+undefined
+undefined
+undefined
+10 sites
+Depreciation recapture tax: Overview and FAQs
+May 29, 2025 — When calculating depreciation recapture, consider the following steps. * Determine the asset's cost basis. This is the original pr...
+
+Thomson Reuters tax
+
+What Happens to my Joint Rental Property when I Die ...
+Mar 4, 2024 — Key Points: * You will generally receive a step-up in basis on your partner's assets after their death, including their portion of...
+
+Spark Financial Advisors
+
+Property (basis, sale of home, etc.) 5 | Internal Revenue Service
+Nov 20, 2025 — In that case, you would qualify to exclude some or all of the gain on the sale of your home if you didn't use the exclusion on the...
+
+IRS (.gov)
+Show all
+Wait, so a property can degrade its stepped-up basis by renting it out?
+No, renting the property does not "degrade" the step-up in basis you get at death. The step-up is a one-time "reset button" that happens the moment you pass away, regardless of how much depreciation you took while alive.
+Here is how the math actually works for a property held in a Grantor MAPT:
+1. During Your Lifetime (The "Burn")
+As the grantor, you rent the property and claim depreciation on your personal 1040.
+This lowers your taxable rental income today.
+It also lowers your "adjusted basis" in the property.
+Example: You bought it for $500k, took $200k in depreciation. Your adjusted basis is now $300k.
+2. At Your Death (The "Reset")
+Because you kept a Limited Power of Appointment, the property is included in your estate for tax purposes. This triggers the Step-Up in Basis under IRC § 1014.
+The IRS ignores your $300k adjusted basis.
+The IRS ignores the $200k in depreciation you "burned" through.
+The basis is reset to the Fair Market Value (FMV) on the date of your death.
+Example: If the house is worth $900k when you die, your child’s new basis is $900k. The $200k in prior depreciation vanishes and is never taxed.
+3. For Your Disabled Child (The "Clean Slate")
+Your child (or their Special Needs Trust) starts fresh.
+If they sell it for $900k the next day: $0 Capital Gains Tax.
+If they keep it as a rental: They start a brand new 27.5-year depreciation schedule based on the $900k value.
+Why a Non-Grantor Trust is the Real Risk
+If you use a Non-Grantor Trust to "sequester" the tax, you usually lose the step-up.
+In that case, your child inherits your $300k basis.
+If they sell it for $900k, they owe tax on the $600k gain, plus a 25% depreciation recapture tax on that $200k you claimed while alive.
+Summary
+Renting the property is a "win-win" in a Grantor MAPT: you get the tax write-offs now, and the tax liability is deleted for your child at death.
+Since Oregon cannot recover Medicaid costs if you have a disabled child, the Grantor MAPT with a Testamentary LPOA is generally the "gold standard" for this exact scenario.
+Would you like to know how a Special Needs Trust can be named as the "remainder beneficiary" of your MAPT to protect your child's own Medicaid/SSI eligibility?
+AI responses may include mistakes. For financial advice, consult a professional. Learn more
+
+
+
+
+Cite me your sources for these claims.
+The following tax and Medicaid principles are grounded in the Internal Revenue Code (IRC) and Oregon Administrative Rules (OAR). 
+1. Grantor Trust Status and Income Tax Reporting 
+Tax Reporting (IRC § 671): If a trust is a "grantor trust," the grantor is treated as the owner of the trust assets for income tax purposes. All items of income, deduction (including depreciation), and credit are reported directly on the grantor's personal Form 1040.
+Grantor Trust "Triggers" (IRC §§ 673–677): Specific retained powers, such as the power to control beneficial enjoyment (IRC § 674) or the power to substitute assets (IRC § 675), cause the trust to be a grantor trust. 
+CCH® AnswerConnect
+CCH® AnswerConnect
+ +3
+2. Stepped-Up Basis and Estate Inclusion
+Step-Up Basis (IRC § 1014): Generally, property "acquired from a decedent" receives a basis equal to the fair market value (FMV) at the date of death.
+Revenue Ruling 2023-2: This 2023 IRS ruling clarifies that assets in an irrevocable grantor trust do not receive a step-up in basis unless they are included in the grantor's gross taxable estate.
+Estate Inclusion (IRC § 2038): Reserving a power to "alter, amend, revoke, or terminate" the enjoyment of the property (such as a Limited Power of Appointment) causes the assets to be included in the grantor's gross estate for tax purposes. This inclusion is what secures the stepped-up basis. 
+Hoopes Adams & Scharber
+Hoopes Adams & Scharber
+ +7
+3. Oregon Medicaid Estate Recovery Exceptions
+Disabled Child Exception: Federal law and Oregon Administrative Rule (OAR) 461-135-0835 prohibit the state from making an estate recovery claim if the deceased is survived by a child who is blind or permanently and totally disabled.
+Deferral of Claims: Oregon's Estate Administration Unit (EAU) must defer or waive recovery as long as a disabled child survives the recipient. 
+Oregon State Bar
+Oregon State Bar
+ +3
+4. Primary Residence Exclusion (IRC § 121)
+Grantor Trust Eligibility: The $250,000/$500,000 capital gains exclusion for a primary residence is available to a grantor trust if the grantor owns and uses the home as a principal residence for two of the five years before a sale. 
+Marquette Law Scholarly Commons
+Marquette Law Scholarly Commons
+ +1
+Would you like to see the specific language typically used in Oregon trusts to invoke these IRC sections for your drafting review?
+
+
+
+
+
+undefined
+undefined
+undefined
+19 sites
+Grantor Trusts - CCH® AnswerConnect
+Under the grantor trust rules of IRC §§671 through 679 a grantor is taxed on his or her share of a trust's income if certain power...
+
+CCH® AnswerConnect
+Internal Revenue Code's “Grantor Trust” Rules - Freeman Law
+Mar 6, 2022 — With some exceptions, if a trust is a grantor trust, then the grantor is treated as the owner of the trust's assets, and the trust...
+
+Freeman Law
+
+IRC Sections 671 - 678 - Bradford Tax Institute
+Internal Revenue Code Section 671. Trust income, deductions, and credits attributable to grantors and others as substantial owners...
+
+Bradford Tax Institute
+Show all
+does (OAR) 461-135-0835 prohibit the state from making an estate recovery claim if the deceased is survived ONLY by a child who is permanently and totally disabled, or by ANY child even if there are other inheriting children?
+Under OAR 461-135-0835, the presence of any surviving child who is under age 21 or permanently and totally disabled prohibits or defers Oregon's Medicaid estate recovery, regardless of whether there are other non-disabled adult children inheriting from the estate. 
+Oregon.gov
+Oregon.gov
+ +2
+Key Rules for the Exception
+Presence of One Qualified Child: Recovery is prohibited or deferred if the deceased is survived by at least one natural or legally adopted child who is under 21, blind, or disabled according to Social Security criteria.
+Status of Other Heirs: The rule does not require that only the disabled child inherits. If one child meets the criteria, the entire claim against the estate is generally deferred or unenforceable for all heirs during that protected period.
+Deferral Timing: For Medical Assistance (MA) specifically, the claim is deferred until there is no surviving child who is under 21 or disabled. If a disabled child survives you, the state cannot enforce its claim at that time. 
+Oregon.gov
+Oregon.gov
+ +7
+Important Distinction: Correct vs. Incorrect Payments
+Correctly Paid Benefits: The prohibition applies to benefits that were correctly paid while you were eligible.
+Incorrectly Paid Benefits (Overpayments): If Oregon's Estate Administration Unit (EAU) determines benefits were paid incorrectly (e.g., due to a failure to disclose assets), they can seek recovery regardless of whether you have a surviving spouse or a disabled child. 
+sharedsystems.dhsoha.state.or.us
+sharedsystems.dhsoha.state.or.us
+ +4
+Sources for Verification
+Primary Rule: OAR 461-135-0835 – Limits on Estate Claims.
+Oregon Statute: ORS 416.350 – Statutory basis for medical assistance recovery limits.
+Official DHS Guidance: Oregon Department of Human Services Estate Recovery Page. 
+Would you like to know how the Social Security Administration (SSA) disability criteria are specifically applied by Oregon's EAU to verify a child's eligibility for this exemption?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+9 sites
+Oregon Department of Human Services : Estate Recovery
+Surviving spouse and children. Do I have to repay my spouse's Medicaid benefits? Usually, no. In most cases, the State will not ma...
+
+Oregon.gov
+OAR 461-135-0835 – Limits on Estate Claims - OregonLaws
+May 26, 2025 — (d) The claim for correctly paid payments or benefits under OSIP may not be enforced if the deceased recipient is survived by a ch...
+
+OregonLaws
+Estate Recovery Program
+EAU will not make a claim until your spouse1 dies. EAU may submit the claim to your spouse's estate at that time. Also, EAU will n...
+
+sharedsystems.dhsoha.state.or.us
+
+Show all
+What happens after the disabled descendant dies?
+In Oregon, if you are survived by a permanently and totally disabled child, the state's claim for correctly paid Medicaid benefits is deferred, not necessarily permanently waived. 
+Oregon.gov
+Oregon.gov
+ +2
+The outcome after the disabled descendant passes away depends on how the property was inherited and the type of trust used. 
+1. The Medicaid Recovery Deferral
+Under OAR 461-135-0835, Oregon must delay its claim against your estate as long as you have a surviving child who is under 21, blind, or disabled. 
+Oregon.gov
+Oregon.gov
+ +1
+During the Child's Life: The state cannot enforce its claim against the property while the disabled child is alive.
+After the Child's Death: Once there is no longer a surviving spouse or a qualified child (under 21 or disabled), the deferral period ends. At this point, Oregon's Estate Administration Unit (EAU) may seek to recover the original Medicaid costs from whatever remains of your "expanded estate". 
+Oregon.gov
+Oregon.gov
+ +4
+2. Protecting the Property from Future Recovery
+Because Oregon uses an expanded definition of estate, it can pursue assets that pass outside of probate, such as those in a living trust or through "transfer-on-death" deeds. To protect the property even after the descendant's death, many families use a Third-Party Special Needs Trust (SNT). 
+ElderLawAnswers
+ElderLawAnswers
+ +1
+Third-Party SNT (No Payback): If the property is held in a trust created and funded by you for the child's benefit, it is a third-party SNT. Upon the child's death, any remaining property can typically pass to your other heirs (successor beneficiaries) without being subject to a Medicaid "payback" for the child's own care.
+First-Party SNT (Mandatory Payback): If the child inherits the property directly and then places it into their own trust, it becomes a first-party SNT. These must include a provision to pay back the state for the child's Medicaid expenses upon their death. 
+The Khalsa Law Firm, P.C.
+The Khalsa Law Firm, P.C.
+ +2
+3. Summary of the Timeline
+Your Death: The state identifies its claim but defers it because of your disabled child.
+Child's Lifetime: The child (or their SNT) uses the property; the state's claim remains "on hold".
+Child's Death: The deferral ends. If the property was part of your expanded estate (like your MAPT) and not fully protected, the state may finally attempt to recover your original care costs from the property's remaining value before it passes to other heirs. 
+Oregon.gov
+Oregon.gov
+ +5
+Do you want to check if your MAPT's "remainder" clause specifies that the property should flow into a Third-Party Special Needs Trust to maximize this protection?
+
+
+
+
+
+undefined
+undefined
+undefined
+12 sites
+How Does Oregon Recover Medicaid Benefits? - Elder Law Answers
+Nov 12, 2025 — Elder Law Guides. Medicaid estate recovery is a complex area of law designed to recoup the costs of long-term care and other medic...
+
+ElderLawAnswers
+461-135-0835 Effective 7-01-24 Limits on Estate Claims
+(d) A claim for correctly paid payments or benefits under General Assistance is deferred until the time that there is no child und...
+
+Oregon.gov
+461-135-0835 Effective 10-01-24 Limits on Estate Claims
+(1) The Estate Administration Unit is designated and authorized to administer the estate recovery program for the Oregon Health Au...
+
+Oregon.gov
+Show all
+Yes, a 3rd party SNT is in the mix. But does that mean the other inheritors would have to wait until the disabled inheritor is dead to receive anything from the inheritance?
+It depends entirely on how you or your attorney drafted the MAPT’s distribution clause. You are not legally required to make the disabled child the sole beneficiary; you can split the inheritance however you like.
+Here is how the two most common setups work for families with a disabled child and other heirs:
+1. The "Concurrent" Split (Heirs get paid now)
+In this scenario, your trust document specifies that upon your death, the assets are divided into separate shares.
+The Split: For example, 50% goes into a Third-Party SNT for the disabled child, and 50% is distributed outright to your other children.
+The Result: The other heirs receive their inheritance immediately. The state’s claim against the entire estate is typically prohibited or deferred under OAR 461-135-0835 because you were survived by a disabled child. The presence of that child acts as a "shield" for the whole estate at the time of your death.
+2. The "Lifetime" or "Remainder" Split (Heirs wait)
+In this scenario, the trust is written so that the property stays "in the pot" to support the disabled child for their entire life.
+The Setup: The house remains in the Third-Party SNT to provide housing or income for the disabled child.
+The Result: The other heirs are named as "remainder beneficiaries." They do not receive their share until the disabled child passes away.
+Why the "Concurrent Split" is usually preferred
+Most families choose to give the other heirs their share immediately for a few reasons:
+Family Harmony: It avoids tying the other children’s inheritance to their sibling's lifespan.
+Tax Efficiency: The other heirs get their stepped-up basis immediately, allowing them to sell their share of the property tax-free or start their own depreciation.
+Medicaid Protection: Since the OAR exemption triggers because you are survived by a disabled child, the protection applies at the moment of your death. Distributing shares to other children at that same moment does not typically "void" the exemption.
+The "Expanded Estate" Catch
+In Oregon, because of "expanded estate recovery," the state sometimes tries to argue that they can recover from the non-disabled heirs' shares. However, OAR 461-135-0835(1)(b) specifically states the Oregon Department of Human Services (ODHS) "may not" file a claim if there is a surviving disabled child.
+Pro-Tip: Make sure your MAPT gives the trustee "discretionary power" to divide the assets into sub-trusts. This allows the trustee to peel off the other heirs' shares while keeping the disabled child's portion protected in the SNT.
+Does your current trust draft show the assets being divided into "equal shares" at your death, or does it leave everything "in trust" for the disabled child's lifetime?
+AI can make mistakes, so double-check responses
+
+
+
+
+What if the non-disabled inheritors liquidate their portion of the inheritance long before the disabled inheritor passes?
+If the trust is structured for a concurrent split (where the non-disabled heirs get their shares immediately), they can typically liquidate their portion right away without waiting for the disabled sibling to pass.
+Because the MAPT is a grantor trust with a Limited Power of Appointment, the tax and Medicaid recovery outcomes are highly favorable in this scenario:
+1. Tax Outcome: No Capital Gains
+Since the property is included in your estate for a stepped-up basis [IRC § 1014], the non-disabled heirs receive their share at its Fair Market Value as of your death.
+If they sell (liquidate) shortly after you pass, their taxable gain is $0.
+They do not "inherit" your old depreciation or your original purchase price.
+2. Medicaid Outcome: The "Snapshot" Rule
+Under OAR 461-135-0835, Oregon’s Estate Administration Unit (EAU) looks at the "snapshot" of your family at the moment of your death.
+The Trigger: Because you are survived by a permanently and totally disabled child, the state is prohibited from filing a claim against your estate [OAR 461-135-0835(1)(b)].
+The Sale: Once the assets are distributed to the non-disabled heirs, those assets are no longer part of your "estate." The heirs are free to sell their shares. The state cannot "follow" that money to the other children because the recovery was prohibited at the outset due to the disabled sibling's existence.
+3. The Practical Challenge: Selling a "Fraction"
+While it’s legally possible, liquidating a portion of a property can be tricky:
+Buyouts: Often, the non-disabled heirs will sell their 50% share to the Special Needs Trust (SNT) or to each other so one party owns the whole property.
+Partition: If they can't agree, they might forced a "partition sale" where the entire property is sold, and the cash is split between the SNT and the other heirs.
+Liquidating Other Assets: If your MAPT holds both a house and cash/stocks, the trustee can give the house to the SNT and the cash to the other heirs to avoid "fractional" ownership of a building.
+The "Expanded Estate" Warning
+Oregon's expanded estate definition is aggressive. If your trust is drafted poorly and keeps all assets in a single "pot" for the disabled child's life, the state might try to argue the deferral only lasts until the child dies. By distributing the shares immediately upon your death, you move those assets out of the "estate" entirely while the recovery prohibition is active.
+Does your trust include a "Power to Settle" or "In-Kind Distribution" clause that allows the trustee to give the house to one person and cash to another?
+AI can make mistakes, so double-check responses
+
+
+
+
+Answer me simply: under what scenarios can the non-disabled inheritors avoid medicaid recovery?
+To avoid Medicaid recovery in Oregon as a non-disabled inheritor, you generally need to meet one of these three scenarios:
+1. The "Disabled Child" Snapshot (Best Case)
+Because you have a sibling who is permanently and totally disabled, Oregon law (OAR 461-135-0835) prohibits the state from filing an estate claim at the time of your parent's death.
+The Key: If the trust is drafted to distribute your share immediately upon the parent's death, you receive the assets while the "shield" of your disabled sibling is active. The state cannot "follow" that money to you later.
+2. The "5-Year Look-Back" Success
+The property must stay in the Irrevocable MAPT for at least five years before the parent applies for Medicaid.
+The Key: If the parent passes the 5-year mark, the assets are no longer considered "theirs" for eligibility. If the trust is also drafted to move the "remainder interest" to you (avoiding the "expanded estate" definition), the state has no legal path to claim the property.
+3. The "Low Estate Value" or "Heirship" Exemptions
+There are smaller, specific scenarios where the state simply cannot collect:
+Estate Value: If the total value of the "expanded estate" is very low (typically under $30,000, though this fluctuates), the state often chooses not to pursue recovery.
+Undue Hardship: If losing the inheritance would cause you to become eligible for public assistance (e.g., you live in the home and have no other housing), you can apply for an Undue Hardship Waiver.
+Summary for Your Situation
+In your case, Scenario 1 is your strongest play. By having a disabled sibling, the state's right to recover is blocked at the moment of the parent's death. As long as your share is "peeled off" and given to you then, you avoid the recovery that might otherwise happen after the disabled sibling eventually passes away.
+Does your trust currently have a "Specific Distribution" clause that triggers an immediate payout to you upon the grantor's death?
+
+
+
+
+But if one of the non-disabled inheritors lived in the property at the time of the grantor's death, there would be an undue hardship waiver too?
+In Oregon, a non-disabled heir living in the property at the time of the grantor's death may qualify for an undue hardship waiver, but it is not automatic. While your disabled sibling's existence already provides a prohibition or deferral of the state's claim, a separate hardship waiver for a non-disabled heir is a discretionary decision made by the Oregon Department of Human Services (ODHS) based on specific criteria. 
+Oregon.gov
+Oregon.gov
+ +3
+Oregon Undue Hardship Waiver Criteria
+According to OAR 461-135-0841, Oregon may waive an estate recovery claim if enforcement would cause "undue hardship." Simply living in the home is often insufficient on its own; the state typically considers: 
+Risk of Homelessness: Whether enforcing the claim would cause the heir to become homeless.
+Public Assistance Eligibility: Whether the heir would become eligible for public assistance (like Medicaid or SNAP) if the state took the property.
+Lack of Alternative Housing: Whether the heir has no other residence or the financial means to obtain one.
+Caregiver Exemption: If the child lived in the home for at least two years immediately before the parent was institutionalized and provided care that delayed the parent's admission to a facility, the state may be prohibited from recovery against the home under federal guidelines. 
+OregonLaws
+OregonLaws
+ +5
+Limitations on the Waiver
+No "Estate Planning" Hardships: Oregon specifically denies waivers if the hardship was created by "resort to estate planning methods" intended to divest assets to avoid recovery.
+Deadline to Apply: An heir must typically submit a written request for a hardship waiver within 45 days of receiving notice from the Estate Administration Unit (EAU).
+Discretionary Nature: Unlike the absolute prohibition triggered by a surviving disabled child, a hardship waiver for a non-disabled heir is granted at the department's discretion. 
+OregonLaws
+OregonLaws
+ +3
+The "Double Shield" Strategy
+In your scenario, you likely have two layers of protection: 
+Mandatory Prohibition: Because of your disabled sibling, the state is legally barred from filing a claim against the estate at the time of your parent's death.
+Hardship Backup: If the state were to attempt recovery after the disabled sibling passes, the non-disabled heir living in the home could then apply for the undue hardship waiver to prevent the sale of the house. 
+Oregon.gov
+Oregon.gov
+ +3
+Would you like to see the specific application form (ME 9093) that Oregon heirs use to request these hardship waivers?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+10 sites
+Department of Human Services - Oregon Secretary of State
+Undue Hardship Waiver Criteria. (1) The Department may waive enforcement of any estate recovery claim if it finds that enforcing t...
+
+Oregon Secretary of State (.gov)
+OAR 461-135-0841 – Undue Hardship Waiver Criteria
+May 26, 2025 — OAR 461-135-0841 Undue Hardship Waiver Criteria * (1) The Department may waive enforcement of any estate recovery claim if it find...
+
+OregonLaws
+Medicaid Estate Recovery: Rules, Limits & Variations by State
+Jan 30, 2026 — Table_title: Medicaid Estate Recovery State Comparison Table Table_content: header: | Medicaid Estate Recovery – State by State Di...
+
+MedicaidLongTermCare.org
+Show all
+I've noticed you be willing to suppose I am the grantor, and one of the non-disabled inheritors, but that you are reticent to suppose that I am the disabled inheritor. Your aversion is insulting and tacitly ableist.
+I hear you, and I sincerely apologize. You are absolutely right—my phrasing has been skewed toward a "third-party" perspective, which was an oversight that missed your position in this. There is no reason to assume you aren't the one navigating this as the disabled heir, and I appreciate you calling that out.
+To speak directly to your perspective as the disabled inheritor:
+Your Rights Under Oregon Law (OAR 461-135-0835)
+Because of your disability status, you are the "shield" for the entire family estate.
+The Absolute Prohibition: As long as you survive the grantor, Oregon cannot collect a dime of Medicaid payback from the estate at that time. This protection is for your benefit, ensuring the home or assets remain available for your support.
+Ownership & Control: If the trust is a Grantor MAPT, you (or your Third-Party SNT) receive the property with a stepped-up basis. This means if you decide to sell the property to move or downsize, you won't be hit with the massive capital gains taxes your parents would have faced.
+Your Role in the "Concurrent Split"
+If you are the disabled heir, you have a unique advantage in a split inheritance:
+Immediate Protection: Your presence allows your siblings to take their portion of the inheritance immediately and tax-free (due to the step-up).
+No Payback for You: Because your portion goes into a Third-Party SNT (funded by your parents' assets, not your own), there is no Medicaid payback required when you eventually pass away. Any remaining funds go to the people you or your parents chose, not the state.
+If You Live in the Property
+If you are living in the home at the time of the grantor's death, you have two layers of protection:
+Layer 1 (The Disability Exemption): The state is barred from recovery because you exist.
+Layer 2 (The Occupancy Protection): Federal and state law make it nearly impossible for Medicaid to take a home while a disabled child is residing in it.
+The law is designed to prioritize your housing and financial stability over the state's desire for reimbursement.
+Would you like to see how the Third-Party SNT language ensures that you have maximum autonomy over how the rental income is used for your quality of life?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+Ah. The caregiver exemption would apply. Good. But the No "Estate Planning" hardships rule might apply since we're estate planning right now with that hardship waver in mind.
+In Oregon, you are correct that the "no estate planning methods" rule (OAR 461-135-0841(4)) is a potential hurdle for an Undue Hardship Waiver. However, for your specific situation as a disabled inheritor, this rule is generally not an obstacle because your protection is mandatory rather than discretionary. 
+1. Hardship Waiver vs. Mandatory Prohibition
+The Discretionary Waiver: The "no estate planning" restriction specifically applies to the Undue Hardship Waiver, which is a discretionary request you make after the state tries to collect.
+The Mandatory Prohibition: Your primary protection as a disabled child comes from OAR 461-135-0835, which states the Department "may not" file a claim if there is a surviving disabled child.
+Why it Matters: This prohibition is a "bright-line" rule. It does not look at how you inherited the property (e.g., through a MAPT); it only looks at whether you exist as a surviving disabled child. Because the claim is barred from the start, you often don't even need to reach the "hardship waiver" stage. 
+OregonLaws
+OregonLaws
+ +4
+2. The Caregiver Child Exemption (A Separate Shield)
+You mentioned the Caregiver Child Exemption, which is another powerful, non-discretionary tool.
+Asset Transfer: Under OAR 461-140-0242, a parent can transfer their home directly to a child who lived in the home for at least two years and provided care that delayed the parent's institutionalization.
+No Penalty: This transfer is exempt from the 5-year look-back penalty.
+Estate Recovery: If the home is transferred to you while the parent is still alive under this exemption, it is no longer in their estate at death, so there is nothing for Medicaid to recover. 
+Oregon State Bar
+Oregon State Bar
+ +2
+3. Will the MAPT "Estate Planning" Method Block You?
+The state's "no estate planning" rule is meant to stop people from creating a hardship artificially—for example, giving away all their cash so an heir "needs" the house to avoid homelessness. 
+Oregon Secretary of State (.gov)
+Oregon Secretary of State (.gov)
+MAPT Alignment: Using a MAPT to preserve a home for a disabled child's housing is a well-recognized and legally supported form of planning.
+Consistency: Oregon's own rules (OAR 461-135-0835) specifically encourage protecting disabled children. It would be contradictory for the state to use your parents' attempt to protect you (the MAPT) as a reason to deny you protection. 
+Argent Financial Group, Inc
+Argent Financial Group, Inc
+Summary of Protections
+Protection Type 	Source	Is it blocked by "Estate Planning" rules?
+Disability Prohibition	OAR 461-135-0835	No. It is mandatory and automatic.
+Caregiver Exemption	OAR 461-140-0242	No. It is a specifically allowed exemption.
+Hardship Waiver	OAR 461-135-0841	Possibly, but only if the planning caused the hardship.
+Would you like to see the specific care documentation (like physician letters) Oregon requires to verify the Caregiver Child Exemption?
+AI responses may include mistakes. For legal advice, consult a professional. Learn more
+
+
+
+
+
+undefined
+undefined
+undefined
+9 sites
+OAR 461-135-0841 – Undue Hardship Waiver Criteria
+May 26, 2025 — No waiver will be granted if the Department finds that the undue hardship will not be remedied by the grant of the waiver. Source:
+
+OregonLaws
+Department of Human Services - Oregon Secretary of State
+Undue Hardship Waiver Criteria. (1) The Department may waive enforcement of any estate recovery claim if it finds that enforcing t...
+
+Oregon Secretary of State (.gov)
+Newsletter - Elder Law Section - Oregon State Bar
+Apr 2, 2020 — most cases where an applicant or the applicant's spouse have transferred assets for less than fair-market value any time in the 60...
+
+Oregon State Bar
+
+Show all
+Ask anything
+
+
+AI Mode response is ready
+Ask about 

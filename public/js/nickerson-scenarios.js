@@ -17,12 +17,47 @@
 
     // Initialize on page load
     $(document).ready(function() {
+        initializeSidebar();
         initializeTriggerSelector();
         initializeCards();
         initializeSliders();
         initializeDetailLinks();
         loadInitialMetrics();
     });
+
+    /**
+     * Initialize parameter sidebar toggle
+     */
+    function initializeSidebar() {
+        // Overview: open by default
+        if (window.sidebarDefaultOpen) {
+            $('#paramSidebar').addClass('open');
+            $('#sidebarToggle').addClass('shifted');
+        }
+
+        $('#sidebarToggle').on('click', function() {
+            if ($('#paramSidebar').hasClass('open')) {
+                $('#paramSidebar').removeClass('open');
+                $(this).removeClass('shifted');
+            } else {
+                $('#paramSidebar').addClass('open');
+                $(this).addClass('shifted');
+            }
+        });
+
+        $('#sidebarClose').on('click', function() {
+            $('#paramSidebar').removeClass('open');
+            $('#sidebarToggle').removeClass('shifted');
+        });
+
+        // Close on Escape key
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $('#paramSidebar').hasClass('open')) {
+                $('#paramSidebar').removeClass('open');
+                $('#sidebarToggle').removeClass('shifted');
+            }
+        });
+    }
 
     /**
      * Initialize LTC trigger year selector buttons
@@ -228,7 +263,17 @@
             const scenarioId = $card.data('scenario-id');
 
             if (scenarioId) {
-                window.location.href = '/Nickerson/scenario/' + scenarioId;
+                const dest = '/Nickerson/scenario/' + scenarioId;
+
+                // Animate sidebar closed so user sees it collapse (teaches affordance)
+                if ($('#paramSidebar').hasClass('open')) {
+                    $('#paramSidebar').removeClass('open');
+                    $('#sidebarToggle').removeClass('shifted');
+                    // Navigate after the CSS transition completes (300ms)
+                    setTimeout(function() { window.location.href = dest; }, 350);
+                } else {
+                    window.location.href = dest;
+                }
             } else {
                 console.warn('[Nickerson] No scenario ID found for detail link');
             }
@@ -324,52 +369,48 @@
             }, 300);  // 300ms debounce
         });
 
-        // Advanced parameters toggle
-        $('.param-toggle').on('change', function() {
-            const $card = $(this).closest('.scenario-card');
-            const $sliders = $card.find('.param-sliders');
-
-            if (this.checked) {
-                $sliders.slideDown(200);
-            } else {
-                $sliders.slideUp(200);
-            }
-        });
-
-        // Sell-condo checkbox (per-card, NOT synced)
+        // Sell-condo checkbox (sidebar — updates Rental and MAPT, not Baseline)
         $('.sell-condo-toggle').on('change', function() {
-            const $card = $(this).closest('.scenario-card');
-            const disposition = $card.data('disposition');
-            const scenarioId = scenarioMap[disposition];
             const checked = this.checked ? 1 : 0;
+            const nonBaselineIds = ['ScA_Rental', 'ScA_MAPT'];
 
-            if (!scenarioId) return;
-
-            $.ajax({
-                url: '/Nickerson/scenario/' + scenarioId + '/update-parameter',
+            const updates = nonBaselineIds.map(id => $.ajax({
+                url: '/Nickerson/scenario/' + id + '/update-parameter',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ paramName: 'sell_condo_upfront', paramValue: checked }),
                 xhrFields: { withCredentials: true }
-            }).then(() => {
+            }));
+
+            Promise.all(updates).then(() => {
                 loadMetricsForAllCards();
             });
         });
 
-        // Parameter sliders (Phase 1: synchronized across all cards)
+        // Roommate checkbox (MAPT only)
+        $('#sidebar-roommate').on('change', function() {
+            const checked = this.checked ? 1 : 0;
+            if (checked) {
+                $('.roommate-amount').show();
+            } else {
+                $('.roommate-amount').hide();
+            }
+            $.ajax({
+                url: '/Nickerson/scenario/ScA_MAPT/update-parameter',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ paramName: 'roommate_enabled', paramValue: checked }),
+                xhrFields: { withCredentials: true }
+            }).then(() => { loadMetricsForAllCards(); });
+        });
+
+        // Parameter sliders (sidebar — single instance per param)
         $('.param-slider').on('input', function() {
             const param = $(this).data('param');
             const value = parseFloat($(this).val());
-            const cardNum = parseInt($(this).data('card'));
 
-            // Update display value for this card
+            // Update display value
             updateParamDisplay($(this), param, value);
-
-            // Sync all other cards' sliders for this parameter
-            $('.param-slider[data-param="' + param + '"]').not(this).each(function() {
-                $(this).val(value);
-                updateParamDisplay($(this), param, value);
-            });
 
             // Update backend for all parameters
             const paramMap = {
@@ -388,14 +429,18 @@
                 'heloc_rate': 'heloc_rate',
                 'medical_base_monthly': 'medical_base_monthly',
                 'memory_care_cost': 'memory_care_cost',
-                'condo_maintenance': 'condo_maintenance'
+                'condo_maintenance': 'condo_maintenance',
+                'roommate_monthly': 'roommate_monthly',
+                'primary_house_value': 'primary_house_value',
+                'condo_value': 'condo_value',
+                'rental_increase_rate': 'rental_increase_rate'
             };
 
             // Percentage parameters: slider value (6.0) → decimal (0.06) for backend
             const percentageParams = ['ira_growth', 'primary_appreciation', 'condo_appreciation',
                                        'memory_care_inflation', 'management_fee',
                                        'primary_mortgage_rate', 'condo_mortgage_rate', 'heloc_rate',
-                                       'mortgage_split_pct'];
+                                       'mortgage_split_pct', 'rental_increase_rate'];
 
             if (paramMap[param]) {
                 clearTimeout(window.paramSliderUpdateTimer);
@@ -419,9 +464,9 @@
             displayText = '$' + formatNumber(value) + '/yr';
         } else if (param === 'rental_income') {
             displayText = '$' + formatNumber(value) + '/mo';
-        } else if (param === 'medical_base_monthly') {
+        } else if (param === 'medical_base_monthly' || param === 'roommate_monthly') {
             displayText = '$' + formatNumber(value) + '/mo';
-        } else if (param === 'managed_ira_start' || param === 'total_mortgage_amount') {
+        } else if (param === 'managed_ira_start' || param === 'total_mortgage_amount' || param === 'primary_house_value' || param === 'condo_value') {
             displayText = '$' + formatNumber(value);
         } else if (param === 'memory_care_cost' || param === 'condo_maintenance') {
             displayText = '$' + formatNumber(value) + '/yr';
@@ -464,7 +509,10 @@
             'mortgage_split_pct':      { val: data.mortgage_split_pct * 100 },
             'primary_mortgage_rate':   { val: data.primary_mortgage_rate * 100 },
             'condo_mortgage_rate':       { val: data.condo_mortgage_rate * 100 },
-            'condo_maintenance':       { val: data.condo_maintenance }
+            'condo_maintenance':       { val: data.condo_maintenance },
+            'primary_house_value':     { val: data.primary_house_value },
+            'condo_value':             { val: data.condo_value },
+            'rental_increase_rate':    { val: data.rental_increase_rate * 100 }
         };
 
         Object.keys(paramInit).forEach(function(param) {
@@ -487,18 +535,27 @@
         }
         if (data.year_of_passing) {
             $('.year-of-passing-slider').val(data.year_of_passing);
-            $('.year-of-passing-slider').siblings('.passing-value').text(data.year_of_passing);
+            $('.year-of-passing-slider').siblings('.year-of-passing-value, .passing-value').text(data.year_of_passing);
         }
 
-        // Sell-condo checkbox (per-scenario, not synced)
-        $('.sell-condo-toggle').each(function() {
-            var $card = $(this).closest('.scenario-card');
-            var disposition = $card.data('disposition');
-            var scenarioId = scenarioMap[disposition];
-            if (scenarioId && window.scenarioData[scenarioId]) {
-                this.checked = window.scenarioData[scenarioId].sell_condo_upfront === 1;
+        // Sell-condo checkbox (sidebar — init from Rental scenario state)
+        var rentalData = window.scenarioData['ScA_Rental'];
+        if (rentalData) {
+            $('#sidebar-sell-condo').prop('checked', rentalData.sell_condo_upfront === 1);
+        }
+
+        // Roommate checkbox (sidebar — init from MAPT scenario state)
+        var maptData = window.scenarioData['ScA_MAPT'];
+        if (maptData) {
+            $('#sidebar-roommate').prop('checked', maptData.roommate_enabled === 1);
+            if (maptData.roommate_enabled === 1) {
+                $('.roommate-amount').show();
             }
-        });
+            if (maptData.roommate_monthly) {
+                $('.param-slider[data-param="roommate_monthly"]').val(maptData.roommate_monthly);
+                updateParamDisplay($('.param-slider[data-param="roommate_monthly"]'), 'roommate_monthly', maptData.roommate_monthly);
+            }
+        }
     }
 
     /**
@@ -633,18 +690,35 @@
 
         // Update liquid assets values
         $card.find('.liquid-assets-start').text(formatCurrency(metrics.liquid_assets_start));
-        $card.find('.liquid-assets-min').text(formatCurrency(metrics.liquid_assets_min) +
-                                              (metrics.liquid_assets_min_year ? ' (' + metrics.liquid_assets_min_year + ')' : ''));
-        $card.find('.liquid-assets-final').text(formatCurrency(metrics.liquid_assets_final));
+        // Final: show depletion year if hit $0
+        if (metrics.liquid_assets_final <= 0 && metrics.liquid_assets_min_year) {
+            $card.find('.liquid-assets-final').text('$0 (' + metrics.liquid_assets_min_year + ')');
+        } else {
+            $card.find('.liquid-assets-final').text(formatCurrency(metrics.liquid_assets_final));
+        }
 
         // Update IRA values
         $card.find('.ira-start').text(formatCurrency(metrics.ira_start));
-        $card.find('.ira-min').text(formatCurrency(metrics.ira_min) +
-                                     (metrics.ira_min_year ? ' (' + metrics.ira_min_year + ')' : ''));
-        $card.find('.ira-final').text(formatCurrency(metrics.ira_final));
+        // Final: show depletion year if hit $0
+        if (metrics.ira_final <= 0 && metrics.ira_min_year) {
+            $card.find('.ira-final').text('$0 (' + metrics.ira_min_year + ')');
+        } else {
+            $card.find('.ira-final').text(formatCurrency(metrics.ira_final));
+        }
 
         // Update LTC total
         $card.find('.ltc-total').text(formatCurrency(metrics.ltc_total));
+
+        // MAPT Trust balance (only for MAPT scenario)
+        if (metrics.trust_balance_final !== undefined && metrics.trust_balance_final !== null) {
+            var trustTotal = (metrics.trust_balance_final || 0) + (metrics.snt_balance_final || 0);
+            var trustText = formatCurrency(trustTotal);
+            if (trustTotal <= 0 && metrics.trust_exhausted_year) {
+                trustText = '$0 (' + metrics.trust_exhausted_year + ')';
+            }
+            $card.find('.trust-balance-final').text(trustText);
+            $card.find('.mapt-only').show();
+        }
 
         // Update final real estate values (multi-line display)
         let realEstateLines = [];
@@ -688,8 +762,8 @@
             realEstateTooltipParts.push('Final mortgage balance: ' + formatCurrency(metrics.mortgage_final));
         }
 
-        // Show critical liquidation if needed
-        if (metrics.real_estate_liquidation_total > 0) {
+        // Show critical liquidation only if it's forced (not a voluntary condo sale)
+        if (metrics.real_estate_liquidation_total > 0 && !metrics.condo_sale_year) {
             realEstateLiqLines.push('CRITICAL: ' + formatCurrency(metrics.real_estate_liquidation_total) + ' (' + metrics.real_estate_liquidation_year + ')');
             realEstateTooltipParts.push('WARNING: All assets exhausted. Additional liquidation needed.');
         }

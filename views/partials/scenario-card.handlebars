@@ -9,205 +9,6 @@
         <strong>Timeline:</strong> <span class="timeline-text">LTC insurance payout in 2028, Memory Care starts 2031, Passing in 2040</span>
     </div>
 
-    <div class="ltc-trigger-control">
-        <label>LTC Trigger Year</label>
-        <div class="slider-container">
-            <input type="range" min="2026" max="2036" value="2028" step="1"
-                   class="ltc-slider" data-card="{{cardNumber}}">
-            <span class="ltc-value">2028</span>
-        </div>
-    </div>
-
-    <div class="memory-care-control">
-        <label>Memory Care Start Year</label>
-        <div class="slider-container">
-            <input type="range" min="2026" max="2040" value="2031" step="1"
-                   class="memory-care-slider" data-card="{{cardNumber}}">
-            <span class="memory-care-value">2031</span>
-        </div>
-    </div>
-
-    <div class="year-of-passing-control">
-        <label>Year of Passing</label>
-        <div class="slider-container">
-            <input type="range" min="2026" max="2040" value="2040" step="1"
-                   class="year-of-passing-slider" data-card="{{cardNumber}}">
-            <span class="year-of-passing-value">2040</span>
-        </div>
-    </div>
-
-    {{#unless isBaseline}}
-    <div class="sell-condo-control">
-        <label class="sell-condo-label">
-            <input type="checkbox" class="sell-condo-toggle" data-card="{{cardNumber}}">
-            Sell condo upfront (no rental income)
-        </label>
-    </div>
-    {{/unless}}
-
-    <div class="advanced-params-section">
-        <label class="param-toggle-label">
-            <input type="checkbox" class="param-toggle" data-card="{{cardNumber}}">
-            ⚙️ Advanced Parameters
-        </label>
-
-        <div class="param-sliders" style="display:none;">
-
-            <details class="param-group">
-                <summary>Income & Assets</summary>
-                <div class="param-group-body">
-                    <div class="param-row">
-                        <label>IRA Growth Rate</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="10" value="4.0" step="0.1"
-                                   class="param-slider" data-param="ira_growth" data-card="{{cardNumber}}">
-                            <span class="param-value">4.0%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>ManagedIRA Starting Balance</label>
-                        <div class="slider-container">
-                            <input type="range" min="100000" max="1000000" value="300000" step="5000"
-                                   class="param-slider" data-param="managed_ira_start" data-card="{{cardNumber}}">
-                            <span class="param-value">$300,000</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Monthly Rental Income</label>
-                        <div class="slider-container">
-                            <input type="range" min="2000" max="3500" value="2350" step="50"
-                                   class="param-slider" data-param="rental_income" data-card="{{cardNumber}}">
-                            <span class="param-value">$2,350/mo</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <details class="param-group">
-                <summary>Expenses & Care</summary>
-                <div class="param-group-body">
-                    <div class="param-row">
-                        <label title="A's personal budget (rental income is additional, earmarked for condo expenses)">Personal Gross Expenses (Pre-Facility)</label>
-                        <div class="slider-container">
-                            <input type="range" min="50000" max="150000" value="95000" step="1000"
-                                   class="param-slider" data-param="lifestyle" data-card="{{cardNumber}}">
-                            <span class="param-value">$95,000/yr</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Medical Base Monthly</label>
-                        <div class="slider-container">
-                            <input type="range" min="100" max="500" value="200" step="10"
-                                   class="param-slider" data-param="medical_base_monthly" data-card="{{cardNumber}}">
-                            <span class="param-value">$200/mo</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Memory Care (pre-inflation)</label>
-                        <div class="slider-container">
-                            <input type="range" min="80000" max="200000" value="120000" step="5000"
-                                   class="param-slider" data-param="memory_care_cost" data-card="{{cardNumber}}">
-                            <span class="param-value">$120,000/yr</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Memory Care Inflation</label>
-                        <div class="slider-container">
-                            <input type="range" min="3" max="10" value="5.0" step="0.5"
-                                   class="param-slider" data-param="memory_care_inflation" data-card="{{cardNumber}}">
-                            <span class="param-value">5.0%</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <details class="param-group">
-                <summary>Real Estate</summary>
-                <div class="param-group-body">
-                    <div class="param-row">
-                        <label>Primary House Appreciation</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="15" value="6.0" step="0.1"
-                                   class="param-slider" data-param="primary_appreciation" data-card="{{cardNumber}}">
-                            <span class="param-value">6.0%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Condo Appreciation</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="15" value="5.0" step="0.1"
-                                   class="param-slider" data-param="condo_appreciation" data-card="{{cardNumber}}">
-                            <span class="param-value">5.0%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Condo Maintenance</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="6000" value="2400" step="100"
-                                   class="param-slider" data-param="condo_maintenance" data-card="{{cardNumber}}">
-                            <span class="param-value">$2,400/yr</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Management Fee</label>
-                        <div class="slider-container">
-                            <input type="range" min="6" max="10" value="8.0" step="0.5"
-                                   class="param-slider" data-param="management_fee" data-card="{{cardNumber}}">
-                            <span class="param-value">8.0%</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <details class="param-group">
-                <summary>Mortgages & Debt</summary>
-                <div class="param-group-body">
-                    <div class="param-row">
-                        <label>Total Mortgage Amount</label>
-                        <div class="slider-container">
-                            <input type="range" min="250000" max="400000" value="300000" step="10000"
-                                   class="param-slider" data-param="total_mortgage_amount" data-card="{{cardNumber}}">
-                            <span class="param-value">$300,000</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label title="Percentage allocated to primary house (interest-only). Remainder goes to condo (30yr P&I).">Mortgage Split (Primary / Condo)</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="100" value="80" step="5"
-                                   class="param-slider" data-param="mortgage_split_pct" data-card="{{cardNumber}}">
-                            <span class="param-value">80% / 20%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Primary Mortgage Rate (Interest-Only)</label>
-                        <div class="slider-container">
-                            <input type="range" min="4.0" max="10.0" value="5.7" step="0.1"
-                                   class="param-slider" data-param="primary_mortgage_rate" data-card="{{cardNumber}}">
-                            <span class="param-value">5.7%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>Condo Mortgage Rate (30yr P&I)</label>
-                        <div class="slider-container">
-                            <input type="range" min="4.0" max="10.0" value="6.5" step="0.1"
-                                   class="param-slider" data-param="condo_mortgage_rate" data-card="{{cardNumber}}">
-                            <span class="param-value">6.5%</span>
-                        </div>
-                    </div>
-                    <div class="param-row">
-                        <label>HELOC Interest Rate</label>
-                        <div class="slider-container">
-                            <input type="range" min="4.0" max="10.0" value="7.5" step="0.1"
-                                   class="param-slider" data-param="heloc_rate" data-card="{{cardNumber}}">
-                            <span class="param-value">7.5%</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-        </div>
-    </div>
-
     <div class="metrics">
         <h3>Financial Metrics (2026-2040)</h3>
         <div class="metric-row">
@@ -215,11 +16,7 @@
             <span class="metric-value liquid-assets-start">$643,000</span>
         </div>
         <div class="metric-row">
-            <span class="metric-label" title="Minimum liquid assets during projection">Liquid Assets Min:</span>
-            <span class="metric-value liquid-assets-min">—</span>
-        </div>
-        <div class="metric-row">
-            <span class="metric-label" title="Liquid assets at end of 2040">Liquid Assets Final:</span>
+            <span class="metric-label" title="Liquid assets at end of projection, or year depleted if $0">Liquid Assets Final:</span>
             <span class="metric-value liquid-assets-final">—</span>
         </div>
         <div class="metric-row">
@@ -227,16 +24,16 @@
             <span class="metric-value ira-start">$368,000</span>
         </div>
         <div class="metric-row">
-            <span class="metric-label" title="Minimum combined IRA balance during projection">IRA Min:</span>
-            <span class="metric-value ira-min">—</span>
-        </div>
-        <div class="metric-row">
-            <span class="metric-label" title="Combined IRA balance in 2040">IRA Final:</span>
+            <span class="metric-label" title="Combined IRA balance at end of projection, or year depleted if $0">IRA Final:</span>
             <span class="metric-value ira-final">—</span>
         </div>
         <div class="metric-row">
             <span class="metric-label" title="Total LTC payouts from trigger year onward">LTC Disbursed:</span>
             <span class="metric-value ltc-total">—</span>
+        </div>
+        <div class="metric-row mapt-only" style="display:none;">
+            <span class="metric-label" title="MAPT checking + SNT balance at end of projection">Trust Balance Final:</span>
+            <span class="metric-value trust-balance-final">—</span>
         </div>
         <div class="metric-row">
             <span class="metric-label" title="Final value of all real estate in 2040">Real Estate Final:</span>

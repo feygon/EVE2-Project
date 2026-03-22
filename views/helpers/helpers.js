@@ -228,6 +228,11 @@ exports.json = function(context) {
     return JSON.stringify(context);
 };
 
+// JSON for HTML data attributes (HTML-entity-escaped)
+exports.jsonEscape = function(context) {
+    return JSON.stringify(context).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
 // Format number rounded to nearest $1k, displayed with 'k' suffix (e.g., 95000 -> 95k, 1235000 -> 1,235k)
 // Actual values preserved in tooltips; this is display-only rounding
 exports.formatNumber = function(num) {
@@ -463,12 +468,19 @@ exports.formatIncomeTooltip = function(income, projection) {
     // Rental income below personal budget with divider
     if (income.rental && income.rental > 0) {
         lines.push('────────────────────────');
-        lines.push(`Rental Income: $${formatNum(income.rental)}`);
-        lines.push('');
-        lines.push('Note: Rental income is earmarked for');
-        lines.push('condo expenses (mortgage, management,');
-        lines.push('taxes, etc.) and is ADDITIONAL to the');
-        lines.push('Personal Gross Expenses (Pre-Facility) slider.');
+        if (projection && projection.rental_to_trust) {
+            lines.push(`Rental Income: $${formatNum(income.rental)} (MAPT trust income)`);
+            lines.push('');
+            lines.push('Note: Rental flows to MAPT checking account.');
+            lines.push('Not included in Person A\'s taxable income.');
+        } else {
+            lines.push(`Rental Income: $${formatNum(income.rental)}`);
+            lines.push('');
+            lines.push('Note: Rental income is earmarked for');
+            lines.push('condo expenses (mortgage, management,');
+            lines.push('taxes, etc.) and is ADDITIONAL to the');
+            lines.push('Personal Gross Expenses (Pre-Facility) slider.');
+        }
     }
 
     // Add AGI reference
@@ -495,8 +507,8 @@ exports.formatTaxableIncomeTooltip = function(projection) {
         lines.push(`Social Security: $${formatNum(projection.income.ssdi)}`);
     }
 
-    // Rental income (full amount)
-    if (projection.income && projection.income.rental) {
+    // Rental income (only if it's Person A's income, not trust income)
+    if (projection.income && projection.income.rental && !projection.rental_to_trust) {
         lines.push(`Rental Income: $${formatNum(projection.income.rental)}`);
     }
 
@@ -520,7 +532,8 @@ exports.formatTaxableIncomeTooltip = function(projection) {
         lines.push(`SS (85% taxable): $${formatNum(taxableSS)}`);
     }
 
-    if (projection.income && projection.income.rental) {
+    // Rental only in AGI if it's Person A's income (not MAPT trust income)
+    if (projection.income && projection.income.rental && !projection.rental_to_trust) {
         lines.push(`Rental (100% taxable): $${formatNum(projection.income.rental)}`);
     }
 
@@ -543,40 +556,48 @@ exports.formatTaxableIncomeTooltip = function(projection) {
 };
 
 // Format Expenses tooltip - grouped by category
-exports.formatExpensesTooltip = function(expenses) {
+// projection param is optional — used to detect MAPT scenario for @ markers
+exports.formatExpensesTooltip = function(expenses, projection) {
     if (!expenses || typeof expenses !== 'object') return '';
+    // Handlebars passes options hash as last arg — detect and ignore
+    if (projection && projection.hash !== undefined) projection = null;
 
     const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
     const lines = [];
+    const isMapt = projection && projection.rental_to_trust;
+    const inMC = projection && projection.in_memory_care;
+    // @ = paid by MAPT trust, not Person A
+    const m = (isTrustExp) => (isMapt && isTrustExp) ? ' @' : '';
 
     lines.push('Base Expenses:');
+    if (isMapt) lines.push('@ = MAPT trust expense');
     lines.push('');
 
     // Primary House expenses
     const primaryExpenses = [];
     let primaryTotal = 0;
     if (expenses.primary_house_taxes) {
-        primaryExpenses.push(`  Property Taxes: $${formatNum(expenses.primary_house_taxes)}*`);
+        primaryExpenses.push(`  Property Taxes: $${formatNum(expenses.primary_house_taxes)}${m(inMC)}`);
         primaryTotal += expenses.primary_house_taxes;
     }
     if (expenses.primary_house_utilities) {
-        primaryExpenses.push(`  Utilities: $${formatNum(expenses.primary_house_utilities)}`);
+        primaryExpenses.push(`  Utilities: $${formatNum(expenses.primary_house_utilities)}${m(inMC)}`);
         primaryTotal += expenses.primary_house_utilities;
     }
     if (expenses.primary_house_insurance) {
-        primaryExpenses.push(`  Insurance: $${formatNum(expenses.primary_house_insurance)}`);
+        primaryExpenses.push(`  Insurance: $${formatNum(expenses.primary_house_insurance)}${m(inMC)}`);
         primaryTotal += expenses.primary_house_insurance;
     }
     if (expenses.primary_house_maintenance) {
-        primaryExpenses.push(`  Maintenance: $${formatNum(expenses.primary_house_maintenance)}`);
+        primaryExpenses.push(`  Maintenance: $${formatNum(expenses.primary_house_maintenance)}${m(inMC)}`);
         primaryTotal += expenses.primary_house_maintenance;
     }
     if (expenses.primary_mortgage_interest) {
-        primaryExpenses.push(`  Mortgage Interest: $${formatNum(expenses.primary_mortgage_interest)}*`);
+        primaryExpenses.push(`  Mortgage Interest (IO): $${formatNum(expenses.primary_mortgage_interest)}${m(true)}`);
         primaryTotal += expenses.primary_mortgage_interest;
     }
     if (expenses.condo_mortgage_interest) {
-        primaryExpenses.push(`  Condo Mortgage Interest: $${formatNum(expenses.condo_mortgage_interest)}*`);
+        primaryExpenses.push(`  Condo Mortgage Interest: $${formatNum(expenses.condo_mortgage_interest)}`);
         primaryTotal += expenses.condo_mortgage_interest;
     }
     if (expenses.condo_mortgage_principal) {
@@ -592,27 +613,27 @@ exports.formatExpensesTooltip = function(expenses) {
     const condoExpenses = [];
     let condoTotal = 0;
     if (expenses.management_fee) {
-        condoExpenses.push(`  Management Fee: $${formatNum(expenses.management_fee)}\u2020`);
+        condoExpenses.push(`  Management Fee: $${formatNum(expenses.management_fee)}${m(true)}`);
         condoTotal += expenses.management_fee;
     }
     if (expenses.condo_hoa) {
-        condoExpenses.push(`  HOA Fee: $${formatNum(expenses.condo_hoa)}\u2020`);
+        condoExpenses.push(`  HOA Fee: $${formatNum(expenses.condo_hoa)}${m(true)}`);
         condoTotal += expenses.condo_hoa;
     }
     if (expenses.condo_maintenance) {
-        condoExpenses.push(`  Maintenance: $${formatNum(expenses.condo_maintenance)}\u2020`);
+        condoExpenses.push(`  Maintenance: $${formatNum(expenses.condo_maintenance)}${m(true)}`);
         condoTotal += expenses.condo_maintenance;
     }
     if (expenses.condo_property_tax) {
-        condoExpenses.push(`  Property Taxes: $${formatNum(expenses.condo_property_tax)}\u2020`);
+        condoExpenses.push(`  Property Taxes: $${formatNum(expenses.condo_property_tax)}${m(true)}`);
         condoTotal += expenses.condo_property_tax;
     }
     if (expenses.condo_insurance) {
-        condoExpenses.push(`  Insurance: $${formatNum(expenses.condo_insurance)}\u2020`);
+        condoExpenses.push(`  Insurance: $${formatNum(expenses.condo_insurance)}${m(true)}`);
         condoTotal += expenses.condo_insurance;
     }
     if (expenses.condo_deferred_maintenance) {
-        condoExpenses.push(`  Deferred Maintenance: $${formatNum(expenses.condo_deferred_maintenance)}\u2020`);
+        condoExpenses.push(`  Deferred Maintenance: $${formatNum(expenses.condo_deferred_maintenance)}${m(true)}`);
         condoTotal += expenses.condo_deferred_maintenance;
     }
     if (condoExpenses.length > 0) {
@@ -672,7 +693,14 @@ exports.formatExpensesTooltip = function(expenses) {
     }
 
     lines.push('────────────────────────');
-    lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
+    if (isMapt && projection && projection.mapt_property_expenses) {
+        // Show Person A's expenses excluding MAPT trust expenses
+        const personATotal = (expenses.total || 0) - projection.mapt_property_expenses;
+        lines.push(`Person A Expenses: $${formatNum(personATotal)}`);
+        lines.push(`MAPT Trust Expenses: $${formatNum(projection.mapt_property_expenses)} @`);
+    } else {
+        lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
+    }
 
     // Lifestyle below total with divider (user's personal budget slider)
     if (expenses.lifestyle) {
@@ -681,6 +709,9 @@ exports.formatExpensesTooltip = function(expenses) {
     }
 
     lines.push('');
+    if (isMapt) {
+        lines.push('@ = MAPT trust expense (not Person A)');
+    }
     lines.push('* Itemized deduction (Sch A)');
     lines.push('\u2020 Rental deduction (Sch E)');
 
@@ -847,6 +878,69 @@ exports.formatDeductionsTooltip = function(projection) {
     if (projection.agi !== undefined) {
         lines.push('');
         lines.push(`AGI: $${formatNum(projection.agi)}`);
+    }
+
+    return lines.join('\n');
+};
+
+// Format MAPT Net tooltip — trust income, expenses, balance
+exports.formatMaptTooltip = function(projection) {
+    if (!projection) return '';
+
+    const formatNum = (num) => Math.round(num || 0).toLocaleString('en-US');
+    const lines = [];
+    const exp = projection.expenses || {};
+
+    lines.push('=== MAPT Trust Income ===');
+    if (projection.income && projection.income.rental) {
+        lines.push(`Condo Rental: $${formatNum(projection.income.rental)}`);
+    }
+    if (projection.income && projection.income.roommate) {
+        lines.push(`Roommate Rent: $${formatNum(projection.income.roommate)}`);
+        if (projection.roommate_tax > 0) {
+            lines.push(`  Tax (30%): -$${formatNum(projection.roommate_tax)}`);
+            lines.push(`  Net to trust: $${formatNum(projection.roommate_net_to_trust)}`);
+        }
+        if (projection.roommate_depreciation > 0) {
+            lines.push(`  Depreciation: $${formatNum(projection.roommate_depreciation)}`);
+        }
+    }
+
+    lines.push('');
+    lines.push('=== MAPT Trust Expenses ===');
+    lines.push('--- Condo ---');
+    if (exp.condo_property_tax) lines.push(`  Property Tax: -$${formatNum(exp.condo_property_tax)}`);
+    if (exp.condo_hoa) lines.push(`  HOA: -$${formatNum(exp.condo_hoa)}`);
+    if (exp.condo_insurance) lines.push(`  Insurance: -$${formatNum(exp.condo_insurance)}`);
+    if (exp.condo_maintenance) lines.push(`  Maintenance: -$${formatNum(exp.condo_maintenance)}`);
+    if (exp.management_fee) lines.push(`  Mgmt Fee: -$${formatNum(exp.management_fee)}`);
+
+    lines.push('--- Primary House ---');
+    if (exp.primary_mortgage_interest) lines.push(`  Mortgage (IO): -$${formatNum(exp.primary_mortgage_interest)}`);
+    if (projection.in_memory_care) {
+        if (exp.primary_house_taxes) lines.push(`  Property Tax: -$${formatNum(exp.primary_house_taxes)}`);
+        if (exp.primary_house_insurance) lines.push(`  Insurance: -$${formatNum(exp.primary_house_insurance)}`);
+        if (exp.primary_house_maintenance) lines.push(`  Maintenance: -$${formatNum(exp.primary_house_maintenance)}`);
+        if (exp.primary_house_utilities) lines.push(`  Utilities: -$${formatNum(exp.primary_house_utilities)}`);
+    } else {
+        lines.push('  (Person A pays as occupant)');
+    }
+
+    if (projection.mapt_property_expenses) {
+        lines.push(`Total Trust Expenses: -$${formatNum(projection.mapt_property_expenses)}`);
+    }
+
+    lines.push('');
+    lines.push('=== Trust Balance ===');
+    if (projection.mapt_checking_open !== undefined) {
+        lines.push(`Opening: $${formatNum(projection.mapt_checking_open)}`);
+    }
+    lines.push(`Closing: $${formatNum(projection.trust_balance)}`);
+    if (projection.snt_balance > 0) {
+        lines.push(`SNT: $${formatNum(projection.snt_balance)}`);
+    }
+    if (projection.mapt_trust_shortfall > 0) {
+        lines.push(`SHORTFALL: $${formatNum(projection.mapt_trust_shortfall)}`);
     }
 
     return lines.join('\n');
