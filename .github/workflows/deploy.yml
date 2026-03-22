@@ -60,11 +60,37 @@ jobs:
             --exclude='scripts/_calculateMedicalDeduction.js' \
             --exclude='scripts/_calculateSSDITaxability.js' \
             --exclude='scripts/_calculateEffectiveTaxRate.js' \
+            --exclude='scripts/_calculatePropertyValue.js' \
+            --exclude='scripts/_calculateCondoSale.js' \
+            --exclude='scripts/_calculateMortgagePayments.js' \
+            --exclude='scripts/_calculateTaxes.js' \
+            --exclude='scripts/constants.js' \
+            --exclude='scripts/migrate.js' \
+            --exclude='scripts/capture-baselines.js' \
+            --exclude='scripts/verify-all-baselines.js' \
+            --exclude='scripts/add-medical-base-monthly-column.js' \
+            --exclude='scripts/add-condo-basis-column.js' \
+            --exclude='scripts/check-scenarios.js' \
+            --exclude='scripts/check-schema.js' \
+            --exclude='scripts/delete-zombie-scenarios.js' \
+            --exclude='scripts/verify-depreciation-fix.js' \
+            --exclude='migrations' \
             --exclude='views/nickerson' \
             --exclude='views/layouts/nickerson.handlebars' \
+            --exclude='views/partials/tooltip-sidebar.handlebars' \
+            --exclude='views/partials/param-sidebar.handlebars' \
             --exclude='data' \
+            --exclude='tests' \
+            --exclude='openspec' \
             --exclude='public/js/nickerson' \
+            --exclude='public/js/debug-sidebar.js' \
+            --exclude='public/js/param-sidebar.js' \
+            --exclude='public/js/tooltip-sidebar.js' \
             --exclude='public/css/nickerson' \
+            --exclude='public/css/nickerson.css' \
+            --exclude='skills-lock.json' \
+            --exclude='.agents' \
+            --exclude='.claude' \
             ./ ${{ secrets.SSH_USERNAME}}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
       
       # Remove any .env file on server to ensure DirectAdmin env vars are used
