@@ -1,25 +1,19 @@
 {{!-- Creature Table Row Partial - Reusable row for table view --}}
-<tr data-animal-id="{{id}}">
+<tr data-animal-id="{{id}}" data-name="{{name}}" data-level="{{baseLevel}}" data-hp="{{versions.normal.hp}}" data-ac="{{versions.normal.ac}}" data-speed-land="{{versions.normal.speed.land}}" data-speed-fly="{{versions.normal.speed.fly}}" data-speed-swim="{{versions.normal.speed.swim}}" data-speed-climb="{{versions.normal.speed.climb}}" data-speed-burrow="{{versions.normal.speed.burrow}}">
     <td>
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="showAnimalDetail('{{id}}', 'normal')">
+            <i class="fas fa-eye"></i>
+        </button>
         <a href="{{@root.aonprdBaseUrl}}{{url}}" target="_blank">{{name}}</a>
     </td>
     <td>{{baseLevel}}</td>
     <td>{{versions.normal.hp}}</td>
     <td>{{versions.normal.ac}}</td>
     <td>{{versions.normal.size}}</td>
-    <td>
-        {{versions.normal.speed.land}}
-        {{#if versions.normal.speed.fly}}, fly {{versions.normal.speed.fly}}{{/if}}
-        {{#if versions.normal.speed.swim}}, swim {{versions.normal.speed.swim}}{{/if}}
-    </td>
+    <td>{{~#if versions.normal.speed.land}}{{versions.normal.speed.land}}{{/if~}}{{~#if versions.normal.speed.fly}}{{~#if versions.normal.speed.land}}, {{/if~}}fly {{versions.normal.speed.fly}}{{/if~}}{{~#if versions.normal.speed.climb}}{{~#if (or versions.normal.speed.land versions.normal.speed.fly)}}, {{/if~}}climb {{versions.normal.speed.climb}}{{/if~}}{{~#if versions.normal.speed.burrow}}{{~#if (or versions.normal.speed.land versions.normal.speed.fly versions.normal.speed.climb)}}, {{/if~}}burrow {{versions.normal.speed.burrow}}{{/if~}}{{~#if versions.normal.speed.swim}}{{~#if (or versions.normal.speed.land versions.normal.speed.fly versions.normal.speed.climb versions.normal.speed.burrow)}}, {{/if~}}swim {{versions.normal.speed.swim}}{{/if~}}</td>
     <td>
         {{#each versions.normal.traits}}
         <span class="badge bg-secondary me-1 mb-1">{{this}}</span>
         {{/each}}
-    </td>
-    <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="showAnimalDetail('{{id}}', 'normal')">
-            <i class="fas fa-eye"></i>
-        </button>
     </td>
 </tr>

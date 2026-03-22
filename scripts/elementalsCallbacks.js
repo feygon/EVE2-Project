@@ -1,18 +1,18 @@
-// animalsCallbacks.js
+// elementalsCallbacks.js
 const fs = require('fs').promises;
 const path = require('path');
-const config = require('./animals-config');
+const config = require('./elementals-config');
 
-// Path to the animals data JSON
-const ANIMALS_DATA_PATH = path.join(__dirname, '..', config.DATA_PATH);
+// Path to the elementals data JSON
+const ELEMENTALS_DATA_PATH = path.join(__dirname, '..', config.DATA_PATH);
 
 // Cache configuration from config file
 const CACHE_DURATION = config.CACHE_DURATION_MS;
 const MAX_RETRY_ATTEMPTS = config.MAX_RETRY_ATTEMPTS;
 const RETRY_DELAY = config.RETRY_DELAY_MS;
 
-// Cache the animals data in memory
-let animalsCache = null;
+// Cache the elementals data in memory
+let elementalsCache = null;
 let lastLoadTime = null;
 let isLoading = false;
 let loadPromise = null;
@@ -26,30 +26,30 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const animalsCallbacks = {
+const elementalsCallbacks = {
     /**
-     * Load animals data from JSON file with caching and retry logic
+     * Load elementals data from JSON file with caching and retry logic
      * @param {boolean} forceReload - Force reload even if cache is valid
-     * @returns {Promise<Object>} The parsed animals data object containing metadata, trait_index, and animals array
+     * @returns {Promise<Object>} The parsed elementals data object
      * @throws {Error} If the file cannot be read or parsed after all retry attempts
      */
-    loadAnimalsData: async function(forceReload = false) {
+    loadElementalsData: async function(forceReload = false) {
         const now = Date.now();
-        
+
         // Return cached data if still valid and not forcing reload
-        if (!forceReload && animalsCache && lastLoadTime && (now - lastLoadTime < CACHE_DURATION)) {
-            return animalsCache;
+        if (!forceReload && elementalsCache && lastLoadTime && (now - lastLoadTime < CACHE_DURATION)) {
+            return elementalsCache;
         }
-        
+
         // If already loading, wait for that promise
         if (isLoading && loadPromise) {
             return loadPromise;
         }
-        
+
         // Start loading
         isLoading = true;
         loadPromise = this._loadWithRetry();
-        
+
         try {
             const result = await loadPromise;
             return result;
@@ -62,94 +62,94 @@ const animalsCallbacks = {
     /**
      * Internal method to load data with retry logic
      * @private
-     * @returns {Promise<Object>} The parsed animals data
+     * @returns {Promise<Object>} The parsed elementals data
      */
     _loadWithRetry: async function() {
         let lastError = null;
-        
+
         for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             try {
-                const data = await fs.readFile(ANIMALS_DATA_PATH, 'utf-8');
+                const data = await fs.readFile(ELEMENTALS_DATA_PATH, 'utf-8');
                 const parsed = JSON.parse(data);
-                
+
                 // Validate data structure
-                if (!parsed.animals || !Array.isArray(parsed.animals)) {
-                    throw new Error('Invalid data structure: missing animals array');
+                if (!parsed.elementals || !Array.isArray(parsed.elementals)) {
+                    throw new Error('Invalid data structure: missing elementals array');
                 }
-                
+
                 // Update cache
-                animalsCache = parsed;
+                elementalsCache = parsed;
                 lastLoadTime = Date.now();
-                
+
                 if (attempt > 1) {
-                    console.log(`Successfully loaded animals data on attempt ${attempt}`);
+                    console.log(`Successfully loaded elementals data on attempt ${attempt}`);
                 }
-                
+
                 return parsed;
             } catch (error) {
                 lastError = error;
-                console.error(`Error loading animals data (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
-                
+                console.error(`Error loading elementals data (attempt ${attempt}/${MAX_RETRY_ATTEMPTS}):`, error.message);
+
                 if (attempt < MAX_RETRY_ATTEMPTS) {
-                    await sleep(RETRY_DELAY * attempt); // Exponential backoff
+                    await sleep(RETRY_DELAY * attempt);
                 }
             }
         }
-        
+
         // If we have stale cache, return it as fallback
-        if (animalsCache) {
+        if (elementalsCache) {
             console.warn('Using stale cache after failed reload attempts');
-            return animalsCache;
+            return elementalsCache;
         }
-        
-        throw new Error(`Failed to load animals data after ${MAX_RETRY_ATTEMPTS} attempts: ${lastError.message}`);
+
+        throw new Error(`Failed to load elementals data after ${MAX_RETRY_ATTEMPTS} attempts: ${lastError.message}`);
     },
 
     /**
      * Clear the cache (useful for testing or forced refresh)
      */
     clearCache: function() {
-        animalsCache = null;
+        elementalsCache = null;
         lastLoadTime = null;
-        console.log('Animals cache cleared');
+        console.log('Elementals cache cleared');
     },
 
     /**
-     * Get the main animals page with all data
+     * Get the main elementals page with all data
      * @param {Object} res - Express response object
      * @param {Object} context - Handlebars template context to populate
      * @param {Function} complete - Callback to invoke after context is populated
      * @returns {Promise<void>}
      */
-    getAnimalsPage: async function(res, context, complete) {
+    getElementalsPage: async function(res, context, complete) {
         try {
-            console.log('[Animals] Loading animals data...');
-            console.log('[Animals] Data path:', ANIMALS_DATA_PATH);
-            
-            const data = await this.loadAnimalsData();
+            console.log('[Elementals] Loading elementals data...');
+            console.log('[Elementals] Data path:', ELEMENTALS_DATA_PATH);
+
+            const data = await this.loadElementalsData();
             /* istanbul ignore next */
-            console.log('[Animals] Data loaded successfully, animals count:', data.animals ? data.animals.length : 0);
-            
+            console.log('[Elementals] Data loaded successfully, elementals count:', data.elementals ? data.elementals.length : 0);
+
             // Get unique traits for filtering
             const allTraits = new Set();
             if (data.trait_index) {
                 Object.keys(data.trait_index).forEach(trait => allTraits.add(trait));
             }
-            
-            // Get level range from all animal versions
-            const levels = data.animals.map(a => {
-                const versions = [a.versions.normal.level];
-                if (a.versions.weak) versions.push(a.versions.weak.level);
-                versions.push(a.versions.elite.level);
+
+            // Get level range from all versions
+            const levels = data.elementals.map(e => {
+                const versions = [e.versions.normal.level];
+                if (e.versions.weak) versions.push(e.versions.weak.level);
+                if (e.versions.elite) versions.push(e.versions.elite.level);
                 return versions;
-            }).reduce((acc, val) => acc.concat(val), []); // Flatten the array (Node 10 compatible)
-            
+            }).reduce((acc, val) => acc.concat(val), []);
+
             const minLevel = Math.min(...levels);
             const maxLevel = Math.max(...levels);
-            
-            console.log('[Animals] Level range:', minLevel, '-', maxLevel);
-            console.log('[Animals] Traits count:', allTraits.size);
-            
+
+            console.log('[Elementals] Level range:', minLevel, '-', maxLevel);
+            console.log('[Elementals] Traits count:', allTraits.size);
+
             // Split traits into categorized groups
             const sortedTraits = Array.from(allTraits).sort();
             const elementalTraits = sortedTraits.filter(t => config.ELEMENTAL_TRAITS.includes(t));
@@ -163,7 +163,7 @@ const animalsCallbacks = {
 
             // Populate context for template
             context.metadata = data.metadata;
-            context.animals = data.animals;
+            context.elementals = data.elementals;
             context.traits = sortedTraits;
             context.elementalTraits = elementalTraits;
             context.creatureTypeTraits = creatureTypeTraits;
@@ -172,44 +172,34 @@ const animalsCallbacks = {
             context.minLevel = minLevel;
             context.maxLevel = maxLevel;
             context.aonprdBaseUrl = config.AONPRD_BASE_URL;
-            
+
             complete();
-            
+
         } catch (error) {
-            console.error('[Animals] ERROR in getAnimalsPage:', error);
-            console.error('[Animals] Error stack:', error.stack);
-            res.status(500).send('Failed to load animal data. Please try again later.');
+            console.error('[Elementals] ERROR in getElementalsPage:', error);
+            console.error('[Elementals] Error stack:', error.stack);
+            res.status(500).send('Failed to load elemental data. Please try again later.');
         }
     },
 
     /**
-     * Filter animals based on query parameters
+     * Filter elementals based on query parameters
      * @param {Object} req - Express request object with query parameters
      * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with filtered animals
-     * 
-     * @description
-     * Supported query parameters:
-     * - level {number} - Filter by spell level (checks all versions)
-     * - trait {string} - Filter by trait name
-     * - size {string} - Filter by size (Tiny, Small, Medium, Large, Huge, Gargantuan)
-     * - minHp {number} - Minimum HP threshold
-     * - maxHp {number} - Maximum HP threshold
-     * - hasFlying {string} - Filter creatures with fly speed ("true")
-     * - hasSwimming {string} - Filter creatures with swim speed ("true")
+     * @returns {Promise<void>} Sends JSON response with filtered elementals
      */
-    filterAnimals: async function(req, res) {
+    filterElementals: async function(req, res) {
         try {
-            const data = await this.loadAnimalsData();
+            const data = await this.loadElementalsData();
             const { level, trait, size, minHp, maxHp, hasFlying, hasSwimming, hasBurrowing, hasClimbing, keyword } = req.query;
-            
-            let filtered = data.animals;
-            
+
+            let filtered = data.elementals;
+
             // Filter by keyword (searches name, abilities, summary, traits, senses)
             if (keyword) {
                 const kw = keyword.toLowerCase();
-                filtered = filtered.filter(animal => {
-                    const n = animal.versions.normal;
+                filtered = filtered.filter(elemental => {
+                    const n = elemental.versions.normal;
                     return n.name.toLowerCase().includes(kw) ||
                            (n.abilities && n.abilities.some(a => a.toLowerCase().includes(kw))) ||
                            (n.summary && n.summary.toLowerCase().includes(kw)) ||
@@ -225,128 +215,128 @@ const animalsCallbacks = {
             // Filter by level (checks all versions) and tag matched version
             if (level) {
                 const targetLevel = parseInt(level);
-                filtered = filtered.filter(animal => {
-                    return animal.versions.normal.level === targetLevel ||
-                           (animal.versions.weak && animal.versions.weak.level === targetLevel) ||
-                           (animal.versions.elite && animal.versions.elite.level === targetLevel);
+                filtered = filtered.filter(elemental => {
+                    return elemental.versions.normal.level === targetLevel ||
+                           (elemental.versions.weak && elemental.versions.weak.level === targetLevel) ||
+                           (elemental.versions.elite && elemental.versions.elite.level === targetLevel);
                 });
                 // Tag each creature with which version matched
-                filtered = filtered.map(animal => {
+                filtered = filtered.map(elemental => {
                     let matchedVersion = 'normal';
-                    if (animal.versions.normal.level === targetLevel) {
+                    if (elemental.versions.normal.level === targetLevel) {
                         matchedVersion = 'normal';
-                    } else if (animal.versions.elite && animal.versions.elite.level === targetLevel) {
+                    } else if (elemental.versions.elite && elemental.versions.elite.level === targetLevel) {
                         matchedVersion = 'elite';
-                    } else if (animal.versions.weak && animal.versions.weak.level === targetLevel) {
+                    } else if (elemental.versions.weak && elemental.versions.weak.level === targetLevel) {
                         matchedVersion = 'weak';
                     }
-                    return { ...animal, matchedVersion };
+                    return { ...elemental, matchedVersion };
                 });
             }
-            
+
             // Filter by trait (comma-separated, OR logic)
             if (trait) {
                 const selectedTraits = trait.split(',').map(t => t.trim()).filter(Boolean);
                 if (selectedTraits.length > 0) {
-                    filtered = filtered.filter(animal =>
-                        animal.versions.normal.traits &&
-                        selectedTraits.some(t => animal.versions.normal.traits.includes(t))
+                    filtered = filtered.filter(elemental =>
+                        elemental.versions.normal.traits &&
+                        selectedTraits.some(t => elemental.versions.normal.traits.includes(t))
                     );
                 }
             }
-            
+
             // Filter by size
             if (size) {
-                filtered = filtered.filter(animal => 
-                    animal.versions.normal.size === size
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.size === size
                 );
             }
-            
-            // Filter by HP range (normal version only)
+
+            // Filter by HP range
             if (minHp) {
                 const min = parseInt(minHp);
-                filtered = filtered.filter(animal => 
-                    animal.versions.normal.hp >= min
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.hp >= min
                 );
             }
-            
+
             if (maxHp) {
                 const max = parseInt(maxHp);
-                filtered = filtered.filter(animal => 
-                    animal.versions.normal.hp <= max
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.hp <= max
                 );
             }
-            
+
             // Filter by flying capability
             if (hasFlying === 'true') {
-                filtered = filtered.filter(animal => 
-                    animal.versions.normal.speed.fly && animal.versions.normal.speed.fly > 0
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.speed.fly && elemental.versions.normal.speed.fly > 0
                 );
             }
-            
+
             // Filter by climbing capability
             if (hasClimbing === 'true') {
-                filtered = filtered.filter(animal =>
-                    animal.versions.normal.speed.climb && animal.versions.normal.speed.climb > 0
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.speed.climb && elemental.versions.normal.speed.climb > 0
                 );
             }
 
             // Filter by burrowing capability
             if (hasBurrowing === 'true') {
-                filtered = filtered.filter(animal =>
-                    animal.versions.normal.speed.burrow && animal.versions.normal.speed.burrow > 0
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.speed.burrow && elemental.versions.normal.speed.burrow > 0
                 );
             }
 
             // Filter by swimming capability
             if (hasSwimming === 'true') {
-                filtered = filtered.filter(animal =>
-                    animal.versions.normal.speed.swim && animal.versions.normal.speed.swim > 0
+                filtered = filtered.filter(elemental =>
+                    elemental.versions.normal.speed.swim && elemental.versions.normal.speed.swim > 0
                 );
             }
-            
+
             res.json({
                 count: filtered.length,
-                animals: filtered
+                elementals: filtered
             });
-            
+
         } catch (error) {
-            console.error('Error in filterAnimals:', error);
-            res.status(500).json({ 
-                error: 'Failed to fetch animals',
+            console.error('Error in filterElementals:', error);
+            res.status(500).json({
+                error: 'Failed to fetch elementals',
                 message: 'Please try again or contact support if the problem persists.'
             });
         }
     },
 
     /**
-     * Get detailed info for a specific animal
-     * @param {Object} req - Express request object with animal ID in params
+     * Get detailed info for a specific elemental
+     * @param {Object} req - Express request object with elemental ID in params
      * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with animal details
+     * @returns {Promise<void>} Sends JSON response with elemental details
      */
-    getAnimalDetail: async function(req, res) {
+    getElementalDetail: async function(req, res) {
         try {
-            const data = await this.loadAnimalsData();
-            const animal = data.animals.find(a => a.id === req.params.id);
-            
-            if (!animal) {
-                return res.status(404).json({ 
-                    error: 'Animal not found',
-                    message: `No animal found with ID: ${req.params.id}`
+            const data = await this.loadElementalsData();
+            const elemental = data.elementals.find(e => e.id === req.params.id);
+
+            if (!elemental) {
+                return res.status(404).json({
+                    error: 'Elemental not found',
+                    message: `No elemental found with ID: ${req.params.id}`
                 });
             }
-            
-            res.json(animal);
-            
+
+            res.json(elemental);
+
         } catch (error) {
-            console.error('Error in getAnimalDetail:', error);
-            res.status(500).json({ 
-                error: 'Failed to fetch animal details',
+            console.error('Error in getElementalDetail:', error);
+            res.status(500).json({
+                error: 'Failed to fetch elemental details',
                 message: 'Please try again or contact support if the problem persists.'
             });
         }
     }
 };
 
-module.exports = animalsCallbacks;
+module.exports = elementalsCallbacks;

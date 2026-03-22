@@ -1,16 +1,16 @@
 /**
- * Animals UI Controller
- * Handles filtering, display, and interactions for the Summon Animal comparison tool
+ * Elementals UI Controller
+ * Handles filtering, display, and interactions for the Summon Elemental comparison tool
  */
 
-class AnimalsUI {
+class ElementalsUI {
     constructor() {
-        this.allAnimals = [];
-        this.filteredAnimals = [];
+        this.allElementals = [];
+        this.filteredElementals = [];
         this.currentView = 'table';
         this.currentSort = 'name-asc';
         this.modal = null;
-        
+
         this.init();
     }
 
@@ -18,8 +18,8 @@ class AnimalsUI {
      * Initialize the UI and set up event listeners
      */
     init() {
-        console.log('Animals page loaded');
-        
+        console.log('Elementals page loaded');
+
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.onDOMReady());
@@ -33,34 +33,34 @@ class AnimalsUI {
      */
     onDOMReady() {
         console.log('DOM loaded, initializing...');
-        
-        // Load initial animals from rendered cards
-        this.loadInitialAnimals();
-        
+
+        // Load initial elementals from rendered cards
+        this.loadInitialElementals();
+
         // Bind event listeners
         this.bindEvents();
-        
+
         // Initialize Bootstrap modal
         this.modal = new bootstrap.Modal(document.getElementById('animalDetailModal'));
-        
-        console.log('Initialized with', this.allAnimals.length, 'animals');
+
+        console.log('Initialized with', this.allElementals.length, 'elementals');
     }
 
     /**
-     * Load initial animal data from pre-rendered cards
+     * Load initial elemental data from pre-rendered cards
      */
-    loadInitialAnimals() {
-        const animalCards = document.querySelectorAll('.animal-card');
-        console.log('Found', animalCards.length, 'animal cards');
-        
-        animalCards.forEach(card => {
+    loadInitialElementals() {
+        const elementalCards = document.querySelectorAll('.animal-card');
+        console.log('Found', elementalCards.length, 'elemental cards');
+
+        elementalCards.forEach(card => {
             const id = card.dataset.animalId;
             if (id) {
-                this.allAnimals.push({ id: id });
+                this.allElementals.push({ id: id });
             }
         });
-        
-        this.filteredAnimals = [...this.allAnimals];
+
+        this.filteredElementals = [...this.allElementals];
     }
 
     /**
@@ -138,42 +138,43 @@ class AnimalsUI {
         if (document.getElementById('burrowingFilter').checked) params.append('hasBurrowing', 'true');
         if (document.getElementById('swimmingFilter').checked) params.append('hasSwimming', 'true');
 
+
         this.showLoading(true);
-        
+
         try {
-            const url = `/animals/api/list?${params.toString()}`;
+            const url = `/elementals/api/list?${params.toString()}`;
             console.log('Fetching:', url);
-            
+
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const data = await response.json();
-            console.log('Received:', data.count, 'animals');
-            
-            this.filteredAnimals = data.animals;
+            console.log('Received:', data.count, 'elementals');
+
+            this.filteredElementals = data.elementals;
             this.updateResults();
             this.sortResults();
             this.updateStats(data.count);
             this.updateVersionButtons(level);
         } catch (error) {
-            console.error('Error fetching filtered animals:', error);
-            alert('Failed to filter animals. Please try again.');
+            console.error('Error fetching filtered elementals:', error);
+            alert('Failed to filter elementals. Please try again.');
         } finally {
             this.showLoading(false);
         }
     }
 
     /**
-     * Reset all filters and show all animals
+     * Reset all filters and show all elementals
      */
     resetFilters() {
         console.log('Reset filters clicked');
-        this.filteredAnimals = [...this.allAnimals];
+        this.filteredElementals = [...this.allElementals];
         this.updateResults();
         this.sortResults();
-        this.updateStats(this.allAnimals.length);
+        this.updateStats(this.allElementals.length);
         this.updateVersionButtons(null);
     }
 
@@ -201,15 +202,15 @@ class AnimalsUI {
         const view = e.currentTarget.dataset.view;
         console.log('View toggle clicked:', view);
         this.currentView = view;
-        
+
         // Update active button
         document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        
+
         // Toggle views
         const cardsContainer = document.getElementById('resultsContainer');
         const tableContainer = document.getElementById('tableContainer');
-        
+
         if (view === 'cards') {
             cardsContainer.style.display = '';
             tableContainer.style.display = 'none';
@@ -302,7 +303,7 @@ class AnimalsUI {
         cards.forEach(card => cardsContainer.appendChild(card));
 
         // Sort table rows
-        const table = document.getElementById('animalsTable');
+        const table = document.getElementById('elementalsTable');
         if (table) {
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -337,14 +338,14 @@ class AnimalsUI {
     }
 
     /**
-     * Update the displayed results based on filtered animals
+     * Update the displayed results based on filtered elementals
      */
     updateResults() {
-        console.log('Updating results, showing', this.filteredAnimals.length, 'animals');
+        console.log('Updating results, showing', this.filteredElementals.length, 'elementals');
 
         // Build a map of id -> creature data (with matchedVersion if present)
         const filteredMap = {};
-        this.filteredAnimals.forEach(a => { filteredMap[a.id] = a; });
+        this.filteredElementals.forEach(e => { filteredMap[e.id] = e; });
 
         const versionColors = { elite: '#4caf50', weak: '#e57373' };
 
@@ -355,103 +356,106 @@ class AnimalsUI {
         });
 
         // Update table rows
-        document.querySelectorAll('#animalsTable tbody tr').forEach(row => {
-            const id = row.dataset.animalId;
-            const creature = filteredMap[id];
-            if (!creature) {
-                row.style.display = 'none';
-                return;
-            }
-            row.style.display = '';
-
-            const mv = creature.matchedVersion;
-            const hpCell = row.children[2]; // HP column
-            const acCell = row.children[3]; // AC column
-            const nameCell = row.children[0]; // Name column (has eye button)
-            const eyeBtn = nameCell.querySelector('button');
-
-            if (mv && mv !== 'normal' && creature.versions[mv]) {
-                const vData = creature.versions[mv];
-                const color = versionColors[mv];
-                const label = mv.charAt(0).toUpperCase() + mv.slice(1);
-                hpCell.innerHTML = `<span style="color: ${color};" title="${label}">${vData.hp}</span>`;
-                acCell.innerHTML = `<span style="color: ${color};" title="${label}">${vData.ac}</span>`;
-                if (eyeBtn) {
-                    eyeBtn.setAttribute('onclick', `showAnimalDetail('${id}', '${mv}')`);
+        const table = document.getElementById('elementalsTable');
+        if (table) {
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const id = row.dataset.animalId;
+                const creature = filteredMap[id];
+                if (!creature) {
+                    row.style.display = 'none';
+                    return;
                 }
-            } else {
-                // Reset to normal values
-                hpCell.textContent = row.dataset.hp;
-                hpCell.style.color = '';
-                acCell.textContent = row.dataset.ac;
-                acCell.style.color = '';
-                if (eyeBtn) {
-                    eyeBtn.setAttribute('onclick', `showAnimalDetail('${id}', 'normal')`);
+                row.style.display = '';
+
+                const mv = creature.matchedVersion;
+                const hpCell = row.children[2]; // HP column
+                const acCell = row.children[3]; // AC column
+                const nameCell = row.children[0]; // Name column (has eye button)
+                const eyeBtn = nameCell.querySelector('button');
+
+                if (mv && mv !== 'normal' && creature.versions[mv]) {
+                    const vData = creature.versions[mv];
+                    const color = versionColors[mv];
+                    const label = mv.charAt(0).toUpperCase() + mv.slice(1);
+                    hpCell.innerHTML = `<span style="color: ${color};" title="${label}">${vData.hp}</span>`;
+                    acCell.innerHTML = `<span style="color: ${color};" title="${label}">${vData.ac}</span>`;
+                    // Update eye button to open matched version
+                    if (eyeBtn) {
+                        eyeBtn.setAttribute('onclick', `showAnimalDetail('${id}', '${mv}')`);
+                    }
+                } else {
+                    // Reset to normal values
+                    hpCell.textContent = row.dataset.hp;
+                    hpCell.style.color = '';
+                    acCell.textContent = row.dataset.ac;
+                    acCell.style.color = '';
+                    if (eyeBtn) {
+                        eyeBtn.setAttribute('onclick', `showAnimalDetail('${id}', 'normal')`);
+                    }
                 }
-            }
-        });
-    }
-
-    /**
-     * Update the stats display
-     * @param {number} count - Number of filtered animals
-     */
-    updateStats(count) {
-        console.log('Updating stats, count:', count);
-        
-        document.getElementById('resultCount').textContent = count;
-        document.getElementById('resultSummary').textContent = 
-            count === this.allAnimals.length 
-                ? 'Showing all creatures' 
-                : `Filtered from ${this.allAnimals.length} total`;
-    }
-
-    /**
-     * Show animal detail modal
-     * @param {string} animalId - ID of the animal to display
-     * @param {string} version - Version to display (normal, weak, elite)
-     */
-    async showAnimalDetail(animalId, version) {
-        console.log('Showing detail for:', animalId, version);
-        
-        const titleEl = document.getElementById('animalDetailTitle');
-        const bodyEl = document.getElementById('animalDetailBody');
-        
-        // Show loading spinner in modal
-        bodyEl.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
-        this.modal.show();
-        
-        try {
-            const response = await fetch(`/animals/api/detail/${animalId}`);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const animal = await response.json();
-            const data = animal.versions[version];
-            
-            // Update modal title
-            titleEl.textContent = `${data.name} (${version.charAt(0).toUpperCase() + version.slice(1)} - Level ${data.level})`;
-            
-            // Build modal body HTML
-            bodyEl.innerHTML = this.buildModalContent(animal, data);
-        } catch (error) {
-            console.error('Error loading animal details:', error);
-            bodyEl.innerHTML = '<div class="alert alert-danger">Failed to load animal details.</div>';
+            });
         }
     }
 
     /**
-     * Build the HTML content for the animal detail modal
-     * @param {Object} animal - Full animal data
+     * Update the stats display
+     * @param {number} count - Number of filtered elementals
+     */
+    updateStats(count) {
+        console.log('Updating stats, count:', count);
+
+        document.getElementById('resultCount').textContent = count;
+        document.getElementById('resultSummary').textContent =
+            count === this.allElementals.length
+                ? 'Showing all creatures'
+                : `Filtered from ${this.allElementals.length} total`;
+    }
+
+    /**
+     * Show elemental detail modal
+     * @param {string} elementalId - ID of the elemental to display
+     * @param {string} version - Version to display (always 'normal' for elementals)
+     */
+    async showElementalDetail(elementalId, version) {
+        console.log('Showing detail for:', elementalId, version);
+
+        const titleEl = document.getElementById('animalDetailTitle');
+        const bodyEl = document.getElementById('animalDetailBody');
+
+        // Show loading spinner in modal
+        bodyEl.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+        this.modal.show();
+
+        try {
+            const response = await fetch(`/elementals/api/detail/${elementalId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const elemental = await response.json();
+            const data = elemental.versions[version || 'normal'];
+
+            // Update modal title
+            titleEl.textContent = `${data.name} (Level ${data.level})`;
+
+            // Build modal body HTML
+            bodyEl.innerHTML = this.buildModalContent(elemental, data);
+        } catch (error) {
+            console.error('Error loading elemental details:', error);
+            bodyEl.innerHTML = '<div class="alert alert-danger">Failed to load elemental details.</div>';
+        }
+    }
+
+    /**
+     * Build the HTML content for the elemental detail modal
+     * @param {Object} elemental - Full elemental data
      * @param {Object} data - Version-specific data
      * @returns {string} HTML content
      */
-    buildModalContent(animal, data) {
-        // Get the AONPRD base URL from the page (set by server in template context)
+    buildModalContent(elemental, data) {
         const aonprdBaseUrl = document.querySelector('.animal-card a')?.href.split('/Monsters')[0] || 'https://2e.aonprd.com';
-        
-        return `
+
+        let html = `
             <div class="row">
                 <div class="col-md-6">
                     <h6>Stats</h6>
@@ -459,9 +463,9 @@ class AnimalsUI {
                         <tr><th>HP</th><td>${data.hp}</td></tr>
                         <tr><th>AC</th><td>${data.ac}</td></tr>
                         <tr><th>Perception</th><td>${data.perception}</td></tr>
-                        <tr><th>Fort</th><td>${data.saves.fortitude}</td></tr>
-                        <tr><th>Reflex</th><td>${data.saves.reflex}</td></tr>
-                        <tr><th>Will</th><td>${data.saves.will}</td></tr>
+                        <tr><th>Fort</th><td>+${data.saves.fortitude}</td></tr>
+                        <tr><th>Reflex</th><td>+${data.saves.reflex}</td></tr>
+                        <tr><th>Will</th><td>+${data.saves.will}</td></tr>
                     </table>
                 </div>
                 <div class="col-md-6">
@@ -473,51 +477,81 @@ class AnimalsUI {
                         ${data.speed.climb ? `<li>Climb: ${data.speed.climb}ft</li>` : ''}
                         ${data.speed.burrow ? `<li>Burrow: ${data.speed.burrow}ft</li>` : ''}
                     </ul>
-                    
+
                     <h6 class="mt-3">Traits</h6>
                     <div>
                         ${data.traits.map(t => `<span class="badge bg-secondary me-1">${t}</span>`).join('')}
                     </div>
                 </div>
             </div>
-            
-            ${data.senses.length > 0 ? `
+
+            ${data.summary ? `
+            <div class="mt-3">
+                <h6>Description</h6>
+                <p>${data.summary}</p>
+            </div>
+            ` : ''}
+
+            ${data.skills ? `
+            <div class="mt-3">
+                <h6>Skills</h6>
+                <p>${data.skills}</p>
+            </div>
+            ` : ''}
+
+            ${data.senses && data.senses.length > 0 ? `
             <div class="mt-3">
                 <h6>Senses</h6>
                 <p>${data.senses.join(', ')}</p>
             </div>
             ` : ''}
-            
-            ${data.abilities.length > 0 ? `
-            <div class="mt-3">
-                <h6>Special Abilities</h6>
-                <ul>
-                    ${data.abilities.map(a => `<li>${a}</li>`).join('')}
-                </ul>
-            </div>
-            ` : ''}
-            
-            ${data.immunities.length > 0 ? `
+
+            ${data.immunities && data.immunities.length > 0 ? `
             <div class="mt-3">
                 <h6>Immunities</h6>
                 <p>${data.immunities.join(', ')}</p>
             </div>
             ` : ''}
-            
-            ${data.resistances.length > 0 ? `
-            <div class="mt-3">
-                <h6>Resistances</h6>
-                <p>${data.resistances.join(', ')}</p>
-            </div>
-            ` : ''}
-            
-            ${data.weaknesses.length > 0 ? `
+
+            ${data.weaknesses && data.weaknesses.length > 0 ? `
             <div class="mt-3">
                 <h6>Weaknesses</h6>
                 <p>${data.weaknesses.join(', ')}</p>
             </div>
             ` : ''}
-            
+
+            ${data.resistances && data.resistances.length > 0 ? `
+            <div class="mt-3">
+                <h6>Resistances</h6>
+                <p>${data.resistances.join(', ')}</p>
+            </div>
+            ` : ''}
+
+            ${data.spell && data.spell.length > 0 ? `
+            <div class="mt-3">
+                <h6>Spells</h6>
+                <p>${data.spell.join(', ')}${data.spell_attack_bonus ? ` (attack +${data.spell_attack_bonus})` : ''}</p>
+            </div>
+            ` : ''}
+
+            ${data.abilities && data.abilities.length > 0 ? `
+            <div class="mt-3">
+                <h6>Special Abilities</h6>
+                ${data.ability_descriptions ? `
+                <dl>
+                    ${data.abilities.map(a => `
+                        <dt>${a}</dt>
+                        <dd style="margin-bottom: 0.75rem; color: #bbb;">${data.ability_descriptions[a] || '<em>No description available.</em>'}</dd>
+                    `).join('')}
+                </dl>
+                ` : `
+                <ul>
+                    ${data.abilities.map(a => `<li>${a}</li>`).join('')}
+                </ul>
+                `}
+            </div>
+            ` : ''}
+
             <div class="mt-3">
                 <h6>Source</h6>
                 <p>${data.source}</p>
@@ -526,15 +560,17 @@ class AnimalsUI {
                 </a>
             </div>
         `;
+
+        return html;
     }
 }
 
-// Global function for onclick handlers in HTML
+// Global function for onclick handlers in shared partials (uses same name as animals)
 function showAnimalDetail(animalId, version) {
-    if (window.animalsUI) {
-        window.animalsUI.showAnimalDetail(animalId, version);
+    if (window.elementalsUI) {
+        window.elementalsUI.showElementalDetail(animalId, version);
     }
 }
 
 // Initialize when script loads
-window.animalsUI = new AnimalsUI();
+window.elementalsUI = new ElementalsUI();

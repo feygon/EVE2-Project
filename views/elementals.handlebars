@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summon Animal - Creature Comparison</title>
-    
+    <title>Summon Elemental - Creature Comparison</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         body {
             font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -17,117 +17,117 @@
             color: #dcdcdc;
             line-height: 1.6;
         }
-        
+
         .container-fluid {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .card {
             background-color: #232323;
             border: 1px solid #444;
             color: #dcdcdc;
         }
-        
+
         .card-header {
             background-color: #2a2a2a;
             border-bottom: 1px solid #444;
             color: #66ccff;
         }
-        
+
         .btn-primary {
             background-color: #66ccff;
             border-color: #66ccff;
             color: #1a1a1a;
         }
-        
+
         .btn-primary:hover {
             background-color: #82b1ff;
             border-color: #82b1ff;
         }
-        
+
         .form-control, .form-select {
             background-color: #2a2a2a;
             border-color: #444;
             color: #dcdcdc;
         }
-        
+
         .form-control:focus, .form-select:focus {
             background-color: #2a2a2a;
             border-color: #66ccff;
             color: #dcdcdc;
         }
-        
+
         .badge {
             font-size: 0.75rem;
         }
-        
+
         .animal-card {
             transition: transform 0.2s;
         }
-        
+
         .animal-card:hover {
             transform: translateY(-5px);
         }
-        
+
         a {
             color: #58a6ff;
         }
-        
+
         a:hover {
             color: #82b1ff;
         }
-        
+
         .modal-content {
             background-color: #232323;
             color: #dcdcdc;
         }
-        
+
         .modal-header {
             border-bottom-color: #444;
         }
-        
+
         .table {
             color: #dcdcdc !important;
             background-color: #232323;
         }
-        
+
         .table-dark {
             --bs-table-bg: #232323;
             --bs-table-border-color: #444;
             --bs-table-color: #dcdcdc;
         }
-        
+
         .table-striped > tbody > tr:nth-of-type(odd) > * {
             background-color: #2a2a2a !important;
             color: #dcdcdc !important;
         }
-        
+
         .table-striped > tbody > tr:nth-of-type(even) > * {
             background-color: #232323 !important;
             color: #dcdcdc !important;
         }
-        
+
         .table thead th {
             background-color: #2a2a2a !important;
             border-bottom: 1px solid #444;
             color: #dcdcdc !important;
         }
-        
+
         .table tbody tr {
             border-bottom: 1px solid #444;
         }
-        
+
         .table tbody tr:hover {
             background-color: #2d2d2d !important;
         }
-        
+
         .table tbody tr:hover td {
             background-color: #2d2d2d !important;
             color: #dcdcdc !important;
         }
-        
+
         .table td, .table th {
             color: #dcdcdc !important;
         }
@@ -147,13 +147,13 @@
     <div class="row">
         <div class="col-12">
             <h1 class="text-center mb-4">
-                <i class="fas fa-paw"></i> Summon Animal - Creature Comparison
+                <i class="fas fa-fire"></i> Summon Elemental - Creature Comparison
             </h1>
             <p class="text-center mb-4" style="color: #aaa;">
-                Compare animals for the <strong>Summon Animal</strong> spell. Filter by level, traits, and abilities.
+                Compare elementals for the <strong>Summon Elemental</strong> spell. Filter by level, traits, and abilities.
                 <br>
                 <small>
-                    <strong>{{metadata.animal_count}}</strong> animals •
+                    <strong>{{metadata.elemental_count}}</strong> elementals •
                     <strong>Level {{minLevel}}-{{maxLevel}}</strong>
                 </small>
             </p>
@@ -165,12 +165,12 @@
         <div class="col-lg-3 mb-4">
             {{> filter-panel
                 levelLabel="Summon at Spell Level"
-                levelHelp="Shows normal, weak, and elite versions at this level"
+                levelHelp="Shows elementals at this level"
                 minLevel=minLevel
                 maxLevel=maxLevel
                 traits=traits
-                creatureCount=metadata.animal_count
-                creatureType="animals"
+                creatureCount=metadata.elemental_count
+                creatureType="elementals"
             }}
         </div>
 
@@ -178,7 +178,7 @@
         <div class="col-lg-9">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-list"></i> Animals</h5>
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Elementals</h5>
                     <div class="btn-group btn-group-sm" role="group">
                         <button type="button" class="btn btn-outline-light" data-view="cards">
                             <i class="fas fa-th"></i> Cards
@@ -194,19 +194,19 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-2 text-muted">Loading animals...</p>
+                        <p class="mt-2 text-muted">Loading elementals...</p>
                     </div>
 
                     {{!-- Results Container (Cards View) --}}
                     <div id="resultsContainer" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" style="display: none;">
-                        {{#each animals}}
+                        {{#each elementals}}
                             {{> creature-card}}
                         {{/each}}
                     </div>
 
                     {{!-- Results Container (Table View) --}}
                     <div id="tableContainer" class="table-responsive">
-                        <table class="table table-striped table-hover" id="animalsTable">
+                        <table class="table table-striped table-hover" id="elementalsTable">
                             <thead class="table-dark">
                                 <tr>
                                     <th class="sortable-header" data-sort="name" style="cursor: pointer; min-width: 220px;">Name <i class="fas fa-sort"></i></th>
@@ -219,7 +219,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{#each animals}}
+                                {{#each elementals}}
                                     {{> creature-table-row}}
                                 {{/each}}
                             </tbody>
@@ -231,14 +231,14 @@
     </div>
 </div>
 
-{{!-- Animal Detail Modal --}}
+{{!-- Elemental Detail Modal --}}
 {{> creature-detail-modal}}
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Animals UI Controller -->
-<script src="/static/js/animals-ui.js"></script>
+<!-- Elementals UI Controller -->
+<script src="/static/js/elementals-ui.js"></script>
 
 </body>
 </html>

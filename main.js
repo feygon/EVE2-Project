@@ -66,6 +66,7 @@ app.set('hbs', handlebars);
 app.set('callbacks', callbacks);
 app.set('illusionCallbacks', illusionCallbacks);
 app.set('animalsCallbacks', require('./scripts/animalsCallbacks'));
+app.set('elementalsCallbacks', require('./scripts/elementalsCallbacks'));
 app.set('queries', queries);
 
 // Set a route for each module
@@ -74,6 +75,7 @@ app.use('/spa-resume/', require('./spa-resume.js'));
 app.use('/eve2/', require('./eve2.js'));
 app.use('/illusion/', require('./illusion.js'));
 app.use('/animals/', require('./animals.js'));  // Animal comparison tool
+app.use('/elementals/', require('./elementals.js'));  // Elemental comparison tool
 app.use('/', require('./documentation.js'));  // Documentation routes
 
 // Nickerson BurnRate Module (conditionally loaded from private repo)

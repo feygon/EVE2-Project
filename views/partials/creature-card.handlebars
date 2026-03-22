@@ -1,5 +1,5 @@
 {{!-- Creature Card Partial - Reusable card for grid view --}}
-<div class="col animal-card" data-animal-id="{{id}}">
+<div class="col animal-card" data-animal-id="{{id}}" data-name="{{name}}" data-level="{{baseLevel}}" data-hp="{{versions.normal.hp}}" data-ac="{{versions.normal.ac}}" data-speed-land="{{versions.normal.speed.land}}" data-speed-fly="{{versions.normal.speed.fly}}" data-speed-swim="{{versions.normal.speed.swim}}" data-speed-climb="{{versions.normal.speed.climb}}" data-speed-burrow="{{versions.normal.speed.burrow}}">
     <div class="card h-100 shadow-sm">
         <div class="card-header">
             <h6 class="mb-0">
@@ -8,7 +8,7 @@
                 </a>
             </h6>
             <small class="text-muted">
-                {{#if creature_family}}{{creature_family}} • {{/if}}Level {{baseLevel}}
+                {{#if creature_family}}{{creature_family}} ï¿½ {{/if}}Level {{baseLevel}}
             </small>
         </div>
         <div class="card-body">
@@ -23,7 +23,7 @@
                     <strong>Size:</strong> {{versions.normal.size}}
                 </div>
                 <div class="col-6">
-                    <strong>Speed:</strong> {{versions.normal.speed.land}}ft
+                    <strong>Speed:</strong> {{#if versions.normal.speed.land}}{{versions.normal.speed.land}}{{else}}â€”{{/if}}
                 </div>
             </div>
 
@@ -51,17 +51,19 @@
         </div>
         <div class="card-footer">
             <div class="btn-group w-100" role="group">
-                <button class="btn btn-sm btn-outline-primary" onclick="showAnimalDetail('{{id}}', 'normal')">
+                <button class="btn btn-sm btn-outline-primary version-btn" data-version-level="{{baseLevel}}" onclick="showAnimalDetail('{{id}}', 'normal')">
                     Normal ({{baseLevel}})
                 </button>
                 {{#if versions.weak}}
-                <button class="btn btn-sm btn-outline-secondary" onclick="showAnimalDetail('{{id}}', 'weak')">
+                <button class="btn btn-sm btn-outline-secondary version-btn" data-version-level="{{versions.weak.level}}" onclick="showAnimalDetail('{{id}}', 'weak')">
                     Weak ({{versions.weak.level}})
                 </button>
                 {{/if}}
-                <button class="btn btn-sm btn-outline-success" onclick="showAnimalDetail('{{id}}', 'elite')">
+                {{#if versions.elite}}
+                <button class="btn btn-sm btn-outline-success version-btn" data-version-level="{{versions.elite.level}}" onclick="showAnimalDetail('{{id}}', 'elite')">
                     Elite ({{versions.elite.level}})
                 </button>
+                {{/if}}
             </div>
         </div>
     </div>
