@@ -88,6 +88,10 @@
             if (d.condo_sale_proceeds) html += line('condo_sale_proceeds', d.condo_sale_proceeds, 'Net proceeds from condo sale');
         }
         html += line('real_estate_total [EOY]', d.real_estate_total, 'Combined RE value');
+        var totalAppr = (d.house_appreciation || 0) + (d.condo_appreciation || 0);
+        html += '<div style="border-top:1px solid #444;margin-top:4px;padding-top:4px;">';
+        html += line('total_appreciation', totalAppr, fmt(d.house_appreciation || 0) + ' house + ' + fmt(d.condo_appreciation || 0) + ' condo');
+        html += '</div>';
         html += '</div>';
 
         // === Mortgage & HELOC ===
