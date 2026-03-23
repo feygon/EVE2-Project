@@ -164,7 +164,10 @@
         if (d.annuity_payments) {
             html += calc('sdira_checking_available', 'sdira_checking_open + annuity_payments',
                 fmt(d.sdira_checking_open) + ' + ' + fmt(d.annuity_payments) + ' = ' + fmt(d.sdira_checking_available));
-            html += '<div style="color:#666;font-size:11px;margin-left:12px;">SMA annuities paid monthly. LS7 paid Jan (start of year). LS6 paid Jun (TODO: model as end-of-year availability).</div>';
+            if (d.annuity_payments_h1 || d.annuity_payments_h2) {
+                html += '<div style="color:#666;font-size:11px;margin-left:12px;">H1 (Jan-Jun): ' + fmt(d.annuity_payments_h1 || 0) + ' | H2 (Jul-Dec): ' + fmt(d.annuity_payments_h2 || 0) + '</div>';
+            }
+            html += '<div style="color:#666;font-size:11px;margin-left:12px;">SMA annuities paid monthly. LS7 matures Jan. LS6 matures Jun.</div>';
         }
         if (d.sdira_distributions) html += line('sdira_distributions', d.sdira_distributions, 'Withdrawn from SDIRA Checking for expenses & lifestyle');
         html += '<div><span class="debug-key">sdira_checking_close [EOY]</span>: <span class="debug-val">' + fmt(d.sdira_checking_available || d.sdira_checking_open) + ' - ' + fmt(d.sdira_distributions || 0) + ' = ' + fmt(d.sdira_checking_close) + '</span></div>';
