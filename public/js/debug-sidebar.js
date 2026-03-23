@@ -104,20 +104,27 @@
                     html += calc('primary_mortgage_interest', 'balance * rate',
                         fmt(d.primary_mortgage_balance) + ' * ' + fmt(d.primary_mortgage_rate) + ' = ' + fmt(exp.primary_mortgage_interest) + ' (' + fmtMo(exp.primary_mortgage_interest) + ')');
                 }
+                if (exp.mortgage_payment_total) {
+                    html += line('mortgage_payment_total', exp.mortgage_payment_total, 'Total mortgage payments (' + fmtMo(exp.mortgage_payment_total) + ')');
+                }
             }
             if (d.condo_mortgage_balance) {
                 html += line(eKey('condo_mortgage_balance'), d.condo_mortgage_balance, condoPct + '% of total mortgage, 30yr fixed P&I at 840 credit, paid off at Medicaid activation');
                 html += line(eKey('condo_mortgage_rate'), d.condo_mortgage_rate, 'Condo mortgage rate, 30yr fixed at 840 credit');
                 if (exp.condo_mortgage_interest || exp.condo_mortgage_principal) {
                     var condoTotal = (exp.condo_mortgage_interest || 0) + (exp.condo_mortgage_principal || 0);
-                    html += line('condo_mortgage_payment', condoTotal, 'Condo P&I annual (' + fmtMo(condoTotal) + ')');
+                    html += line('condo_mortgage_payment', condoTotal, 'Condo P&I annual (' + fmtMo(condoTotal) + '), budgeted into SNT ABLE Account');
                     html += line('  condo_interest', exp.condo_mortgage_interest, '');
                     html += line('  condo_principal', exp.condo_mortgage_principal, '');
                 }
                 html += line('condo_mortgage_close [EOY]', d.condo_mortgage_close, 'Condo mortgage after principal paid');
             }
-            if (exp.mortgage_payment_total) {
-                html += line('mortgage_payment_total', exp.mortgage_payment_total, 'Total mortgage payments (' + fmtMo(exp.mortgage_payment_total) + ')');
+            var primaryIO = exp.primary_mortgage_interest || 0;
+            var condoPI = (exp.condo_mortgage_interest || 0) + (exp.condo_mortgage_principal || 0);
+            if (primaryIO || condoPI) {
+                html += '<div style="border-top:1px solid #444;margin-top:4px;padding-top:4px;">';
+                html += line('total_mortgage_payments', primaryIO + condoPI, fmt(primaryIO) + ' primary IO + ' + fmt(condoPI) + ' condo P&I = ' + fmt(primaryIO + condoPI) + ' (' + fmtMo(primaryIO + condoPI) + ')');
+                html += '</div>';
             }
             if (d.heloc_balance) {
                 html += line('heloc_balance [EOY]', d.heloc_balance, 'HELOC balance carried forward');
@@ -549,7 +556,22 @@
             html += line('  Total shared expenses', sharedTotal, 'Benefits all siblings equally');
 
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">C2 Equity Building:</div>';
-            html += line('  Condo mortgage P&I paid', L.cum_condo_mortgage_paid, 'Provides outlet for tax-free relief of expenses from SNT or C2 back to Person A');
+            html += line('  Condo mortgage interest', L.cum_condo_mortgage_interest, 'Cumulative interest paid');
+            html += line('  Condo mortgage principal', L.cum_condo_mortgage_principal, 'Cumulative principal paid (builds C2 equity)');
+            html += line('  Condo mortgage P&I total', L.cum_condo_mortgage_paid, 'Provides outlet for tax-free relief of expenses from SNT or C2 back to Person A');
+
+            html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">Person A → SNT Total Contributions:</div>';
+            var totalMortgagePaid = (L.cum_rental_to_primary_mortgage || 0) + (L.cum_condo_mortgage_paid || 0);
+            html += line('  Primary mortgage IO paid', L.cum_rental_to_primary_mortgage || 0, 'Cumulative interest-only payments on primary house');
+            html += line('  Condo mortgage P&I paid', L.cum_condo_mortgage_paid || 0, 'Cumulative P&I on SNT condo');
+            html += line('  Total SNT mortgage paid', totalMortgagePaid, 'Primary IO + Condo P&I — Person A\'s total mortgage obligation for SNT arrangement');
+            html += line('  SNT top-up', L.snt_initial_contribution || 0, '$10k seed from refinance savings');
+            var optimizerTaxCost = L.cum_optimizer_tax_cost || 0;
+            var optimizerIrmaaCost = L.cum_optimizer_irmaa_cost || 0;
+            html += line('  Extra tax from SNT expenses', optimizerTaxCost, optimizerTaxCost ? 'Income tax on IRA withdrawals needed to cover SNT condo costs' : 'TODO — dynamic optimizer will calculate');
+            html += line('  IRMAA penalties from SNT expenses', optimizerIrmaaCost, optimizerIrmaaCost ? 'Medicare surcharges triggered by IRA withdrawals for SNT' : 'TODO — dynamic optimizer will calculate');
+            var totalContributions = totalMortgagePaid + (L.snt_initial_contribution || 0) + optimizerTaxCost + optimizerIrmaaCost;
+            html += line('  Total Person A SNT contributions', totalContributions, 'All costs Person A incurred for the SNT condo arrangement');
 
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">SNT → MAPT Backup:</div>';
             if (L.cum_snt_mapt_backup) {

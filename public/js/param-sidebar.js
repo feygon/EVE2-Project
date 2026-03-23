@@ -115,7 +115,8 @@
             'condo_maintenance':     data.condo_maintenance,
             'primary_house_value':   data.primary_house_value,
             'condo_value':           data.condo_value,
-            'rental_increase_rate':  data.rental_increase_rate * 100
+            'rental_increase_rate':  data.rental_increase_rate * 100,
+            'ssdi_monthly':          data.ssdi_monthly
         };
 
         Object.keys(paramInit).forEach(function(param) {
@@ -164,7 +165,7 @@
         var text = '';
         if (param === 'lifestyle') {
             text = '$' + fmtNum(value) + '/yr';
-        } else if (param === 'rental_income' || param === 'medical_base_monthly' || param === 'roommate_monthly') {
+        } else if (param === 'rental_income' || param === 'medical_base_monthly' || param === 'roommate_monthly' || param === 'ssdi_monthly') {
             text = '$' + fmtNum(value) + '/mo';
         } else if (param === 'sdira_start' || param === 'managed_ira_start' || param === 'total_mortgage_amount' || param === 'primary_house_value' || param === 'condo_value') {
             text = '$' + fmtNum(value);
@@ -207,7 +208,8 @@
             'primary_house_value': 'primary_house_value',
             'condo_value': 'condo_value',
             'roommate_monthly': 'roommate_monthly',
-            'rental_increase_rate': 'rental_increase_rate'
+            'rental_increase_rate': 'rental_increase_rate',
+            'ssdi_monthly': 'ssdi_monthly'
         };
 
         var percentageParams = ['ira_growth', 'primary_appreciation', 'condo_appreciation',
