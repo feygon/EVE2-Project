@@ -36,19 +36,41 @@
         return '<div class="debug-section"><h4>' + title + '</h4>';
     }
 
+    // Set of debug-sidebar keys whose values are directly editable from the parameter sidebar.
+    // Asterisk (*) is appended to the label so the user knows they can change it.
+    var EDITABLE_PARAMS = {
+        'primary_appreciation_rate': true,
+        'condo_appreciation_rate': true,
+        'primary_mortgage_balance': true,
+        'condo_mortgage_balance': true,
+        'mortgage_split_pct': true,
+        'primary_mortgage_rate': true,
+        'condo_mortgage_rate': true,
+        'heloc_rate': true,
+        'sdira_checking_open': true,
+        'managed_ira_open': true,
+        'managed_ira_growth_rate': true,
+        'personal_budget': true
+    };
+
+    // Wraps key with asterisk if it's an editable param
+    function eKey(key) {
+        return EDITABLE_PARAMS[key] ? '<span style="color:#e74c3c;">*</span>' + key : key;
+    }
+
     function renderYearData(d) {
         var sc = window.scenarioConfig || {};
         var isMAPT = sc.condo_disposition === 'trust_mapt';
         var roommateOn = sc.roommate_enabled === 1;
         var exp = d.expenses || {};
         var html = '<div class="debug-sidebar-content">';
-        html += '<h3 style="color:#66ccff;margin:0 0 10px;">' + d.year + ' (Age ' + d.age_a + ')</h3>';
+        html += '<div style="color:#666;font-size:11px;margin-bottom:10px;"><span style="color:#e74c3c;">*</span> = editable from parameter sidebar</div>';
 
         // === Real Estate === (moved to top)
         html += sectionStart('Real Estate');
         var hRate = sc.primary_appreciation || 0.06;
         var cRate = sc.condo_appreciation || 0.05;
-        html += line('primary_appreciation_rate', hRate, 'Primary house appreciation rate');
+        html += line(eKey('primary_appreciation_rate'), hRate, 'Primary house appreciation rate');
         if (d.house_appreciation) {
             html += calc('house_appreciation', 'house_value_prev * ' + fmt(hRate),
                 fmt(d.house_value - d.house_appreciation) + ' * ' + fmt(hRate) + ' = ' + fmt(d.house_appreciation));
@@ -56,7 +78,7 @@
         html += line('house_value [EOY]', d.house_value, 'Primary house market value after appreciation');
         if (d.condo_value > 0 || d.condo_sold) {
             html += '';
-            html += line('condo_appreciation_rate', cRate, 'Condo appreciation rate');
+            html += line(eKey('condo_appreciation_rate'), cRate, 'Condo appreciation rate');
             if (d.condo_appreciation) {
                 html += calc('condo_appreciation', 'condo_value_prev * ' + fmt(cRate),
                     fmt(d.condo_value - d.condo_appreciation) + ' * ' + fmt(cRate) + ' = ' + fmt(d.condo_appreciation));
@@ -66,36 +88,51 @@
             if (d.condo_sale_proceeds) html += line('condo_sale_proceeds', d.condo_sale_proceeds, 'Net proceeds from condo sale');
         }
         html += line('real_estate_total [EOY]', d.real_estate_total, 'Combined RE value');
+        var totalAppr = (d.house_appreciation || 0) + (d.condo_appreciation || 0);
+        html += '<div style="border-top:1px solid #444;margin-top:4px;padding-top:4px;">';
+        html += line('total_appreciation', totalAppr, fmt(d.house_appreciation || 0) + ' house + ' + fmt(d.condo_appreciation || 0) + ' condo');
+        html += '</div>';
         html += '</div>';
 
         // === Mortgage & HELOC ===
         if (d.primary_mortgage_balance || d.condo_mortgage_balance || d.heloc_balance) {
             html += sectionStart('Mortgage & HELOC');
+            var splitRaw = sc.mortgage_split_pct || 0.80;
+            var splitPct = Math.round(splitRaw * 100);
+            var condoPct = 100 - splitPct;
+            html += line(eKey('mortgage_split_pct'), splitPct + '% / ' + condoPct + '%', 'Primary (IO) / Condo (30yr P&I) split of total mortgage');
             if (d.primary_mortgage_balance) {
-                html += line('primary_mortgage_balance', d.primary_mortgage_balance, 'Primary house mortgage, 15yr interest-only balloon at 840 credit score');
-                html += line('primary_mortgage_rate', d.primary_mortgage_rate, 'Primary house mortgage interest rate, 15yr IO balloon at 840 credit');
+                html += line(eKey('primary_mortgage_balance'), d.primary_mortgage_balance, splitPct + '% of total mortgage, 15yr IO balloon at 840 credit');
+                html += line(eKey('primary_mortgage_rate'), d.primary_mortgage_rate, 'Primary house mortgage interest rate, 15yr IO balloon at 840 credit');
                 if (exp.primary_mortgage_interest) {
                     html += calc('primary_mortgage_interest', 'balance * rate',
                         fmt(d.primary_mortgage_balance) + ' * ' + fmt(d.primary_mortgage_rate) + ' = ' + fmt(exp.primary_mortgage_interest) + ' (' + fmtMo(exp.primary_mortgage_interest) + ')');
                 }
+                if (exp.mortgage_payment_total) {
+                    html += line('mortgage_payment_total', exp.mortgage_payment_total, 'Total mortgage payments (' + fmtMo(exp.mortgage_payment_total) + ')');
+                }
             }
             if (d.condo_mortgage_balance) {
-                html += line('condo_mortgage_balance', d.condo_mortgage_balance, '30yr fixed, provides outlet for tax-free relief of expenses from SNT or C2 as pay-back to Person A, paid off at Medicaid activation');
-                html += line('condo_mortgage_rate', d.condo_mortgage_rate, 'Condo mortgage rate, 30yr fixed at 840 credit');
+                html += line(eKey('condo_mortgage_balance'), d.condo_mortgage_balance, condoPct + '% of total mortgage, 30yr fixed P&I at 840 credit, paid off at Medicaid activation');
+                html += line(eKey('condo_mortgage_rate'), d.condo_mortgage_rate, 'Condo mortgage rate, 30yr fixed at 840 credit');
                 if (exp.condo_mortgage_interest || exp.condo_mortgage_principal) {
                     var condoTotal = (exp.condo_mortgage_interest || 0) + (exp.condo_mortgage_principal || 0);
-                    html += line('condo_mortgage_payment', condoTotal, 'Condo P&I annual (' + fmtMo(condoTotal) + ')');
-                    html += line('  interest', exp.condo_mortgage_interest, '');
-                    html += line('  principal', exp.condo_mortgage_principal, '');
+                    html += line('condo_mortgage_payment', condoTotal, 'Condo P&I annual (' + fmtMo(condoTotal) + '), budgeted into SNT ABLE Account');
+                    html += line('  condo_interest', exp.condo_mortgage_interest, '');
+                    html += line('  condo_principal', exp.condo_mortgage_principal, '');
                 }
                 html += line('condo_mortgage_close [EOY]', d.condo_mortgage_close, 'Condo mortgage after principal paid');
             }
-            if (exp.mortgage_payment_total) {
-                html += line('mortgage_payment_total', exp.mortgage_payment_total, 'Total mortgage payments (' + fmtMo(exp.mortgage_payment_total) + ')');
+            var primaryIO = exp.primary_mortgage_interest || 0;
+            var condoPI = (exp.condo_mortgage_interest || 0) + (exp.condo_mortgage_principal || 0);
+            if (primaryIO || condoPI) {
+                html += '<div style="border-top:1px solid #444;margin-top:4px;padding-top:4px;">';
+                html += line('total_mortgage_payments', primaryIO + condoPI, fmt(primaryIO) + ' primary IO + ' + fmt(condoPI) + ' condo P&I = ' + fmt(primaryIO + condoPI) + ' (' + fmtMo(primaryIO + condoPI) + ')');
+                html += '</div>';
             }
             if (d.heloc_balance) {
                 html += line('heloc_balance [EOY]', d.heloc_balance, 'HELOC balance carried forward');
-                html += line('heloc_rate', d.heloc_rate, 'HELOC interest rate, variable rate at 840 credit');
+                html += line(eKey('heloc_rate'), d.heloc_rate, 'HELOC interest rate, variable rate at 840 credit');
             }
             if (d.heloc_drawn) html += line('heloc_drawn', d.heloc_drawn, 'HELOC drawn this year');
             html += '</div>';
@@ -134,22 +171,25 @@
             html += '</div>';
         } else {
         html += sectionStart('IRA');
-        html += line('sdira_checking_open', d.sdira_checking_open, 'SDIRA Checking balance (start of year)');
+        html += line(eKey('sdira_checking_open'), d.sdira_checking_open, 'SDIRA Checking balance (start of year)');
         if (d.annuity_payments) {
             html += calc('sdira_checking_available', 'sdira_checking_open + annuity_payments',
                 fmt(d.sdira_checking_open) + ' + ' + fmt(d.annuity_payments) + ' = ' + fmt(d.sdira_checking_available));
-            html += '<div style="color:#666;font-size:11px;margin-left:12px;">SMA annuities paid monthly. LS7 paid Jan (start of year). LS6 paid Jun (TODO: model as end-of-year availability).</div>';
+            if (d.annuity_payments_h1 || d.annuity_payments_h2) {
+                html += '<div style="color:#666;font-size:11px;margin-left:12px;">H1 (Jan-Jun): ' + fmt(d.annuity_payments_h1 || 0) + ' | H2 (Jul-Dec): ' + fmt(d.annuity_payments_h2 || 0) + '</div>';
+            }
+            html += '<div style="color:#666;font-size:11px;margin-left:12px;">SMA annuities paid monthly. LS7 matures Jan. LS6 matures Jun.</div>';
         }
         if (d.sdira_distributions) html += line('sdira_distributions', d.sdira_distributions, 'Withdrawn from SDIRA Checking for expenses & lifestyle');
         html += '<div><span class="debug-key">sdira_checking_close [EOY]</span>: <span class="debug-val">' + fmt(d.sdira_checking_available || d.sdira_checking_open) + ' - ' + fmt(d.sdira_distributions || 0) + ' = ' + fmt(d.sdira_checking_close) + '</span></div>';
         html += '';
-        html += line('managed_ira_open', d.managed_ira_open, 'Managed IRA balance (start of year). Check with advisor for exact amount');
+        html += line(eKey('managed_ira_open'), d.managed_ira_open, 'Managed IRA balance (start of year). NOTE: Check with advisor for exact amount');
         if (d.managed_ira_distributions) html += line('managed_ira_distributions', d.managed_ira_distributions, 'Withdrawn from Managed IRA');
         if (d.managed_ira_growth !== undefined && d.managed_ira_growth !== 0) {
             html += calc('managed_ira_growth', 'managed_ira_close_pre_growth * managed_ira_growth_rate',
                 fmt(d.managed_ira_close - d.managed_ira_growth) + ' * ' + fmt(d.managed_ira_growth_rate) + ' = ' + fmt(d.managed_ira_growth));
         }
-        html += line('managed_ira_growth_rate', d.managed_ira_growth_rate, 'Check with advisor for expected IRA growth');
+        html += line(eKey('managed_ira_growth_rate'), d.managed_ira_growth_rate, 'NOTE: Check with advisor for expected IRA growth');
         html += line('managed_ira_close [EOY]', d.managed_ira_close, 'Managed IRA balance after growth');
         html += '';
         html += line('total_ira_open', d.total_ira_open, 'Combined IRA (start of year)');
@@ -165,6 +205,7 @@
         if (d.ltc_savings_open || d.ltc_savings_close || d.ltc_savings_spent) {
             html += sectionStart('LTC Savings');
             html += line('ltc_savings_open', d.ltc_savings_open, 'LTC Savings (start of year)');
+            if (d.income && d.income.ltc_payout) html += line('ltc_disbursement', d.income.ltc_payout, 'LTC insurance payout deposited to savings');
             if (d.ltc_savings_spent) html += line('ltc_savings_spent', d.ltc_savings_spent, 'Spent from LTC Savings this year');
             html += line('ltc_savings_close [EOY]', d.ltc_savings_close, 'LTC Savings after payouts and spending');
             html += '</div>';
@@ -220,6 +261,7 @@
             } else if (d.year >= payoutEndYear) {
                 html += '<div style="color:#e74c3c;">LTC benefits exhausted (ended ' + payoutEndYear + ')</div>';
             }
+            html += line('ltc_savings_spent', d.ltc_savings_spent || 0, 'Cash spent from LTC savings this year');
             html += '</div>';
         }
 
@@ -230,7 +272,6 @@
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">Personal Income:</div>';
             if (d.income.ssdi) html += line('  ssdi', d.income.ssdi, 'Social Security income. Increases annually with the CPI (COLA)');
             if (d.income.ira_distributions) html += line('  ira_distributions', d.income.ira_distributions, 'Total IRA distributions');
-            if (d.income.ltc_payout) html += line('  ltc_payout', d.income.ltc_payout, 'LTC insurance payout');
             if (d.income.ltc_spending) html += line('  ltc_spending', d.income.ltc_spending, 'Spent from LTC savings');
 
             // Rental income (separate subsection)
@@ -298,7 +339,7 @@
             }
             if (exp.condo_mortgage_interest || exp.condo_mortgage_principal) {
                 var condoP = (exp.condo_mortgage_interest || 0) + (exp.condo_mortgage_principal || 0);
-                html += line('  condo_mortgage (P&I)', condoP, fmtMo(condoP));
+                html += line('  condo_mortgage (P&I)', condoP, fmtMo(condoP) + ', budgeted into SNT ABLE Account');
             }
             if (exp.heloc_interest) html += line('  heloc_interest', exp.heloc_interest, '');
         }
@@ -307,6 +348,18 @@
         if (exp.medical) html += line('  medical', exp.medical, '');
         if (exp.memory_care) html += line('  memory_care', exp.memory_care, d.memory_care_medicaid ? 'Medicaid pays (1/12 transition)' : '');
         if (exp.lifestyle) html += line('  lifestyle', exp.lifestyle, 'Residual personal spending');
+        var irmaaVal = exp.irmaa || 0;
+        var irmaaLegend = 'IRMAA Medicare surcharge (MAGI $' + fmt(d.irmaa_lookback_magi || 0) + ' from 2yr prior)';
+        html += line('  irmaa_surcharge', irmaaVal, irmaaLegend);
+        var cumIrmaa = 0;
+        if (window.projectionData) {
+            for (var i = 0; i < window.projectionData.length; i++) {
+                var py = window.projectionData[i];
+                if (py.year > d.year) break;
+                cumIrmaa += (py.expenses && py.expenses.irmaa) || 0;
+            }
+        }
+        html += line('  irmaa_cumulative', cumIrmaa, 'Lifetime IRMAA paid through ' + d.year);
         html += '<div style="border-top:1px solid #444;margin-top:4px;padding-top:4px;">';
         if (isMAPT && d.mapt_property_expenses) {
             var personAExp = (exp.total || 0) - d.mapt_property_expenses;
@@ -454,7 +507,10 @@
 
         // === Budget & Liquid ===
         html += sectionStart('Budget & Liquid');
-        html += line('personal_budget', d.personal_budget, 'Personal budget target (slider)');
+        html += line(eKey('personal_budget'), d.personal_budget, 'Personal budget target (slider)');
+        if (exp.lifestyle !== undefined) html += line('lifestyle_actual', exp.lifestyle, 'TODO - Personal Budget: What is Person A spending this on?');
+        if (d.sdira_distributions) html += line('sdira_distributions', d.sdira_distributions, 'Withdrawn from SDIRA Checking');
+        if (d.ltc_savings_spent) html += line('ltc_savings_spent', d.ltc_savings_spent, 'Cash spent from LTC savings');
         html += line('in_memory_care', d.in_memory_care, d.in_memory_care ? 'Person A is in memory care facility' : '');
         html += line('liquid_assets_open', d.liquid_assets_open, 'Liquid assets (start of year)');
         html += line('liquid_assets_total [EOY]', d.liquid_assets_total, 'Liquid assets after all transactions');
@@ -467,12 +523,27 @@
             var L = d.ledger;
             html += sectionStart('Sibling Equity Ledger (cumulative through ' + d.year + ')');
 
+            // Find Arbor Roses condo sale from projection data
+            var condoSaleData = null;
+            if (window.projectionData) {
+                condoSaleData = window.projectionData.find(function(y) { return y.condo_sold; });
+            }
+            if (condoSaleData && condoSaleData.condo_sale_proceeds) {
+                var netProceeds = condoSaleData.condo_sale_proceeds;
+                var closingCosts = 20000;
+                var salePrice = netProceeds + closingCosts;
+                html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">C3 Arbor Roses Liquidation (' + condoSaleData.year + '):</div>';
+                html += line('  sale price', salePrice, '');
+                html += calc('  net proceeds', fmt(salePrice) + ' - ' + fmt(closingCosts) + ' closing costs & deferred maint', fmt(netProceeds));
+            }
+
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">C2 Early Inheritance:</div>';
             html += line('  SNT condo purchase', L.snt_condo_purchase, 'Mortgage (' + fmt(L.snt_condo_purchase + 30000) + ') - $30k closing/deferred maint/$10k SNT');
-            html += line('  SNT initial contribution', L.snt_initial_contribution, 'From refinance/purchase savings');
+            html += line('  SNT top-up', L.snt_initial_contribution, 'Balance for fallback & SSA administration shenanigans');
             if (L.snt_ira_liquidation) html += line('  IRA/annuity → SNT', L.snt_ira_liquidation, 'Liquid balances + annuity surrender (85%) - tax withholding, at Medicaid trigger');
             var c2Total = L.snt_condo_purchase + L.snt_initial_contribution + L.snt_ira_liquidation;
-            html += line('  C2 total early inheritance', c2Total, '');
+            html += line('  SNT condo total cost', c2Total, '');
+            html += '<div style="color:#666;font-size:11px;margin-left:12px;">Remaining net proceeds deposited to MAPT account</div>';
 
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">MAPT Income → Shared Expenses:</div>';
             html += line('  Rental → condo expenses', L.cum_rental_to_condo_expenses, 'Tax, HOA, ins, maint, mgmt');
@@ -489,7 +560,22 @@
             html += line('  Total shared expenses', sharedTotal, 'Benefits all siblings equally');
 
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">C2 Equity Building:</div>';
-            html += line('  Condo mortgage P&I paid', L.cum_condo_mortgage_paid, 'Provides outlet for tax-free relief of expenses from SNT or C2 back to Person A');
+            html += line('  Condo mortgage interest', L.cum_condo_mortgage_interest, 'Cumulative interest paid');
+            html += line('  Condo mortgage principal', L.cum_condo_mortgage_principal, 'Cumulative principal paid (builds C2 equity)');
+            html += line('  Condo mortgage P&I total', L.cum_condo_mortgage_paid, 'Provides outlet for tax-free relief of expenses from SNT or C2 back to Person A');
+
+            html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">Person A → SNT Total Contributions:</div>';
+            var totalMortgagePaid = (L.cum_rental_to_primary_mortgage || 0) + (L.cum_condo_mortgage_paid || 0);
+            html += line('  Primary mortgage IO paid', L.cum_rental_to_primary_mortgage || 0, 'Cumulative interest-only payments on primary house');
+            html += line('  Condo mortgage P&I paid', L.cum_condo_mortgage_paid || 0, 'Cumulative P&I on SNT condo');
+            html += line('  Total SNT mortgage paid', totalMortgagePaid, 'Primary IO + Condo P&I — Person A\'s total mortgage obligation for SNT arrangement');
+            html += line('  SNT top-up', L.snt_initial_contribution || 0, '$10k seed from refinance savings');
+            var optimizerTaxCost = L.cum_optimizer_tax_cost || 0;
+            var optimizerIrmaaCost = L.cum_optimizer_irmaa_cost || 0;
+            html += line('  Extra tax from SNT expenses', optimizerTaxCost, optimizerTaxCost ? 'Income tax on IRA withdrawals needed to cover SNT condo costs' : 'TODO — dynamic optimizer will calculate');
+            html += line('  IRMAA penalties from SNT expenses', optimizerIrmaaCost, optimizerIrmaaCost ? 'Medicare surcharges triggered by IRA withdrawals for SNT' : 'TODO — dynamic optimizer will calculate');
+            var totalContributions = totalMortgagePaid + (L.snt_initial_contribution || 0) + optimizerTaxCost + optimizerIrmaaCost;
+            html += line('  Total Person A SNT contributions', totalContributions, 'All costs Person A incurred for the SNT condo arrangement');
 
             html += '<div style="color:#aac8e4;font-weight:600;margin-top:4px;">SNT → MAPT Backup:</div>';
             if (L.cum_snt_mapt_backup) {
@@ -542,7 +628,7 @@
         var title = document.getElementById('tooltip-sidebar-title');
         if (sidebar && content) {
             content.innerHTML = html;
-            if (title) title.textContent = data.year + ' (Age ' + data.age_a + ')';
+            if (title) title.textContent = data.year + ' Yearly Values & Calculations';
             sidebar.classList.add('active');
             if (overlay) overlay.classList.add('active');
         }

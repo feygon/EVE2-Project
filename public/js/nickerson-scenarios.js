@@ -57,6 +57,35 @@
                 $('#sidebarToggle').removeClass('shifted');
             }
         });
+
+        // Scroll expanded <details> into view within sidebar
+        $('#paramSidebar details.param-group').on('toggle', function() {
+            if (this.open) {
+                var el = this;
+                var container = document.querySelector('#paramSidebar .sidebar-body');
+                if (container) {
+                    setTimeout(function() {
+                        var elRect = el.getBoundingClientRect();
+                        var contRect = container.getBoundingClientRect();
+                        if (elRect.bottom > contRect.bottom) {
+                            var target = container.scrollTop + (elRect.bottom - contRect.bottom);
+                            var start = container.scrollTop;
+                            var distance = target - start;
+                            var duration = Math.min(300, Math.max(150, distance * 0.5));
+                            var startTime = null;
+                            function step(ts) {
+                                if (!startTime) startTime = ts;
+                                var progress = Math.min((ts - startTime) / duration, 1);
+                                var ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                                container.scrollTop = start + distance * ease;
+                                if (progress < 1) requestAnimationFrame(step);
+                            }
+                            requestAnimationFrame(step);
+                        }
+                    }, 50);
+                }
+            }
+        });
     }
 
     /**
