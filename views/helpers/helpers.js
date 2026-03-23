@@ -692,6 +692,11 @@ exports.formatExpensesTooltip = function(expenses, projection) {
         lines.push(`  Total Tax: $${formatNum(totalTax)}`);
     }
 
+    // IRMAA Medicare surcharge
+    const irmaa = expenses.irmaa || 0;
+    lines.push('');
+    lines.push(`IRMAA Surcharge: $${formatNum(irmaa)}`);
+
     lines.push('────────────────────────');
     if (isMapt && projection && projection.mapt_property_expenses) {
         // Show Person A's expenses excluding MAPT trust expenses

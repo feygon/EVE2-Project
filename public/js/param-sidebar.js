@@ -13,6 +13,51 @@
         $('#sidebarToggle').addClass('shifted');
     }
 
+    // Restore open/closed state of <details> param groups
+    var savedGroupState = sessionStorage.getItem('paramGroupState');
+    if (savedGroupState) {
+        var states = JSON.parse(savedGroupState);
+        $('#paramSidebar details.param-group').each(function(i) {
+            if (i < states.length) {
+                if (states[i]) {
+                    $(this).attr('open', '');
+                } else {
+                    $(this).removeAttr('open');
+                }
+            }
+        });
+        sessionStorage.removeItem('paramGroupState');
+    }
+
+    // Scroll expanded <details> into view within sidebar
+    $('#paramSidebar details.param-group').on('toggle', function() {
+        if (this.open) {
+            var el = this;
+            var container = document.querySelector('#paramSidebar .sidebar-body');
+            if (container) {
+                setTimeout(function() {
+                    var elRect = el.getBoundingClientRect();
+                    var contRect = container.getBoundingClientRect();
+                    if (elRect.bottom > contRect.bottom) {
+                        var target = container.scrollTop + (elRect.bottom - contRect.bottom);
+                        var start = container.scrollTop;
+                        var distance = target - start;
+                        var duration = Math.min(300, Math.max(150, distance * 0.5));
+                        var startTime = null;
+                        function step(ts) {
+                            if (!startTime) startTime = ts;
+                            var progress = Math.min((ts - startTime) / duration, 1);
+                            var ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                            container.scrollTop = start + distance * ease;
+                            if (progress < 1) requestAnimationFrame(step);
+                        }
+                        requestAnimationFrame(step);
+                    }
+                }, 50);
+            }
+        }
+    });
+
     // Sidebar toggle (open/close)
     $('#sidebarToggle').on('click', function() {
         if ($('#paramSidebar').hasClass('open')) {
@@ -52,6 +97,7 @@
     function initSidebarSliders(data) {
         var paramInit = {
             'ira_growth':            data.ira_growth * 100,
+            'sdira_start':           data.sdira_start,
             'managed_ira_start':     data.managed_ira_start,
             'lifestyle':             data.lifestyle_annual,
             'primary_appreciation':  data.primary_appreciation * 100,
@@ -120,7 +166,7 @@
             text = '$' + fmtNum(value) + '/yr';
         } else if (param === 'rental_income' || param === 'medical_base_monthly' || param === 'roommate_monthly') {
             text = '$' + fmtNum(value) + '/mo';
-        } else if (param === 'managed_ira_start' || param === 'total_mortgage_amount' || param === 'primary_house_value' || param === 'condo_value') {
+        } else if (param === 'sdira_start' || param === 'managed_ira_start' || param === 'total_mortgage_amount' || param === 'primary_house_value' || param === 'condo_value') {
             text = '$' + fmtNum(value);
         } else if (param === 'memory_care_cost' || param === 'condo_maintenance') {
             text = '$' + fmtNum(value) + '/yr';
@@ -142,6 +188,7 @@
 
         var paramMap = {
             'ira_growth': 'ira_growth',
+            'sdira_start': 'sdira_start',
             'managed_ira_start': 'managed_ira_start',
             'lifestyle': 'lifestyle_annual',
             'primary_appreciation': 'primary_appreciation',
@@ -250,6 +297,12 @@
             if ($('#paramSidebar').hasClass('open')) {
                 sessionStorage.setItem('sidebarOpen', 'true');
             }
+            // Save open/closed state of each <details> group
+            var detailsState = [];
+            $('#paramSidebar details.param-group').each(function() {
+                detailsState.push($(this).attr('open') !== undefined);
+            });
+            sessionStorage.setItem('paramGroupState', JSON.stringify(detailsState));
             location.reload();
         }
 
