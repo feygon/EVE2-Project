@@ -2,7 +2,11 @@
 <div id="tooltip-sidebar" class="tooltip-sidebar">
     <div class="tooltip-sidebar-header">
         <h3 id="tooltip-sidebar-title">Details</h3>
-        <button class="tooltip-sidebar-close" onclick="closeTooltipSidebar()">&times;</button>
+        <div style="display:flex;align-items:center;gap:4px;">
+            <button id="debug-nav-prev" title="Previous year" style="background:none;border:1px solid #555;color:#aaa;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:3px;">&#9664;</button>
+            <button id="debug-nav-next" title="Next year" style="background:none;border:1px solid #555;color:#aaa;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:3px;">&#9654;</button>
+            <button class="tooltip-sidebar-close" onclick="closeTooltipSidebar()">&times;</button>
+        </div>
     </div>
     <div class="tooltip-sidebar-content" id="tooltip-sidebar-content">
         <!-- Content will be populated by JavaScript -->

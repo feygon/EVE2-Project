@@ -242,6 +242,14 @@ exports.formatNumber = function(num) {
     return k.toLocaleString('en-US') + 'k';
 };
 
+// Format number in k with 1 decimal place (e.g., $5.2k, -$3.1k)
+exports.formatNumber1d = function(num) {
+    if (typeof num === 'undefined' || num === null) return '0';
+    var k = num / 1000;
+    if (Math.abs(k) < 0.1 && num !== 0) return Math.round(num).toLocaleString('en-US');
+    return k.toFixed(1) + 'k';
+};
+
 // Format number with exact precision (for tooltips and detail views)
 exports.formatNumberExact = function(num) {
     if (typeof num === 'undefined' || num === null) return '0';
