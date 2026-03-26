@@ -117,11 +117,27 @@
             <summary>Expenses &amp; Care</summary>
             <div class="param-group-body">
                 <div class="param-row">
-                    <label title="A's personal budget (rental income is additional, earmarked for condo expenses)">Personal Gross Expenses (Pre-Facility)</label>
+                    <label title="Person A's discretionary spending (groceries, personal, transport, tithe). Inflates 5%/yr. Drops 10%/yr after nursing intensifies (max 20%). Replaced by MC residual in facility.">Lifestyle Floor Monthly</label>
                     <div class="slider-container">
-                        <input type="range" min="50000" max="150000" value="95000" step="1000"
-                               class="param-slider" data-param="lifestyle">
-                        <span class="param-value">$95,000/yr</span>
+                        <input type="range" min="1000" max="5000" value="2500" step="100"
+                               class="param-slider" data-param="lifestyle_floor_monthly">
+                        <span class="param-value">$2,500/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="House maintenance continuing during memory care (gardening, ADT, Noel). Inflates 5%/yr.">MC Household Maintenance</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="1000" value="300" step="50"
+                               class="param-slider" data-param="mc_maintenance_monthly">
+                        <span class="param-value">$300/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Personal spending that continues during memory care (tithe, subscriptions, gifts, professional services). Inflates 5%/yr.">MC Residual Lifestyle Monthly</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="2000" value="200" step="50"
+                               class="param-slider" data-param="mc_residual_monthly">
+                        <span class="param-value">$200/mo</span>
                     </div>
                 </div>
                 <div class="param-row">

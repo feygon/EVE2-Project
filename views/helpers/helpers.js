@@ -502,9 +502,12 @@ exports.formatTaxableIncomeTooltip = function(projection) {
     lines.push('Income from Taxable Sources:');
     lines.push('');
 
-    // Social Security (full amount)
+    // Social Security (full amount, with taxable portion noted)
     if (projection.income && projection.income.ssdi) {
-        lines.push(`Social Security: $${formatNum(projection.income.ssdi)}`);
+        const taxableSS = projection.taxable_ss || 0;
+        const ssTier = projection.ss_tier || '';
+        const pct = taxableSS > 0 ? (taxableSS / projection.income.ssdi * 100).toFixed(1) : '0.0';
+        lines.push(`Social Security: $${formatNum(projection.income.ssdi)} (${pct}% taxable)`);
     }
 
     // Rental income (only if it's Person A's income, not trust income)
@@ -513,44 +516,40 @@ exports.formatTaxableIncomeTooltip = function(projection) {
     }
 
     // IRA distributions (including HELOC if drawn)
-    if (projection.income && projection.income.ira_distributions) {
-        lines.push(`IRA Distributions: $${formatNum(projection.income.ira_distributions)}`);
-        if (projection.heloc_drawn && projection.heloc_drawn > 0) {
-            lines.push(`  (includes $${formatNum(projection.heloc_drawn)} HELOC)`);
-        }
-    }
-
-    lines.push('────────────────────────');
-    lines.push(`Total Taxable Sources: $${formatNum(projection.taxable_income_total || 0)}`);
-    lines.push('');
-    lines.push('Adjusted Gross Income (AGI):');
-    lines.push('');
-
-    // AGI breakdown - what actually gets taxed
-    if (projection.income && projection.income.ssdi) {
-        const taxableSS = projection.income.ssdi * 0.85;
-        lines.push(`SS (85% taxable): $${formatNum(taxableSS)}`);
-    }
-
-    // Rental only in AGI if it's Person A's income (not MAPT trust income)
-    if (projection.income && projection.income.rental && !projection.rental_to_trust) {
-        lines.push(`Rental (100% taxable): $${formatNum(projection.income.rental)}`);
-    }
-
-    if (projection.income && projection.income.ira_distributions) {
-        const totalIRA = projection.income.ira_distributions;
-        const helocDrawn = projection.heloc_drawn || 0;
-        const taxableIRA = totalIRA - helocDrawn;
-
+    const totalIRA = (projection.income && projection.income.ira_distributions) || 0;
+    const helocDrawn = projection.heloc_drawn || 0;
+    const taxableIRA = totalIRA - helocDrawn;
+    if (totalIRA > 0) {
+        lines.push(`IRA Distributions: $${formatNum(totalIRA)}`);
         if (helocDrawn > 0) {
-            lines.push(`IRA (excluding HELOC): $${formatNum(taxableIRA)}`);
-        } else if (taxableIRA > 0) {
-            lines.push(`IRA: $${formatNum(taxableIRA)}`);
+            lines.push(`  (includes $${formatNum(helocDrawn)} HELOC — not taxable)`);
         }
     }
 
+    // Total uses actual taxable amounts, not gross
+    const taxableSS = projection.taxable_ss || 0;
+    const rentalForTax = (!projection.rental_to_trust && projection.income) ? (projection.income.rental || 0) : 0;
+    const totalTaxable = taxableSS + rentalForTax + taxableIRA;
     lines.push('────────────────────────');
-    lines.push(`AGI (amount taxed): $${formatNum(projection.agi || 0)}`);
+    lines.push(`Total Taxable Income: $${formatNum(totalTaxable)}`);
+    lines.push('');
+    lines.push('AGI Breakdown:');
+    lines.push('');
+
+    if (projection.income && projection.income.ssdi) {
+        lines.push(`SS taxable: $${formatNum(taxableSS)}`);
+    }
+
+    if (rentalForTax > 0) {
+        lines.push(`Rental: $${formatNum(rentalForTax)}`);
+    }
+
+    if (taxableIRA > 0) {
+        lines.push(`IRA: $${formatNum(taxableIRA)}`);
+    }
+
+    lines.push('────────────────────────');
+    lines.push(`AGI: $${formatNum(projection.agi || 0)}`);
 
     return lines.join('\n');
 };
@@ -699,9 +698,8 @@ exports.formatExpensesTooltip = function(expenses, projection) {
 
     lines.push('────────────────────────');
     if (isMapt && projection && projection.mapt_property_expenses) {
-        // Show Person A's expenses excluding MAPT trust expenses
-        const personATotal = (expenses.total || 0) - projection.mapt_property_expenses;
-        lines.push(`Person A Expenses: $${formatNum(personATotal)}`);
+        // expenses.total is already Person A only (excludes trust expenses)
+        lines.push(`Person A Expenses: $${formatNum(expenses.total)}`);
         lines.push(`MAPT Trust Expenses: $${formatNum(projection.mapt_property_expenses)} @`);
     } else {
         lines.push(`Total Expenses: $${formatNum(expenses.total)}`);
