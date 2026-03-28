@@ -82,6 +82,7 @@ jobs:
             --exclude='public/js/tooltip-sidebar.js' \
             --exclude='public/css/nickerson' \
             --exclude='public/css/nickerson.css' \
+            --exclude='data' \
             --exclude='skills-lock.json' \
             --exclude='.agents' \
             --exclude='.claude' \
