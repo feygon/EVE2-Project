@@ -77,11 +77,41 @@ Write-Host "  http://localhost:$Port/resume" -ForegroundColor White
 Write-Host "  http://localhost:$Port/eve2" -ForegroundColor White
 Write-Host "  http://localhost:$Port/illusion" -ForegroundColor White
 Write-Host ""
+Write-Host "BurnRate (Nickerson) routes:" -ForegroundColor Green
+Write-Host "  http://localhost:$Port/Nickerson/              Scenarios overview" -ForegroundColor White
+Write-Host "  http://localhost:$Port/Nickerson/scenario/:id  Scenario detail + projections" -ForegroundColor White
+Write-Host "  POST /Nickerson/scenario/:id/param             Update slider parameter" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenario/:id/update-ltc        Update LTC trigger year" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenario/:id/update-memory-care  Update MC start year" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenario/:id/update-managed-ira  Update managed IRA start" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenario/:id/update-parameter    Update checkbox/toggle" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenario/:id/update-year-of-passing  Update year of passing" -ForegroundColor DarkGray
+Write-Host "  POST /Nickerson/scenarios/metrics               Batch metrics for overview cards" -ForegroundColor DarkGray
+Write-Host ""
 
-try {
+# Ensure tmp directory and restart sentinel exist
+if (-not (Test-Path "tmp")) { New-Item -ItemType Directory -Path "tmp" | Out-Null }
+if (-not (Test-Path "tmp/restart.txt")) { "" | Out-File -FilePath "tmp/restart.txt" }
+$restartFile = (Resolve-Path "tmp/restart.txt").Path
+$lastRestart = (Get-Item $restartFile).LastWriteTime
+
+Write-Host "  Restart hook: touch tmp/restart.txt to restart server" -ForegroundColor DarkGray
+Write-Host "  Press Ctrl+C to stop" -ForegroundColor DarkGray
+Write-Host ""
+
+# Run server with restart loop.
+# Exit code 75 = restart requested (from POST /Nickerson/restart).
+# Any other exit = stop.
+while ($true) {
     node main.js $Port
-} catch {
-    Write-Host ""
-    Write-Host "? Server stopped with error: $_" -ForegroundColor Red
-    exit 1
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -eq 75) {
+        Write-Host ""
+        Write-Host "[restart] Server restart requested - restarting..." -ForegroundColor Yellow
+        Start-Sleep -Milliseconds 500
+    } else {
+        Write-Host ""
+        Write-Host "Server stopped (exit code: $exitCode)." -ForegroundColor Cyan
+        break
+    }
 }
