@@ -132,6 +132,14 @@
                     </div>
                 </div>
                 <div class="param-row">
+                    <label title="Pre-MC charitable giving (tithe). Tax-deductible on Schedule A. No inflation. Deactivated at memory care.">Pre-MC Charitable Giving</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="2000" value="800" step="50"
+                               class="param-slider" data-param="charitable_monthly">
+                        <span class="param-value">$800/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
                     <label title="House maintenance continuing during memory care (gardening, ADT, Noel). Inflates 5%/yr.">MC Household Maintenance</label>
                     <div class="slider-container">
                         <input type="range" min="0" max="1000" value="300" step="50"
@@ -232,7 +240,7 @@
             <summary>Mortgages &amp; Debt</summary>
             <div class="param-group-body">
                 <div class="param-row">
-                    <label>Total Mortgage Amount</label>
+                    <label>SNT Condo Purchase Price</label>
                     <div class="slider-container">
                         <input type="range" min="250000" max="400000" value="300000" step="10000"
                                class="param-slider" data-param="total_mortgage_amount">
@@ -240,11 +248,19 @@
                     </div>
                 </div>
                 <div class="param-row">
-                    <label title="Percentage allocated to primary house (interest-only). Remainder goes to condo (30yr P&I).">Mortgage Split (Primary / Condo)</label>
+                    <label title="Percentage of SNT condo purchase price paid as down payment. Remainder is a 30yr fixed P&I mortgage.">SNT Condo Down Payment</label>
                     <div class="slider-container">
-                        <input type="range" min="0" max="100" value="80" step="5"
+                        <input type="range" min="20" max="100" value="80" step="5"
                                class="param-slider" data-param="mortgage_split_pct">
-                        <span class="param-value">80% / 20%</span>
+                        <span class="param-value">80% down</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Initial SNT seed funding from refinance proceeds. Covers trust administration startup and SSA compliance reserve.">SNT Seed Funding</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="20000" value="10000" step="1000"
+                               class="param-slider" data-param="snt_seed">
+                        <span class="param-value">$10,000</span>
                     </div>
                 </div>
                 <div class="param-row">
