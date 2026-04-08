@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../BurnRate-Private"
+		},
+		{
+			"path": "C:/Users/feygo/.claude"
 		}
 	],
 	"settings": {}

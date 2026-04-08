@@ -57,7 +57,6 @@
 
 ### **Required for ALL docs > 60 lines:**
 
-```markdown
 ---
 title: "Document Title"
 version: vX.X.X
@@ -100,7 +99,6 @@ tags: [tag1, tag2, tag3]
 Content here (short paragraphs, 2-3 lines max).
 
 ---
-```
 
 ### **Key Rules:**
 - ✅ Every document > 60 lines gets TOC
@@ -260,6 +258,13 @@ You don't get to wait for the user to remind you.
 **These instructions exist because the user needs them.**
 
 **Follow them. Every time. No exceptions.**
+
+---
+
+## 🛑 Code Editing Restrictions
+
+**Do NOT edit code in this repository.**  
+Claude Code handles all implementation. This VS Copilot instance is for navigation, architecture comprehension, and test running only.
 
 ---
 

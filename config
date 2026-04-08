@@ -7,3 +7,5 @@ Host ftp.realfeygon.com
   User realfey
   HostName ftp.realfeygon.com
   Port 27493
+  IdentityFile D:\Repos\RealFeygon\.vscode\rsa-key-20251219OpenSSH.ppk
+  UserKnownHostsFile D:\Repos\RealFeygon\known_hosts

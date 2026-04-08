@@ -179,6 +179,30 @@
                         <span class="param-value">5.0%</span>
                     </div>
                 </div>
+                <div class="param-row">
+                    <label title="Required private-pay years before a guaranteed Medicaid bed transition. Facility-specific — 3 is conservative, 2 or 1 is possible at some facilities. Changing this shifts the Medicaid trigger year dynamically.">Private Pay Window (years)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="3" value="3" step="1"
+                               class="param-slider" data-param="private_pay_years_required">
+                        <span class="param-value">3 years</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="At-home nursing cost for the first half of the LTC period (low-intensity care). Kicks in at the LTC trigger year.">At-Home Nursing (low)</label>
+                    <div class="slider-container">
+                        <input type="range" min="10000" max="60000" value="30000" step="1000"
+                               class="param-slider" data-param="nursing_low_cost">
+                        <span class="param-value">$30,000/yr</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="At-home nursing cost for the second half of the LTC period (high-intensity care). Kicks in at the midpoint between LTC trigger and memory care entry.">At-Home Nursing (high)</label>
+                    <div class="slider-container">
+                        <input type="range" min="30000" max="120000" value="70000" step="5000"
+                               class="param-slider" data-param="nursing_high_cost">
+                        <span class="param-value">$70,000/yr</span>
+                    </div>
+                </div>
             </div>
         </details>
 
@@ -248,11 +272,11 @@
                     </div>
                 </div>
                 <div class="param-row">
-                    <label title="Percentage of SNT condo purchase price paid as down payment. Remainder is a 30yr fixed P&I mortgage.">SNT Condo Down Payment</label>
+                    <label title="Percentage allocated to primary house (interest-only). Remainder goes to condo (30yr P&I).">Mortgage Split (Primary / Condo)</label>
                     <div class="slider-container">
-                        <input type="range" min="20" max="100" value="80" step="5"
+                        <input type="range" min="0" max="100" value="80" step="5"
                                class="param-slider" data-param="mortgage_split_pct">
-                        <span class="param-value">80% down</span>
+                        <span class="param-value">80% / 20%</span>
                     </div>
                 </div>
                 <div class="param-row">

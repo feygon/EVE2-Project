@@ -95,3 +95,4 @@ views/layouts/nickerson.handlebars
 data/burnrate*.db
 public/js/nickerson/
 public/css/nickerson/
+.env.production
