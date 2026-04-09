@@ -12,6 +12,20 @@
         <details class="param-group" open>
             <summary>Timeline</summary>
             <div class="param-group-body">
+                <div class="param-row base-year-row">
+                    <label title="Projection anchor year. Drives Person A's age, SSDI COLA compounding start, and RMD timing. LTC / Memory Care / Year of Passing sliders below base_year are treated as 'already happened' — walking base_year back re-enables them.">Base Year</label>
+                    <div class="slider-container">
+                        <input type="number" min="2026" max="2040" step="1" value="2026"
+                               class="base-year-input" id="sidebar-base-year">
+                        <span class="base-year-hint" style="color:#888; font-size:11px; margin-left:6px;"></span>
+                    </div>
+                </div>
+                <div class="param-row" style="margin-bottom: 8px;">
+                    <a id="sidebar-actuals-link" href="/Nickerson/actuals" style="color:#66ccff; text-decoration:none; font-size:0.9em;">&#128221; Year Actuals (fill in past years)</a>
+                </div>
+                <div class="param-row" style="margin-bottom: 8px;">
+                    <a href="/Nickerson/tax-brackets" style="color:#66ccff; text-decoration:none; font-size:0.9em;">&#9881; IRS Tax Brackets (edit yearly)</a>
+                </div>
                 <div class="param-row">
                     <label>LTC Trigger Year</label>
                     <div class="slider-container">
@@ -164,7 +178,7 @@
                     </div>
                 </div>
                 <div class="param-row">
-                    <label>Memory Care (pre-inflation)</label>
+                    <label title="Memory care annual cost in 2026 dollars. The model compounds the inflation rate below starting from 2026, regardless of the scenario's base year. When base year moves, this value stays anchored — don't re-enter it.">Memory Care (2026 pre-inflation)</label>
                     <div class="slider-container">
                         <input type="range" min="80000" max="200000" value="120000" step="5000"
                                class="param-slider" data-param="memory_care_cost">
