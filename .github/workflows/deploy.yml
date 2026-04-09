@@ -18,7 +18,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          # Match the prod Node 18 (DirectAdmin) for CI validation consistency.
+          # When prod is moved to Node 24, bump this to 24 as well.
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
@@ -52,6 +54,8 @@ jobs:
             --exclude='tmp/' \
             --exclude='.github' \
             --exclude='github-deploy-key*' \
+            --exclude='node_modules' \
+            --exclude='package-lock.json' \
             --exclude='Nickerson.js' \
             --exclude='dbcon_nickerson.js' \
             --exclude='dbcon_nickerson.local.js' \
