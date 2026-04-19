@@ -103,6 +103,29 @@ try {
     console.error('Stack:', e.stack);
 }
 
+// BurnRate public demo route (additive)
+console.error('[BURNRATE] Attempting to load BurnRate demo module...');
+try {
+    console.error('[BURNRATE] Loading dbcon_burnrate.js...');
+    var dbBurnRate = require('./dbcon_burnrate.js');
+    console.error('[BURNRATE] dbcon_burnrate.js loaded successfully');
+
+    console.error('[BURNRATE] Loading BurnRateCallbacks.js...');
+    var BurnRateCallbacks = require('./scripts/BurnRateCallbacks.js');
+    console.error('[BURNRATE] BurnRateCallbacks.js loaded successfully');
+
+    app.set('dbBurnRate', dbBurnRate);
+    app.set('BurnRateCallbacks', BurnRateCallbacks);
+
+    console.error('[BURNRATE] Loading BurnRate.js router...');
+    app.use('/BurnRate/', require('./BurnRate.js'));
+    console.error('✓ BurnRate public demo module loaded successfully');
+} catch (e) {
+    console.error('❌ BurnRate public demo module failed to load');
+    console.error('Error:', e.message);
+    console.error('Stack:', e.stack);
+}
+
 // Site index route - serve the site map
 app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site-index.html'));

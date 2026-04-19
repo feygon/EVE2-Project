@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/static/css/nickerson.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body class="{{bodyClass}}">
+    {{#unless isLoginPage}}
+    <button class="left-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="hamburger-icon">&#9776;</span>
+        <span class="close-icon" style="display:none;">&times;</span>
+    </button>
+    <nav id="left-nav" class="left-nav" aria-label="Main navigation">
+        <div class="left-nav-title">BurnRate</div>
+        <div class="left-nav-section">
+            <h4>Scenarios</h4>
+            <ul id="nav-scenario-list">
+                {{#each navScenarios}}
+                <li><a href="/BurnRate/scenario/{{this.id}}">{{navLabel this.name}}</a></li>
+                {{else}}
+                <li><a href="/BurnRate/">All Scenarios</a></li>
+                {{/each}}
+            </ul>
+        </div>
+        <div class="left-nav-section">
+            <h4>Tools</h4>
+            <ul>
+                <li><a href="/BurnRate/">Scenario Comparison</a></li>
+            </ul>
+        </div>
+    </nav>
+    {{/unless}}
+
+    <div class="version-badge">v{{appVersion}}</div>
+
+    <div class="main-content-wrapper">
+    {{{body}}}
+    </div>
+
+    {{#unless isLoginPage}}
+    <script src="/static/js/nickerson-left-nav.js"></script>
+    {{/unless}}
+    <button id="devRestartBtn" class="dev-restart-btn" title="Restart server (dev only)">&#x21bb;</button>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        var btn = document.getElementById('devRestartBtn');
+        if (isLocal && btn) {
+            btn.style.cssText = 'display:block;position:fixed;bottom:10px;left:10px;z-index:9999;background:#333;color:#f39c12;border:1px solid #555;border-radius:4px;padding:4px 10px;font-size:16px;cursor:pointer;opacity:0.5;';
+            btn.addEventListener('click', function() {
+                btn.textContent = '...';
+                btn.disabled = true;
+                fetch('/BurnRate/restart', { method: 'POST' }).then(function() {
+                    btn.textContent = 'Restarting...';
+                    var poll = setInterval(function() {
+                        fetch('/BurnRate/', { method: 'HEAD' }).then(function() {
+                            clearInterval(poll);
+                            location.reload();
+                        }).catch(function() {});
+                    }, 500);
+                }).catch(function() { btn.textContent = 'Failed'; btn.disabled = false; });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

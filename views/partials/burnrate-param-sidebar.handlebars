@@ -1,0 +1,294 @@
+<!-- BurnRate Parameter Sidebar -->
+<button class="sidebar-toggle" id="sidebarToggle" title="Parameters">&#9881;</button>
+
+<div class="param-sidebar" id="paramSidebar">
+    <div class="sidebar-header">
+        <h3>Parameters</h3>
+        <button class="sidebar-close" id="sidebarClose">&times;</button>
+    </div>
+
+    <div class="sidebar-body">
+
+        <details class="param-group" open>
+            <summary>Timeline</summary>
+            <div class="param-group-body">
+                <div class="param-row">
+                    <label>LTC Trigger Year</label>
+                    <div class="slider-container">
+                        <input type="range" min="2026" max="2036" value="2028" step="1"
+                               class="ltc-slider" id="sidebar-ltc-slider">
+                        <span class="ltc-value">2028</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Memory Care Start Year</label>
+                    <div class="slider-container">
+                        <input type="range" min="2026" max="2040" value="2031" step="1"
+                               class="memory-care-slider" id="sidebar-mc-slider">
+                        <span class="memory-care-value">2031</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Year of Passing</label>
+                    <div class="slider-container">
+                        <input type="range" min="2026" max="2040" value="2040" step="1"
+                               class="year-of-passing-slider" id="sidebar-yop-slider">
+                        <span class="year-of-passing-value">2040</span>
+                    </div>
+                </div>
+                <div class="sell-condo-control">
+                    <label class="sell-condo-label">
+                        <input type="checkbox" class="sell-condo-toggle" id="sidebar-sell-condo">
+                        Sell condo upfront (no rental income)
+                    </label>
+                </div>
+                <div class="sell-condo-control">
+                    <label class="sell-condo-label">
+                        <input type="checkbox" class="roommate-toggle" id="sidebar-roommate">
+                        Add roommate support at memory care
+                    </label>
+                </div>
+                <div class="param-row roommate-amount" style="display:none;">
+                    <label>Roommate Monthly Rent</label>
+                    <div class="slider-container">
+                        <input type="range" min="500" max="3000" value="1100" step="100"
+                               class="param-slider" data-param="roommate_monthly">
+                        <span class="param-value">$1,100/mo</span>
+                    </div>
+                </div>
+                <div class="sell-condo-control" style="margin-top: 8px;">
+                    <label class="sell-condo-label" title="Enable DP withdrawal optimizer to minimize lifetime tax + IRMAA. Replaces 50/50 IRA/LTC split with tax-optimized decisions.">
+                        <input type="checkbox" class="optimizer-toggle" id="sidebar-optimizer">
+                        Tax-optimized withdrawal strategy
+                    </label>
+                    <div class="optimizer-summary" id="optimizerSummary" style="display:none; margin-left: 24px; color: #27ae60; font-size: 0.85em;"></div>
+                </div>
+            </div>
+        </details>
+
+        <details class="param-group">
+            <summary>Income &amp; Assets</summary>
+            <div class="param-group-body">
+                <div class="param-row">
+                    <label>IRA Growth Rate</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="10" value="4.0" step="0.1"
+                               class="param-slider" data-param="ira_growth">
+                        <span class="param-value">4.0%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>SDIRA Starting Balance</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="150000" value="68000" step="1000"
+                               class="param-slider" data-param="sdira_start">
+                        <span class="param-value">$68,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>ManagedIRA Starting Balance</label>
+                    <div class="slider-container">
+                        <input type="range" min="100000" max="1000000" value="300000" step="5000"
+                               class="param-slider" data-param="managed_ira_start">
+                        <span class="param-value">$300,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Monthly Rental Income</label>
+                    <div class="slider-container">
+                        <input type="range" min="2000" max="3500" value="2350" step="50"
+                               class="param-slider" data-param="rental_income">
+                        <span class="param-value">$2,350/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Annual Rental Increase (from 2028)</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="10" value="4.0" step="0.5"
+                               class="param-slider" data-param="rental_increase_rate">
+                        <span class="param-value">4.0%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>SSDI Monthly</label>
+                    <div class="slider-container">
+                        <input type="range" min="500" max="4000" value="3000" step="100"
+                               class="param-slider" data-param="ssdi_monthly">
+                        <span class="param-value">$3,000/mo</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="param-group">
+            <summary>Expenses &amp; Care</summary>
+            <div class="param-group-body">
+                <div class="param-row">
+                    <label title="Primary household discretionary spending. Inflates 5% per year, softens after higher care intensity, and is replaced by memory-care residual spending in facility years.">Lifestyle Floor Monthly</label>
+                    <div class="slider-container">
+                        <input type="range" min="1000" max="5000" value="2500" step="100"
+                               class="param-slider" data-param="lifestyle_floor_monthly">
+                        <span class="param-value">$2,500/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Pre-MC charitable giving (tithe). Tax-deductible on Schedule A. No inflation. Deactivated at memory care.">Pre-MC Charitable Giving</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="2000" value="800" step="50"
+                               class="param-slider" data-param="charitable_monthly">
+                        <span class="param-value">$800/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="House maintenance continuing during memory care (gardening, ADT, Noel). Inflates 5%/yr.">MC Household Maintenance</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="1000" value="300" step="50"
+                               class="param-slider" data-param="mc_maintenance_monthly">
+                        <span class="param-value">$300/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Personal spending that continues during memory care (tithe, subscriptions, gifts, professional services). Inflates 5%/yr.">MC Residual Lifestyle Monthly</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="2000" value="200" step="50"
+                               class="param-slider" data-param="mc_residual_monthly">
+                        <span class="param-value">$200/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Medical Base Monthly</label>
+                    <div class="slider-container">
+                        <input type="range" min="100" max="5000" value="200" step="100"
+                               class="param-slider" data-param="medical_base_monthly">
+                        <span class="param-value">$200/mo</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Memory Care (pre-inflation)</label>
+                    <div class="slider-container">
+                        <input type="range" min="80000" max="200000" value="120000" step="5000"
+                               class="param-slider" data-param="memory_care_cost">
+                        <span class="param-value">$120,000/yr</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Memory Care Inflation</label>
+                    <div class="slider-container">
+                        <input type="range" min="3" max="10" value="5.0" step="0.5"
+                               class="param-slider" data-param="memory_care_inflation">
+                        <span class="param-value">5.0%</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="param-group">
+            <summary>Real Estate</summary>
+            <div class="param-group-body">
+                <div class="param-row">
+                    <label>Primary House Starting Value</label>
+                    <div class="slider-container">
+                        <input type="range" min="500000" max="1200000" value="825000" step="5000"
+                               class="param-slider" data-param="primary_house_value">
+                        <span class="param-value">$825,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Condo Starting Value</label>
+                    <div class="slider-container">
+                        <input type="range" min="200000" max="700000" value="425000" step="5000"
+                               class="param-slider" data-param="condo_value">
+                        <span class="param-value">$425,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Primary House Appreciation</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="15" value="6.0" step="0.1"
+                               class="param-slider" data-param="primary_appreciation">
+                        <span class="param-value">6.0%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Condo Appreciation</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="15" value="5.0" step="0.1"
+                               class="param-slider" data-param="condo_appreciation">
+                        <span class="param-value">5.0%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Condo Maintenance</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="6000" value="2400" step="100"
+                               class="param-slider" data-param="condo_maintenance">
+                        <span class="param-value">$2,400/yr</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Management Fee</label>
+                    <div class="slider-container">
+                        <input type="range" min="6" max="10" value="8.0" step="0.5"
+                               class="param-slider" data-param="management_fee">
+                        <span class="param-value">8.0%</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="param-group">
+            <summary>Mortgages &amp; Debt</summary>
+            <div class="param-group-body">
+                <div class="param-row">
+                    <label>Protected Condo Purchase Price</label>
+                    <div class="slider-container">
+                        <input type="range" min="250000" max="400000" value="300000" step="10000"
+                               class="param-slider" data-param="total_mortgage_amount">
+                        <span class="param-value">$300,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Percentage of the protected condo purchase price paid as down payment. Remainder is a 30-year fixed P&I mortgage.">Protected Condo Down Payment</label>
+                    <div class="slider-container">
+                        <input type="range" min="20" max="100" value="80" step="5"
+                               class="param-slider" data-param="mortgage_split_pct">
+                        <span class="param-value">80% down</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label title="Initial support-trust seed funding from refinance proceeds. Covers startup administration and reserve needs.">Support Trust Seed Funding</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="20000" value="10000" step="1000"
+                               class="param-slider" data-param="snt_seed">
+                        <span class="param-value">$10,000</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Primary Mortgage Rate (Interest-Only)</label>
+                    <div class="slider-container">
+                        <input type="range" min="4.0" max="10.0" value="5.7" step="0.1"
+                               class="param-slider" data-param="primary_mortgage_rate">
+                        <span class="param-value">5.7%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>Condo Mortgage Rate (30yr P&I)</label>
+                    <div class="slider-container">
+                        <input type="range" min="4.0" max="10.0" value="6.5" step="0.1"
+                               class="param-slider" data-param="condo_mortgage_rate">
+                        <span class="param-value">6.5%</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <label>HELOC Interest Rate</label>
+                    <div class="slider-container">
+                        <input type="range" min="4.0" max="10.0" value="7.5" step="0.1"
+                               class="param-slider" data-param="heloc_rate">
+                        <span class="param-value">7.5%</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+    </div>
+</div>

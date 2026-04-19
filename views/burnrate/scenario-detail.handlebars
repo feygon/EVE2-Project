@@ -1,0 +1,1144 @@
+    <div class="container">
+        <div class="header-bar" style="margin-bottom: 8px; padding-bottom: 8px;">
+            <h1 style="font-size: 1.3em;">BurnRate Financial Planning</h1>
+        </div>
+
+        <!-- Sticky Scenario Navigation -->
+        <div class="scenario-nav-sticky" id="scenarioNavSticky">
+            <div class="scenario-nav-content">
+                <a href="/BurnRate/" class="nav-back-link">&larr; Back to Scenarios</a>
+                <div class="scenario-nav-controls">
+                    <button class="nav-arrow" id="prevScenario" title="Previous scenario">&larr;</button>
+                    <h2 class="scenario-nav-title">{{scenario.name}}</h2>
+                    <button class="nav-arrow" id="nextScenario" title="Next scenario">&rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 5px;">
+            <a href="/BurnRate/" style="color: #66ccff; text-decoration: none; font-size: 13px;">&larr; Back to Scenarios</a>
+        </div>
+
+        <h1 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1.4em;">{{scenario.name}}</h1>
+        <p style="color: #999; margin: 0 0 10px 0; font-size: 0.9em;">{{scenario.description}}</p>
+
+<div>
+
+    {{#if outcome}}
+    <div style="padding: 15px; margin-bottom: 10px; background: #2a2a2a; border-left: 4px solid #66ccff;">
+        <h3 style="margin: 0 0 10px 0; color: #66ccff;">Outcome Summary</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; color: #dcdcdc; font-size: 14px;">
+            <!-- LEFT COLUMN -->
+            <div>
+                <table id="outcomeSummaryTable" style="border-collapse:collapse;font-size:14px;">
+                    <tr><td style="font-weight:bold;padding:2px 8px 2px 0;vertical-align:top;" rowspan="2">Lifestyle:</td><td style="padding:2px 8px;">Cost of living:</td><td style="padding:2px 0;"><span style="color:#27ae60;">${{formatNumber (multiply (or scenario.lifestyle_floor_monthly 2500) 12)}}/yr</span> (${{or scenario.lifestyle_floor_monthly 2500}}/mo)</td></tr>
+                    <tr><td style="padding:2px 8px;">Tithe:</td><td style="padding:2px 0;"><span style="color:#27ae60;">${{formatNumber (multiply (or scenario.charitable_monthly 0) 12)}}/yr</span> (${{or scenario.charitable_monthly 0}}/mo)</td></tr>
+                    <tr><td colspan="3" style="padding:3px 0;"></td></tr>
+                    <tr><td style="font-weight:bold;padding:2px 8px 2px 0;vertical-align:top;" rowspan="4">Total Tax &amp; IRMAA:</td><td style="padding:2px 8px;">State</td><td style="padding:2px 0;">${{formatNumber outcome.total_state_tax}}</td></tr>
+                    <tr><td style="padding:2px 8px;">Fed</td><td style="padding:2px 0;">${{formatNumber outcome.total_federal_tax}}</td></tr>
+                    <tr><td style="padding:2px 8px;">IRMAA</td><td style="padding:2px 0;" id="totalIrmaaSummary">$0</td></tr>
+                    {{#if outcome.total_capital_gains_tax}}
+                    <tr><td style="padding:2px 8px;">Cap Gains</td><td style="padding:2px 0; color: #e74c3c;">${{formatNumber outcome.total_capital_gains_tax}}</td></tr>
+                    {{/if}}
+                </table>
+            </div>
+            <!-- RIGHT COLUMN -->
+            <div>
+                <div style="margin-bottom:6px;"><strong>IRA Depleted:</strong>
+                    {{#if outcome.ira_depleted_year}}
+                        {{#compare scenario.condo_disposition 'trust_mapt' operator='==='}}
+                            {{#compare outcome.ira_depleted_year annotations.medicaid_trigger_year operator='==='}}
+                                <span style="color: #27ae60; font-weight: bold;">${{formatNumber annotations.snt_funded_amount}} preserved for protected spending ({{outcome.ira_depleted_year}})</span>
+                            {{else}}
+                                {{#compare outcome.ira_depleted_year annotations.medicaid_trigger_year operator='<'}}
+                                    <span style="color: #e74c3c; font-weight: bold;">{{outcome.ira_depleted_year}} — depleted before protection activation</span>
+                                {{else}}
+                                    <span>{{outcome.ira_depleted_year}}</span>
+                                {{/compare}}
+                            {{/compare}}
+                        {{else}}
+                            <span style="color: #f39c12;">{{outcome.ira_depleted_year}}</span>
+                        {{/compare}}
+                    {{else}}
+                        <span style="color: #27ae60;">Never (sustainable)</span>
+                    {{/if}}
+                </div>
+                <div style="margin-bottom:6px;"><strong>Real Estate tapped (HELOC or sale):</strong> {{#if outcome.real_estate_liquidated}}${{formatNumber outcome.real_estate_liquidated}}{{else}}<span style="color: #95a5a6;">$0</span>{{/if}}</div>
+                <div><strong>Asset Depletion Risk:</strong>
+                    {{#compare outcome.asset_depletion_risk 'red' operator='==='}}
+                        {{#compare scenario.condo_disposition 'trust_mapt' operator='==='}}
+                            <span style="color: #e74c3c; font-weight: bold;">🛑 DANGER — IRA depleted before the protection window begins. Care continuity is at risk.</span>
+                        {{else}}
+                            <span style="color: #e74c3c; font-weight: bold;">🛑 DANGER — IRA depleted during memory care. Real estate liquidation required to fund remaining care.</span>
+                        {{/compare}}
+                    {{else}}
+                        {{#compare outcome.asset_depletion_risk 'magenta' operator='==='}}
+                            <span style="color: #27ae60; font-weight: bold;">✓ Protection strategy successful</span>
+                        {{else}}
+                            {{#compare outcome.asset_depletion_risk 'yellow' operator='==='}}
+                                <span style="color: #f39c12; font-weight: bold;">⚠️ Tight — may not sustain through memory care</span>
+                            {{else}}
+                                {{#compare outcome.asset_depletion_risk 'cyan' operator='==='}}
+                                    <span style="color: #66ccff; font-weight: bold;">ℹ️ Minor asset depletion risk</span>
+                                {{else}}
+                                    <span style="color: #27ae60;">✓ No risk</span>
+                                {{/compare}}
+                            {{/compare}}
+                        {{/compare}}
+                    {{/compare}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var pd = window.projectionData;
+        var od = window.optimizerData;
+        var sc = window.scenarioConfig;
+
+        // Total IRMAA (always compute, regardless of optimizer)
+        if (pd) {
+            var totalIrmaa = 0;
+            for (var i = 0; i < pd.length; i++) {
+                if (!pd[i].irmaa_self_funding) {
+                    totalIrmaa += (pd[i].expenses && (pd[i].expenses.irmaa_gross || pd[i].expenses.irmaa)) || 0;
+                }
+            }
+            var irmaaEl = document.getElementById('totalIrmaaSummary');
+            if (irmaaEl) irmaaEl.textContent = '$' + Math.round(totalIrmaa).toLocaleString('en-US');
+        }
+
+        // Intensify year for MC facility search
+        if (sc) {
+            var ltcTrigger = sc.ltc_trigger_year || 2028;
+            var mcYr = sc.memory_care_year || 2032;
+            var intensifyYr = ltcTrigger + Math.floor((mcYr - ltcTrigger) / 2);
+            var intEl = document.getElementById('intensifyYearLabel');
+            if (intEl) intEl.textContent = '~' + intensifyYr + ':';
+        }
+
+        // AD survival probability for planning horizon
+        var survEl = document.getElementById('survivalPctDecision');
+        if (survEl && sc) {
+            // MCI with cognitive reserves survival table (diagnosis 2026)
+            var diagnosisYear = 2026;
+            var horizonYear = sc.year_of_passing || 2040;
+            var yearsPost = horizonYear - diagnosisYear;
+            // From AD-actuarial-survival-data.md, mci_with_reserves table
+            var survTable = {0:1.00,1:0.98,2:0.97,3:0.94,4:0.89,5:0.84,6:0.76,7:0.64,8:0.50,9:0.39,10:0.30,11:0.20,12:0.12,13:0.07,14:0.04,15:0.02,16:0.01};
+            var prob = survTable[yearsPost] !== undefined ? survTable[yearsPost] : (yearsPost > 16 ? 0.005 : 1.0);
+            survEl.innerHTML = 'AD actuarial: <span style="color:#f39c12;">' + (prob * 100).toFixed(0) + '% chance</span> of exceeding this horizon';
+        }
+
+        if (!pd || !od || !sc || !sc.optimizer_enabled) return;
+
+        var startYear = pd[0] ? pd[0].year : 2026;
+        var mcYear = sc.memory_care_year || 2032;
+        var fiveYearEnd = startYear + 5;
+        var saved5 = 0, savedMC = 0, savedTotal = 0;
+
+        for (var i = 0; i < pd.length; i++) {
+            var y = pd[i];
+            if (!y.optimizer) continue;
+            var s = y.optimizer.taxSaved || 0;
+            savedTotal += s;
+            if (y.year < fiveYearEnd) saved5 += s;
+            if (y.year < mcYear) savedMC += s;
+        }
+
+        var fmt = function(n) { return '$' + Math.round(Math.abs(n)).toLocaleString('en-US'); };
+        var sign = function(n) { return n >= 0 ? fmt(n) : '-' + fmt(n); };
+
+        var tbl = document.getElementById('outcomeSummaryTable');
+        if (!tbl) return;
+        var p = 'style="padding:2px 8px;"';
+        var spacer = '<tr><td colspan="3" style="padding:3px 0;"></td></tr>';
+        var row = function(label, val) {
+            return '<tr><td ' + p + '>' + label + '</td><td style="padding:2px 0;">' + sign(val) + '</td></tr>';
+        };
+        tbl.innerHTML += spacer +
+            '<tr><td style="font-weight:bold;padding:2px 8px 2px 0;vertical-align:top;" rowspan="3">Optimizer Savings:</td><td ' + p + '>In 5 years:</td><td style="padding:2px 0;">' + sign(saved5) + '</td></tr>' +
+            row('Until Memory Care:', savedMC) +
+            row('Thru Medicaid:', savedTotal);
+    });
+    </script>
+    {{/if}}
+
+    {{#if projections}}
+        <div class="projection-table-wrapper">
+                <table class="projection-table" id="projectionTable" style="width: 100%; margin-top: 0; font-size: 14px;">
+                    <thead>
+                        <tr>
+                            <th class="debug-col" rowspan="2" style="width: 20px; min-width: 20px; max-width: 20px; padding: 0; border: none; background: #1a1a1a;"></th>
+                            <th colspan="5" class="section-header" style="background: #34495e; color: white; padding: 15px; font-size: 16px; font-weight: bold; text-align: center; border: 1px solid #2c3e50;">Assets</th>
+                            <th colspan="{{#compare scenario.condo_disposition 'trust_mapt' operator='==='}}6{{else}}5{{/compare}}" class="section-header" style="background: #34495e; color: white; padding: 15px; font-size: 16px; font-weight: bold; text-align: center; border: 1px solid #2c3e50;">Cash Flow</th>
+                        </tr>
+                        <tr style="background: #34495e; color: white;">
+                            <!-- Left: Assets -->
+                            <th style="padding: 12px; text-align: left; border: 1px solid #2c3e50; width: 7%;">Year (Age)</th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 15%;">Real Estate (+appreciation) <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 13%;">IRA Open | Close <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">LTC Savings <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; border-right: 3px solid #2c3e50; width: 11%;">Total Assets</th>
+
+                            <!-- Right: Cash Flow -->
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">Income (taxable) <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">Tax Deductions <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">Base Expenses <span class="info-icon">ⓘ</span></th>
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">Budget (Lifestyle) <span class="info-icon">ⓘ</span></th>
+                            {{#compare scenario.condo_disposition 'trust_mapt' operator='==='}}
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 12%;">MAPT Net <span class="info-icon">ⓘ</span></th>
+                            {{/compare}}
+                            <th style="padding: 12px; text-align: right; border: 1px solid #2c3e50; width: 9%;">Net Cashflow <span class="info-icon">ⓘ</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each projections}}
+                        <tr data-year="{{this.year}}" style="background: {{#if @index}}#2a2a2a{{else}}#333{{/if}}; color: #dcdcdc;">
+                            <!-- Debug info button -->
+                            <td class="debug-cell" style="padding: 0; border: none; background: #1a1a1a; text-align: center; vertical-align: middle;">
+                                <button class="debug-btn" data-year="{{this.year}}" style="background: none; border: none; color: #1a1a1a; cursor: pointer; font-size: 14px; width: 100%; padding: 4px 0;">&#9432;</button>
+                            </td>
+                            <!-- Year (Age) -->
+                            <td style="padding: 10px; border: 1px solid #444;">{{this.year}} ({{this.age_a}})</td>
+
+                            <!-- Real Estate -->
+                            <td class="real-estate-cell" style="padding: 10px; text-align: right; border: 1px solid #444; cursor: help;"
+                                title="{{formatRealEstateTooltip this}}">
+                                ${{formatNumber this.real_estate_total}} (+${{formatNumber (add this.house_appreciation this.condo_appreciation)}})
+                            </td>
+
+                            <!-- IRA Open | Close -->
+                            <td class="ira-cell" style="padding: 10px; text-align: right; border: 1px solid #444; cursor: help;"
+                                title="{{formatIraTooltip this}}">
+                                ${{formatNumber this.total_ira_open}} | ${{formatNumber this.total_ira_close}}
+                            </td>
+
+                            <!-- LTC Savings -->
+                            <td class="ltc-cell" style="padding: 10px; text-align: right; border: 1px solid #444; cursor: help;"
+                                title="{{formatLtcTooltip this}}">
+                                ${{formatNumber this.ltc_savings_close}}
+                            </td>
+
+                            <!-- Total Assets -->
+                            <td class="total-assets" style="padding: 10px; text-align: right; border: 1px solid #444; border-right: 3px solid #444; font-weight: bold; background: #3a3a3a; color: #66ccff;">
+                                ${{formatAssets (add this.total_ira_close this.real_estate_total this.ltc_savings_close)}}
+                            </td>
+
+                            <!-- Income (taxable) - AGI and Taxable Income after deductions -->
+                            <td class="taxable-income-cell" style="padding: 10px; text-align: right; border: 1px solid #444; color: #95a5a6; cursor: help;"
+                                title="{{formatTaxableIncomeTooltip this}}">
+                                ${{formatNumber this.agi}} (${{formatNumber (subtract this.agi this.deduction_amount)}})
+                            </td>
+
+                            <!-- Tax Deductions -->
+                            <td class="deductions-cell" style="padding: 10px; text-align: right; border: 1px solid #444; color: #f39c12; cursor: help;"
+                                title="{{formatDeductionsTooltip this}}">
+                                {{{formatDeductionDisplay this}}}
+                            </td>
+
+                            <!-- Base Expenses (primary household only — expenses.total already excludes protection-trust expenses) -->
+                            <td class="expenses-cell" style="padding: 10px; text-align: right; border: 1px solid #444; color: #e74c3c; cursor: help;"
+                                title="{{formatExpensesTooltip this.expenses this}}">
+                                ${{formatNumber this.expenses.total}} ({{countItems this.expenses}})
+                            </td>
+
+                            <!-- Personal Budget (Lifestyle) -->
+                            <td class="budget-cell" style="padding: 10px; text-align: right; border: 1px solid #444; color: #27ae60; cursor: help;"
+                                title="{{formatIncomeTooltip this.income this}}">
+                                {{#if this.in_memory_care}}
+                                    ${{formatNumber this.personA_lifestyle_extras}} ($0)
+                                {{else}}
+                                    ${{formatNumber this.personal_budget}} (${{formatNumber this.expenses.lifestyle}})
+                                {{/if}}
+                            </td>
+
+                            <!-- MAPT Net (Trust Income - Trust Expenses - Balance) — MAPT only -->
+                            {{#compare ../scenario.condo_disposition 'trust_mapt' operator='==='}}
+                            <td class="mapt-net-cell" style="padding: 10px; text-align: right; border: 1px solid #444; cursor: help; font-size: 0.85em; white-space: nowrap;"
+                                title="{{formatMaptTooltip this}}">
+                                {{#if this.trust_gross_income}}
+                                    <span style="color: #27ae60;">${{formatNumber1d this.trust_gross_income}}</span>
+                                    <span style="color: #e74c3c;"> -${{formatNumber1d (or this.mapt_property_expenses 0)}}</span><br>
+                                    <span style="color: #888;">={{formatNumber1d (subtract this.trust_gross_income (or this.mapt_property_expenses 0))}} + </span><span style="color: #66ccff;">${{formatNumber1d (or this.mapt_checking_open 0)}}</span><br>
+                                    <span style="color: #66ccff; font-weight: bold;">${{formatNumber1d this.trust_balance}}</span>
+                                {{else}}
+                                    {{#if this.mapt_property_expenses}}
+                                        <span style="color: #e74c3c;">-${{formatNumber1d this.mapt_property_expenses}}</span><br>
+                                        <span style="color: #888;">-${{formatNumber1d this.mapt_property_expenses}} + </span><span style="color: #66ccff;">${{formatNumber1d (or this.mapt_checking_open 0)}}</span><br>
+                                        <span style="color: #66ccff; font-weight: bold;">${{formatNumber1d this.trust_balance}}</span>
+                                    {{else}}
+                                        <span style="color: #555;">—</span>
+                                    {{/if}}
+                                {{/if}}
+                            </td>
+                            {{/compare}}
+
+                            <!-- Net Cashflow (Budget - Expenses) -->
+                            <td class="net-cashflow" style="padding: 10px; text-align: right; border: 1px solid #444; font-weight: bold; cursor: help;"
+                                title="{{formatNetCashflowTooltip this.income this.expenses this}}">
+                                ${{formatNumber (add this.income.total (multiply this.expenses.total -1))}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+        <style>
+            #bodyAnnotations {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 10;
+            }
+            .info-icon {
+                font-size: 0.75em;
+                color: #66ccff;
+                opacity: 0.6;
+                margin-left: 3px;
+            }
+            .annotation-arrow {
+                position: absolute;
+                width: 260px;
+                white-space: normal;
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 1.3;
+                text-indent: -1.1em;
+                padding-left: 1.1em;
+            }
+            .annotation-stack {
+                position: absolute;
+                width: 260px;
+            }
+            .debug-col-hover .debug-btn {
+                color: #444 !important;
+            }
+            .debug-col-hover .debug-btn:hover {
+                color: #888 !important;
+            }
+            .debug-btn:hover {
+                color: #555 !important;
+            }
+            @media (prefers-color-scheme: light) {
+                .debug-cell, .debug-col { background: #fff !important; }
+                .debug-btn { color: #fff !important; }
+                .debug-btn:hover { color: #ccc !important; }
+            }
+            .debug-sidebar-content {
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: 12px;
+                line-height: 1.5;
+                color: #dcdcdc;
+            }
+            .debug-sidebar-content .debug-section {
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #444;
+            }
+            .debug-sidebar-content .debug-key {
+                color: #66ccff;
+            }
+            .debug-sidebar-content .debug-val {
+                color: #27ae60;
+            }
+            .debug-sidebar-content h4 {
+                color: #f39c12;
+                margin: 8px 0 4px;
+                font-size: 13px;
+            }
+            .annotation-label {
+                font-size: 13px;
+                font-weight: bold;
+                line-height: 1.3;
+                margin-bottom: 3px;
+                padding-left: 2px;
+                pointer-events: auto !important;
+                z-index: 20;
+            }
+            .annotation-bracket {
+                position: absolute;
+                border-left: 4px solid #66ccff;
+                padding-left: 8px;
+                font-size: 11px;
+                color: #66ccff;
+                display: flex;
+                align-items: center;
+            }
+            .annotation-bracket::before,
+            .annotation-bracket::after {
+                content: '';
+                position: absolute;
+                left: -15px;
+                width: 15px;
+                height: 4px;
+                background: #66ccff;
+            }
+            .annotation-bracket::before { top: 0; }
+            .annotation-bracket::after { bottom: 0; }
+
+            /* When param sidebar is open, hide annotations (they overlap) */
+            body.param-sidebar-open #bodyAnnotations {
+                display: none !important;
+            }
+            .annotation-bracket-label {
+                position: absolute;
+                white-space: normal;
+                max-width: 300px;
+                font-size: 12px;
+                font-weight: bold;
+                color: #66ccff;
+            }
+            .annotation-bracket-label .bracket-arrow {
+                font-size: 16px;
+                margin-right: 2px;
+            }
+            .annotation-bracket-label .bracket-arrow-large {
+                font-size: 44px;
+                margin-right: 2px;
+                vertical-align: middle;
+                line-height: 0.5;
+            }
+            .care-bracket {
+                position: absolute;
+                border-left: 4px solid #cc44aa;
+                padding-left: 6px;
+                font-size: 10px;
+                color: #cc44aa;
+                display: flex;
+                align-items: center;
+                font-weight: bold;
+            }
+            .care-bracket-top::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -12px;
+                width: 12px;
+                height: 3px;
+                background: #cc44aa;
+            }
+            .care-bracket-bottom::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: -12px;
+                width: 12px;
+                height: 3px;
+                background: #cc44aa;
+            }
+            .care-bracket-midline::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: -12px;
+                width: 12px;
+                height: 3px;
+                background: #cc44aa;
+            }
+        </style>
+
+        {{#if annotations}}
+        <script>
+        (function() {
+            'use strict';
+            var annotations = {{{json annotations}}};
+
+            function placeAnnotations() {
+                var table = document.getElementById('projectionTable');
+                if (!table) return;
+
+                // Annotations on body — positioned in page coordinates
+                // Hidden below 1440px via CSS media query (annotations overlap at narrow widths)
+                document.body.style.position = 'relative';
+
+                var annotDiv = document.getElementById('bodyAnnotations');
+                if (!annotDiv) {
+                    annotDiv = document.createElement('div');
+                    annotDiv.id = 'bodyAnnotations';
+                    document.body.appendChild(annotDiv);
+                }
+                annotDiv.innerHTML = '';
+
+                var container = table.closest('.container');
+                if (!container) return;
+                // Anchor annotations to the table's actual right edge
+                var tableRect = table.getBoundingClientRect();
+                var tableRight = tableRect.left + window.scrollX + table.scrollWidth;
+                var containerRight = container.getBoundingClientRect().right + window.scrollX;
+                var annotAnchor = Math.max(tableRight, containerRight); // whichever is further right
+                var annotLeft = annotAnchor + 15;
+
+                var rows = table.querySelectorAll('tbody tr[data-year]');
+                var rowMap = {};
+                rows.forEach(function(row) {
+                    var year = parseInt(row.getAttribute('data-year'), 10);
+                    rowMap[year] = row;
+                });
+
+                // Page-level Y coordinates (account for scroll)
+                function getRowCenter(year) {
+                    var row = rowMap[year];
+                    if (!row) return null;
+                    var rect = row.getBoundingClientRect();
+                    return rect.top + window.scrollY + (rect.height / 2);
+                }
+
+                function getRowTop(year) {
+                    var row = rowMap[year];
+                    if (!row) return null;
+                    return row.getBoundingClientRect().top + window.scrollY;
+                }
+
+                function getRowBottom(year) {
+                    var row = rowMap[year];
+                    if (!row) return null;
+                    return row.getBoundingClientRect().bottom + window.scrollY;
+                }
+
+                // Magenta care brackets (just inside the table's right edge)
+                var magentaLeft = annotAnchor - 8;
+
+                // At-Home Care bracket: LTC trigger → memory care (with midline at bottom)
+                if (annotations.ltc_trigger_year && annotations.memory_care_year) {
+                    var ahTop = getRowTop(annotations.ltc_trigger_year);
+                    var ahBottom = getRowTop(annotations.memory_care_year);
+                    if (ahTop !== null && ahBottom !== null && ahBottom > ahTop) {
+                        var el = document.createElement('div');
+                        el.className = 'care-bracket care-bracket-top care-bracket-midline';
+                        el.style.top = ahTop + 'px';
+                        el.style.height = (ahBottom - ahTop) + 'px';
+                        el.style.left = magentaLeft + 'px';
+                        annotDiv.appendChild(el);
+                    }
+                }
+
+                // Memory Care bracket: memory care → year of passing
+                if (annotations.memory_care_year && annotations.year_of_passing) {
+                    var mcTop = getRowTop(annotations.memory_care_year);
+                    var mcBottom = getRowBottom(annotations.year_of_passing);
+                    if (mcTop !== null && mcBottom !== null) {
+                        var el = document.createElement('div');
+                        el.className = 'care-bracket care-bracket-bottom';
+                        el.style.top = mcTop + 'px';
+                        el.style.height = (mcBottom - mcTop) + 'px';
+                        el.style.left = magentaLeft + 'px';
+                        annotDiv.appendChild(el);
+                    }
+                }
+
+                // Collect all arrow annotations with their target year
+                var arrowDefs = [];
+
+                function addArrow(year, color, text, title, interactive) {
+                    var y = getRowTop(year);
+                    if (y !== null) arrowDefs.push({ year: year, targetY: y, color: color, text: text, title: title || null, interactive: !!interactive });
+                }
+
+                if (annotations.trust_formation_year)
+                    addArrow(annotations.trust_formation_year, '#66ccff', 'Trust formed \u2014 lookback clock starts');
+
+                if (annotations.condo_sale_year) {
+                    var proceeds = annotations.condo_sale_proceeds ? '$' + annotations.condo_sale_proceeds.toLocaleString() : 'unknown';
+                    addArrow(annotations.condo_sale_year, '#f39c12', 'Investment property sold',
+                        'support property sold for ' + proceeds + '.', true);
+                }
+
+                if (annotations.nursing_intensify_year) {
+                    var lowK = '$' + (annotations.nursing_low_cost / 1000).toLocaleString() + 'k';
+                    var highK = '$' + (annotations.nursing_high_cost / 1000).toLocaleString() + 'k';
+                    addArrow(annotations.nursing_intensify_year, '#e74c3c',
+                        'At-home nursing intensifies (' + highK + '/yr) \u24D8',
+                        'Transitions from ' + lowK + '/yr to ' + highK + '/yr.', true);
+                }
+
+                if (annotations.lookback_clear_year)
+                    addArrow(annotations.lookback_clear_year, '#27ae60', '5-year review window clears \u2014 assets protected');
+
+                if (annotations.crisis_pivot_ready && annotations.lookback_clear_year)
+                    addArrow(annotations.lookback_clear_year, '#e91e63', 'Crisis pivot ready');
+
+                if (annotations.memory_care_year)
+                    addArrow(annotations.memory_care_year, '#cc44aa', 'Memory Care begins \u24D8',
+                        'Choose carefully: transferring facilities mid-care is hazardous. Select one that can continue the long-term coverage path.', true);
+
+                if (annotations.medicaid_pre_liquidation_year) {
+                    var sntAmount = annotations.snt_funded_amount ? '$' + Math.round(annotations.snt_funded_amount).toLocaleString() : 'unknown';
+                    addArrow(annotations.medicaid_pre_liquidation_year, '#f39c12',
+                        'Pre-protection IRA liquidation starts in December (tax strategy) \u24D8',
+                        'Strategic liquidation split across two tax years. All proceeds (' + sntAmount + ') move into the protected support trust.', true);
+                }
+
+                if (annotations.cash_depleted_year) {
+                    var resultMsg = '';
+                    if (annotations.cash_depleted_result === 'medicaid_begins') {
+                        var nYears = annotations.years_in_memory_care_at_depletion;
+                        var suffix = nYears !== null ? ' after ' + nYears + ' yr' + (nYears !== 1 ? 's' : '') + ' in memory care' : '';
+                        resultMsg = 'coverage transition begins' + suffix;
+                    } else if (annotations.cash_depleted_result === 'real_estate_liquidation_imminent') {
+                        resultMsg = 'Partial real estate liquidation imminent';
+                    }
+                    addArrow(annotations.cash_depleted_year, '#e74c3c',
+                        'Cash Depleted \u2014 ' + resultMsg + ' \u24D8',
+                        'Coverage transition requires countable assets below the protected threshold.', true);
+                }
+
+                if (annotations.medicaid_trigger_year)
+                    addArrow(annotations.medicaid_trigger_year, '#e74c3c',
+                        'Coverage invoked \u2014 full liquidation \u2192 support trust \u24D8',
+                        'All financial instruments liquidated and moved into the protected support trust. Institutional coverage takes over care costs.', true);
+
+                if (annotations.roommate_start_year)
+                    addArrow(annotations.roommate_start_year, '#27ae60',
+                        'support-household roommate income begins ($' + (annotations.roommate_monthly || 0).toLocaleString() + '/mo) \u24D8',
+                        'Roommate rent flows to the protection trust checking account to help cover property expenses after the primary household moves to memory care.', true);
+
+                // Sort by year, then by insertion order within same year
+                arrowDefs.sort(function(a, b) { return a.year - b.year; });
+                if (arrowDefs.length === 0) return;
+
+                // Group by year
+                var yearGroups = [];
+                var curGroup = null;
+                arrowDefs.forEach(function(def) {
+                    if (!curGroup || curGroup.year !== def.year) {
+                        curGroup = { year: def.year, rowY: def.targetY, labels: [] };
+                        yearGroups.push(curGroup);
+                    }
+                    curGroup.labels.push(def);
+                });
+
+                // Create label elements (hidden for measurement)
+                var labelX = annotLeft + 18;
+                yearGroups.forEach(function(group) {
+                    group.elements = [];
+                    group.labels.forEach(function(def) {
+                        var el = document.createElement('div');
+                        el.className = 'annotation-label';
+                        el.style.position = 'absolute';
+                        el.style.left = labelX + 'px';
+                        el.style.top = '0px';
+                        el.style.width = '300px';
+                        el.style.visibility = 'hidden';
+                        el.style.fontSize = '13px';
+                        el.style.fontWeight = 'bold';
+                        el.style.lineHeight = '1.3';
+                        el.style.color = def.color;
+                        el.textContent = def.text;
+                        if (def.interactive) el.style.cursor = 'help';
+                        if (def.title) el.title = def.title;
+                        annotDiv.appendChild(el);
+                        group.elements.push(el);
+                    });
+                });
+
+                // Measure heights, compute positions, draw leader lines
+                requestAnimationFrame(function() {
+                    yearGroups.forEach(function(group) {
+                        group.heights = group.elements.map(function(el) { return el.offsetHeight + 2; });
+                        group.totalHeight = group.heights.reduce(function(a, b) { return a + b; }, 0);
+                    });
+
+                    // Create SVG overlay for leader lines
+                    var svgNS = 'http://www.w3.org/2000/svg';
+                    var svg = document.createElementNS(svgNS, 'svg');
+                    svg.style.position = 'absolute';
+                    svg.style.left = '0';
+                    svg.style.top = '0';
+                    svg.style.width = document.documentElement.scrollWidth + 'px';
+                    svg.style.height = document.documentElement.scrollHeight + 'px';
+                    svg.style.pointerEvents = 'none';
+                    svg.style.zIndex = '1';
+                    annotDiv.appendChild(svg);
+
+                    function line(x1, y1, x2, y2, color, width) {
+                        var l = document.createElementNS(svgNS, 'line');
+                        l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+                        l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+                        l.setAttribute('stroke', color || '#888');
+                        l.setAttribute('stroke-width', width || 1.5);
+                        svg.appendChild(l);
+                    }
+
+                    function circle(cx, cy, r, color) {
+                        var c = document.createElementNS(svgNS, 'circle');
+                        c.setAttribute('cx', cx); c.setAttribute('cy', cy);
+                        c.setAttribute('r', r);
+                        c.setAttribute('fill', color || '#888');
+                        svg.appendChild(c);
+                    }
+
+                    var channelX = annotLeft + 8;  // vertical channel for leader lines
+                    var cursor = yearGroups[0].rowY;
+
+                    yearGroups.forEach(function(group) {
+                        var rowMid = group.rowY + 12;
+                        var labelsY = Math.max(cursor, rowMid);
+
+                        // Position each label
+                        var y = labelsY - 5;
+                        for (var i = 0; i < group.elements.length; i++) {
+                            group.elements[i].style.top = y + 'px';
+                            group.elements[i].style.visibility = 'visible';
+                            y += group.heights[i];
+                        }
+
+                        // Measure each label's vertical midpoint (first line of text)
+                        var labelMids = [];
+                        for (var i = 0; i < group.elements.length; i++) {
+                            var el = group.elements[i];
+                            var elTop = parseFloat(el.style.top);
+                            labelMids.push(elTop + 8);  // ~middle of first line
+                        }
+
+                        var firstLabelMidY = labelMids[0];
+                        var lastLabelMidY = labelMids[labelMids.length - 1];
+                        var lineColor = group.labels[0].color;
+
+                        // 1. Dot at the table cell edge
+                        circle(annotAnchor + 3, rowMid, 3.5, lineColor);
+
+                        // 2. Horizontal from dot to channel
+                        line(annotAnchor + 3, rowMid, channelX, rowMid, lineColor, 2);
+
+                        // 3. Vertical stem from row (or where it meets the channel) down through all labels
+                        var stemTop = rowMid;
+                        var stemBottom = lastLabelMidY;
+                        if (stemBottom > stemTop) {
+                            line(channelX, stemTop, channelX, stemBottom, lineColor, 2);
+                        }
+
+                        // 4. Horizontal tick from stem to each label
+                        for (var i = 0; i < labelMids.length; i++) {
+                            var tickColor = group.labels[i].color;
+                            line(channelX, labelMids[i], labelX - 2, labelMids[i], tickColor, 1.5);
+                        }
+
+                        cursor = y + 4;
+                    });
+                });
+
+                // LTC Payout bracket (cyan, in dark body area)
+                if (annotations.ltc_trigger_year && annotations.ltc_payout_end_year) {
+                    var bTop = getRowTop(annotations.ltc_trigger_year);
+                    var bBottom = getRowBottom(annotations.ltc_payout_end_year);
+                    if (bTop !== null && bBottom !== null) {
+                        var el = document.createElement('div');
+                        el.className = 'annotation-bracket';
+                        el.style.top = bTop + 'px';
+                        el.style.height = (bBottom - bTop) + 'px';
+                        el.style.left = annotLeft + 'px';
+                        annotDiv.appendChild(el);
+
+                        // LTC Payout label with ⬐ arrow
+                        var ltcLabel = 'LTC Payout';
+                        if (annotations.ltc_payout_annual && annotations.ltc_payout_daily) {
+                            ltcLabel += ': $' + annotations.ltc_payout_annual.toLocaleString() + '/yr, $' + annotations.ltc_payout_daily.toLocaleString() + '/day';
+                        }
+                        var ltcLabelEl = document.createElement('div');
+                        ltcLabelEl.className = 'annotation-bracket-label';
+                        ltcLabelEl.style.top = (bTop - 22) + 'px';
+                        ltcLabelEl.style.left = (annotLeft - 12) + 'px';
+                        ltcLabelEl.style.width = '300px';
+                        ltcLabelEl.style.pointerEvents = 'auto';
+                        ltcLabelEl.style.cursor = 'help';
+                        ltcLabelEl.title = 'LTC daily payout amount increases by 5% every July 20th, starting at $361 after 7/20/2025. In ' + annotations.ltc_trigger_year + ', it is $' + annotations.ltc_payout_daily.toLocaleString() + '/day.\n\nLTC payout begins when the insurer recognizes the supervision threshold defined in the policy.';
+                        var ltcArrow = document.createElement('span');
+                        ltcArrow.className = 'bracket-arrow';
+                        ltcArrow.textContent = '\u2B10';
+                        ltcLabelEl.appendChild(ltcArrow);
+                        ltcLabelEl.appendChild(document.createTextNode(ltcLabel + ' \u24D8'));
+                        annotDiv.appendChild(ltcLabelEl);
+
+                        // "At-home nursing begins" label above LTC Payout label, with large ⬐ reaching past the smaller arrow
+                        if (annotations.ltc_trigger_year) {
+                            var nursingLabelEl = document.createElement('div');
+                            nursingLabelEl.className = 'annotation-bracket-label';
+                            nursingLabelEl.style.top = (bTop - 44) + 'px';
+                            nursingLabelEl.style.left = (annotLeft - 36) + 'px';
+                            nursingLabelEl.style.width = '300px';
+                            nursingLabelEl.style.color = '#cc44aa';
+                            var nursingArrow = document.createElement('span');
+                            nursingArrow.className = 'bracket-arrow-large';
+                            nursingArrow.textContent = '\u2B10';
+                            nursingLabelEl.appendChild(nursingArrow);
+                            nursingLabelEl.appendChild(document.createTextNode('At-home nursing begins'));
+                            annotDiv.appendChild(nursingLabelEl);
+                        }
+                    }
+                }
+
+                // Ensure page is wide enough to scroll to annotations
+                var spacer = document.getElementById('annotationSpacer');
+                if (!spacer) {
+                    spacer = document.createElement('div');
+                    spacer.id = 'annotationSpacer';
+                    spacer.style.position = 'absolute';
+                    spacer.style.top = '0';
+                    spacer.style.height = '1px';
+                    spacer.style.pointerEvents = 'none';
+                    document.body.appendChild(spacer);
+                }
+                spacer.style.left = '0';
+                spacer.style.width = (annotLeft + 340) + 'px';
+            }
+
+            if (document.readyState === 'complete') {
+                placeAnnotations();
+            } else {
+                window.addEventListener('load', placeAnnotations);
+            }
+            window.addEventListener('resize', placeAnnotations);
+            // Reposition when param sidebar opens/closes (container width changes)
+            document.addEventListener('paramSidebarOpened', function() {
+                setTimeout(placeAnnotations, 350); // after CSS transition (300ms)
+            });
+            // MutationObserver for body class changes (sidebar close removes class)
+            new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                    if (m.attributeName === 'class') {
+                        setTimeout(placeAnnotations, 350);
+                    }
+                });
+            }).observe(document.body, { attributes: true });
+        })();
+        </script>
+        {{/if}}
+    {{else}}
+        <p style="color: #999;">No projection data available for this scenario.</p>
+    {{/if}}
+</div>
+
+<div style="margin-top: 40px; margin-bottom: 40px;">
+    <h2 style="margin-bottom: 15px; color: #66ccff;">Scenario Decisions <span style="font-size: 14px; color: #888; font-weight: normal;">(protected housing trust remains present across all scenarios)</span></h2>
+
+    {{!-- Non-MAPT scenarios (rental and baseline): HARD BLOCKER red flag at top.
+         The protection-trust path is the only one that reuses the existing court-process support property structure
+         already needs — every other path requires the same restructuring with
+         no offsetting benefit. --}}
+    {{#unless (eq scenario.condo_disposition "trust_mapt")}}
+    <div style="margin-bottom: 16px; padding: 12px; background: #4a1c1c; border-left: 4px solid #e74c3c; color: #ffcccc; border-radius: 4px;">
+        <strong style="color: #ff6666;">⚠ NON-VIABLE WITHOUT STRUCTURAL REWORK</strong>
+        <p style="margin: 6px 0 0 0; font-size: 13px;">
+            The support property is already held in an <strong>existing protective trust</strong>. Any "no trust" scenario requires:
+        </p>
+        <ul style="margin: 6px 0 0 18px; font-size: 13px; line-height: 1.5;">
+            <li><strong>Formal restructuring</strong> of the existing trust — the same legal work already required by the protected path</li>
+            <li>or leaving the support property in fragmented protection while moving other assets, which defeats the planning objective</li>
+            <li>or moving the support property into an exposed personal holding pattern, which defeats the original protection purpose</li>
+        </ul>
+        <p style="margin: 6px 0 0 0; font-size: 13px;">
+            <strong>None of these are clean.</strong> This scenario is shown for comparison only — the protected scenarios are the only viable paths because they reuse work the support property already requires.
+        </p>
+    </div>
+    {{/unless}}
+
+    {{!-- 20% down: ORANGE flag for SNT solvency risk --}}
+    {{#if (lt (or scenario.mortgage_split_pct 0.80) 0.50)}}
+    <div style="margin-bottom: 16px; padding: 12px; background: #4a3618; border-left: 4px solid #f39c12; color: #ffe0b3; border-radius: 4px;">
+        <strong style="color: #ffaa44;">⚠ SUPPORT-TRUST SOLVENCY RISK — 20% DOWN PAYMENT</strong>
+        <p style="margin: 6px 0 0 0; font-size: 13px;">
+            In prior sweeps, 20%-down scenarios have failed to satisfy the private-pay window because the support-property mortgage drag depletes the IRA before the protection window activates. The support trust may be insolvent in late projection years. <strong>Strongly recommend 80% or 100% down.</strong>
+        </p>
+    </div>
+    {{/if}}
+
+    <div style="padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px;">
+        <ul style="color: #dcdcdc; list-style: none; padding: 0; margin: 0;">
+            {{!-- Spring 2026: existing trust restructure (always required for any MAPT path) --}}
+            {{#if (eq scenario.condo_disposition "trust_mapt")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> <strong>Petition to restructure the existing irrevocable trust holding the support property</strong> (court-approved modification process, ~2–4 months). The support household is the current beneficiary and consents. The designated fiduciary prepares to assume protection-trust administration.</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> <strong>Attorney decision: refi-bridge to buy the protected condo BEFORE the support-property sale clears, or wait?</strong> Buying first requires a primary house refi as a short-lived bridge (extra closing costs ~$5–10k) but avoids the summer market spike on the protected condo. Buying after avoids the refi but exposes the household to seasonal price movement on the target condo.</li>
+            {{/if}}
+
+            {{!-- Spring 2026: SNT, refi, trusts --}}
+            {{#if (eq scenario.condo_disposition "rental")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> Establish 3rd party <strong>Special Needs Trust (SNT)</strong> for the dependent household, with the fiduciary serving as trustee until the primary household's passing</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> Cash-out refinance: <span style="color: #66ccff;">${{formatNumber (add (add (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80)) (or scenario.snt_seed 10000)) 20000)}}</span> primary house IO — $20k deferred maintenance, ${{formatNumber (or scenario.snt_seed 10000)}} SNT seed, <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> SNT condo down payment</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> SNT purchases condo for <span style="color: #66ccff;">${{formatNumber (or scenario.total_mortgage_amount 350000)}}</span> w/ closing costs, placing <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> down (<span style="color: #66ccff;">{{multiply (or scenario.mortgage_split_pct 0.80) 100}}%</span>), remaining <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (subtract 1 (or scenario.mortgage_split_pct 0.80)))}}</span> condo mortgage (<span style="color: #66ccff;">{{subtract 100 (multiply (or scenario.mortgage_split_pct 0.80) 100)}}%</span> 30yr P&I)</li>
+            {{/if}}
+            {{#if (eq scenario.condo_disposition "trust_mapt")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> Establish 3rd party <strong>Special Needs Trust (SNT)</strong> for the dependent household, with the fiduciary serving as trustee until the primary household's passing</li>
+            {{#if scenario.sell_condo_upfront}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> support property sold (~$404k). Proceeds move into the protection trust. Trust funds: <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> SNT condo down payment, ${{formatNumber (or scenario.snt_seed 10000)}} SNT seed (MAPT → SNT gift)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> SNT purchases condo for <span style="color: #66ccff;">${{formatNumber (or scenario.total_mortgage_amount 350000)}}</span> w/ closing costs, placing <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> down (<span style="color: #66ccff;">{{multiply (or scenario.mortgage_split_pct 0.80) 100}}%</span>), remaining <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (subtract 1 (or scenario.mortgage_split_pct 0.80)))}}</span> condo mortgage (<span style="color: #66ccff;">{{subtract 100 (multiply (or scenario.mortgage_split_pct 0.80) 100)}}%</span> 30yr P&I). No primary house refinance.</li>
+            {{else}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> Cash-out refinance: <span style="color: #66ccff;">${{formatNumber (add (add (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80)) (or scenario.snt_seed 10000)) 20000)}}</span> primary house IO — $20k deferred maintenance, ${{formatNumber (or scenario.snt_seed 10000)}} SNT seed, <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> SNT condo down payment</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Spring 2026:</span> SNT purchases condo for <span style="color: #66ccff;">${{formatNumber (or scenario.total_mortgage_amount 350000)}}</span> w/ closing costs, placing <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (or scenario.mortgage_split_pct 0.80))}}</span> down (<span style="color: #66ccff;">{{multiply (or scenario.mortgage_split_pct 0.80) 100}}%</span>), remaining <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.total_mortgage_amount 350000) (subtract 1 (or scenario.mortgage_split_pct 0.80)))}}</span> condo mortgage (<span style="color: #66ccff;">{{subtract 100 (multiply (or scenario.mortgage_split_pct 0.80) 100)}}%</span> 30yr P&I)</li>
+            {{/if}}
+            {{/if}}
+
+            {{!-- Late spring 2026: Trust establishment (after refi) --}}
+            {{#if (eq scenario.condo_disposition "baseline")}}
+            <li style="margin-bottom: 8px;">• No additional trust structure — assets remain in the primary household's name</li>
+            {{/if}}
+            {{#if (eq scenario.condo_disposition "trust_mapt")}}
+            {{#if scenario.sell_condo_upfront}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Late spring 2026:</span> Primary house placed in the <strong>protection trust</strong> to shield from estate recovery exposure, fiduciary appointed as trustee</li>
+            {{else}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Late spring 2026:</span> Both properties placed in the <strong>protection trust</strong> to shield from estate recovery exposure, fiduciary appointed as trustee</li>
+            {{/if}}
+            {{/if}}
+
+            {{!-- Summer 2026: support household moves in --}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Summer 2026:</span> support household moves out of the support property and in with the primary household as live-in caregiver (beginning the long residency period used by this plan)</li>
+
+            {{!-- Summer 2026: dependent household family moves into SNT condo --}}
+            {{#if (eq scenario.condo_disposition "trust_mapt")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Summer 2026:</span> <strong>dependent household + family move into the protected condo</strong> — load-bearing housing solution for the dependent household (benefits remain protected by the special-needs trust structure)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Summer 2026:</span> <strong>Document the support household's $404k equity claim</strong> from the support-property sale (or rental valuation) — signed acknowledgment by the fiduciary and both households for later estate-settlement repayment (tracked in the equity ledger)</li>
+            {{/if}}
+            {{#if (eq scenario.condo_disposition "rental")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Summer 2026:</span> <strong>dependent household + family move into the protected condo</strong> — load-bearing housing solution for the dependent household (benefits remain protected by the special-needs trust structure)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Summer 2026:</span> <strong>Document the support household's $404k equity claim</strong> from the support-property sale (or rental valuation) — signed acknowledgment by the fiduciary and both households for later estate-settlement repayment (tracked in the equity ledger)</li>
+            {{/if}}
+
+            {{!-- Late summer 2026: Condo rented --}}
+            {{#if (eq scenario.condo_disposition "baseline")}}
+            <li style="margin-bottom: 8px;">• support property remains occupied by the support household, and the primary household covers about $6k/yr in carrying costs</li>
+            {{/if}}
+
+            {{#if (eq scenario.condo_disposition "rental")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Late summer 2026:</span> support property rented out for <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.rental_income_monthly 2350) 12)}}/yr</span> gross rental income</li>
+            {{#if scenario.sell_condo_upfront}}
+            <li style="margin-bottom: 8px; color: #f39c12;">• <strong>Condo sold upfront instead</strong> — no rental income stream</li>
+            {{/if}}
+            {{/if}}
+
+            {{#if (eq scenario.condo_disposition "trust_mapt")}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">Late summer 2026:</span> support property rented out for <span style="color: #66ccff;">${{formatNumber (multiply (or scenario.rental_income_monthly 2350) 12)}}/yr</span> — rental income flows to trust (not the primary household's taxable income)</li>
+            {{#if scenario.sell_condo_upfront}}
+            <li style="margin-bottom: 8px; color: #f39c12;">• <strong>Condo sold upfront instead</strong> — no rental income stream</li>
+            {{/if}}
+            {{/if}}
+
+            {{!-- Optimizer starts at LTC disbursement --}}
+            {{#if scenario.optimizer_enabled}}
+            <li style="margin-bottom: 8px; color: #27ae60;">• <span style="color:#888;">{{scenario.ltc_trigger_year}}:</span> <strong>Optimized cash withdrawal strategy activates</strong> — automatically selects lowest yearly opportunity-cost, IRA vs. LTC, prioritizing solvency</li>
+            {{/if}}
+
+            {{!-- Nursing intensifies → start looking for MC facility --}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;" id="intensifyYearLabel"></span> As nursing needs intensify, begin searching for a memory care facility that <strong>guarantees (in writing) a Medicaid bed after 2–3 years of private pay</strong></li>
+
+            {{!-- Memory care --}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.memory_care_year 2032}}:</span> primary household enters memory care facility — private-pay window begins</li>
+
+            {{!-- Roommate --}}
+            {{#if scenario.roommate_enabled}}
+            <li style="margin-bottom: 8px; color: #66ccff;">• <span style="color:#888;">{{or scenario.memory_care_year 2032}}:</span> <strong>support household takes roommate(s)</strong> — <span style="color: #66ccff;">${{formatNumber (or scenario.roommate_monthly 1100)}}/mo</span> additional <strong>protection-trust income</strong> to help cover house expenses</li>
+            {{/if}}
+
+            {{!-- Medicaid activation --}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{add (or scenario.memory_care_year 2032) 3}}:</span> <strong>Pre-Medicaid IRA liquidation</strong> — all remaining IRA &amp; annuities liquidated into the SNT BEFORE Medicaid application (~$159k tax withholding), protecting these funds from Medicaid seizure so they can maintain the primary house and cover trust obligations</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{add (or scenario.memory_care_year 2032) 3}}:</span> Pay off remaining SNT condo mortgage (if any), then file Medicaid application; lookback period (5 years from 2026 transfers) cleared in 2031</li>
+
+            {{!-- At client household's death --}}
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.year_of_passing 2040}} (primary household's death):</span> <strong>Stepped-up basis</strong> on primary house and any remaining trust assets via §2041 LPOA → §1014 — eliminates accumulated capital gains</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.year_of_passing 2040}}:</span> Sell primary house at stepped-up basis (~$1.6M projected proceeds, $0 capital gains)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.year_of_passing 2040}}:</span> Pay projected estate tax (~$118k on a ~$2.1M estate)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.year_of_passing 2040}}:</span> <strong>Repay the support household's documented $404k equity claim</strong> from house sale proceeds (legally enforceable per Summer 2026 acknowledgment)</li>
+            <li style="margin-bottom: 8px;">• <span style="color:#888;">{{or scenario.year_of_passing 2040}}:</span> Distribute remaining protection-trust assets in equal thirds to the fiduciary, dependent household, and support household — the dependent household's share is offset by trust inheritance to maintain even allocation</li>
+
+            {{!-- Planning horizon --}}
+            <li style="margin-bottom: 8px;">• Planning horizon through <span style="color: #66ccff;">{{or scenario.year_of_passing 2040}}</span> (primary household age {{add 70 (subtract (or scenario.year_of_passing 2040) 2026)}}) — <span id="survivalPctDecision"></span></li>
+        </ul>
+    </div>
+</div>
+
+<div style="margin-bottom: 40px;">
+    <h2 style="margin-bottom: 15px; color: #66ccff;">Scenario Parameters</h2>
+
+    <div style="padding: 10px; margin-bottom: 15px; background: #2a2a2a; border-left: 3px solid #66ccff; font-size: 14px; color: #dcdcdc;">
+        <strong>Timeline:</strong> LTC insurance payout in {{scenario.ltc_trigger_year}}, Memory Care starts {{scenario.memory_care_year}}, Passing in {{scenario.year_of_passing}}
+    </div>
+
+    <div style="padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 4px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #dcdcdc; font-size: 13px;">
+            <div style="font-weight:600;color:#aac8e4;grid-column:1/-1;">Income &amp; IRA</div>
+            <div><strong>SSDI Monthly:</strong> <span style="color: #66ccff;">${{or scenario.ssdi_monthly 3000}}/mo</span> (${{formatNumber (multiply (or scenario.ssdi_monthly 3000) 12)}}/yr)</div>
+            <div><strong>SSDI COLA:</strong> <span style="color: #66ccff;">2.0%/yr</span> <span style="color: #888; font-size: 0.85em;">(constant — engine default per SSA projections)</span></div>
+            <div><strong>IRA Growth Rate:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.ira_growth 0.04)}}</span></div>
+            <div><strong>SDIRA Starting Balance:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.sdira_start 68000)}}</span></div>
+            <div><strong>Managed IRA Start:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.managed_ira_start 300000)}}</span> <span style="color: #e74c3c; font-size: 0.85em;">(Confirm w/ advisor)</span></div>
+            {{#unless scenario.sell_condo_upfront}}
+            <div><strong>Support Property Rental Income:</strong> <span style="color: #66ccff;">${{or scenario.rental_income_monthly 2350}}/mo</span></div>
+            <div><strong>Support Property Rental Increase:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.rental_increase_rate 0.04)}}/yr</span></div>
+            {{/unless}}
+
+            <div style="font-weight:600;color:#aac8e4;grid-column:1/-1;margin-top:6px;">Expenses &amp; Care</div>
+            <div><strong>Lifestyle Floor:</strong> <span style="color: #66ccff;">${{or scenario.lifestyle_floor_monthly 2500}}/mo</span></div>
+            <div><strong>Pre-MC Charitable:</strong> <span style="color: #66ccff;">${{or scenario.charitable_monthly 0}}/mo</span></div>
+            <div><strong>MC Household Maintenance:</strong> <span style="color: #66ccff;">${{or scenario.mc_maintenance_monthly 300}}/mo</span></div>
+            <div><strong>MC Residual Lifestyle:</strong> <span style="color: #66ccff;">${{or scenario.mc_residual_monthly 200}}/mo</span></div>
+            <div><strong>Medical Base:</strong> <span style="color: #66ccff;">${{or scenario.medical_base_monthly 200}}/mo</span></div>
+            <div><strong>Memory Care (pre-inflation):</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.memory_care_cost 120000)}}/yr</span></div>
+            <div><strong>Memory Care Inflation:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.memory_care_inflation 0.05)}}</span></div>
+            {{#unless scenario.sell_condo_upfront}}<div><strong>Support Property Management Fee:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.management_fee 0.08)}}</span></div>{{/unless}}
+
+            <div style="font-weight:600;color:#aac8e4;grid-column:1/-1;margin-top:6px;">Real Estate</div>
+            <div><strong>Primary House Value:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.primary_house_value 825000)}}</span></div>
+            {{#unless scenario.sell_condo_upfront}}
+            <div><strong>Support Property Value:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.condo_value 425000)}}</span></div>
+            {{/unless}}
+            <div><strong>Primary Appreciation:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.primary_appreciation 0.06)}}</span></div>
+            <div><strong>Protected Condo Purchase:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.total_mortgage_amount 350000)}}</span></div>
+            {{#unless scenario.sell_condo_upfront}}
+            <div><strong>Support Property Appreciation:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.condo_appreciation 0.05)}}</span></div>
+            <div><strong>Support Property Maintenance:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.condo_maintenance 0)}}/yr</span></div>
+            {{/unless}}
+
+            <div style="font-weight:600;color:#aac8e4;grid-column:1/-1;margin-top:6px;">Mortgage &amp; HELOC</div>
+            <div><strong>Protected Condo Purchase Price:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.total_mortgage_amount 350000)}}</span></div>
+            <div><strong>Support Trust Seed Funding:</strong> <span style="color: #66ccff;">${{formatNumber (or scenario.snt_seed 10000)}}</span></div>
+            <div><strong>Protected Condo Down Payment:</strong> <span style="color: #66ccff;">{{multiply (or scenario.mortgage_split_pct 0.80) 100}}% down</span></div>
+            {{#unless scenario.sell_condo_upfront}}
+            <div><strong>Primary Mortgage Rate (IO):</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.primary_mortgage_rate 0.057)}}</span></div>
+            {{/unless}}
+            {{#unless (eq scenario.mortgage_split_pct 1)}}
+            <div><strong>Protected Condo Mortgage Rate (P&I):</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.condo_mortgage_rate 0.065)}}</span></div>
+            {{/unless}}
+            {{#unless scenario.sell_condo_upfront}}
+            <div><strong>HELOC Rate:</strong> <span style="color: #66ccff;">{{formatPercentage (or scenario.heloc_rate 0.075)}}</span></div>
+            {{/unless}}
+            {{#if scenario.roommate_enabled}}<div><strong>Roommate Monthly:</strong> <span style="color: #66ccff;">${{or scenario.roommate_monthly 1100}}/mo</span></div>{{/if}}
+        </div>
+    </div>
+</div>
+
+    </div><!-- end container -->
+
+    <!-- Mobile Tooltip Sidebar -->
+    {{> tooltip-sidebar}}
+
+    <!-- Tooltip Sidebar JavaScript -->
+    <script src="/static/js/tooltip-sidebar.js"></script>
+
+    <!-- Scenario Navigation JavaScript -->
+    <script>
+    (function() {
+        'use strict';
+
+        // Scenario navigation order
+        const scenarios = [
+            'ScA_Baseline',
+            'ScA_NoTrust',
+            'ScA_MAPT'
+        ];
+
+        const currentScenarioId = '{{scenario.id}}';
+        const currentIndex = scenarios.indexOf(currentScenarioId);
+
+        // Navigate to previous scenario
+        $('#prevScenario').on('click', function() {
+            if (currentIndex > 0) {
+                const prevScenario = scenarios[currentIndex - 1];
+                window.location.href = '/BurnRate/scenario/' + prevScenario;
+            }
+        });
+
+        // Navigate to next scenario
+        $('#nextScenario').on('click', function() {
+            if (currentIndex < scenarios.length - 1) {
+                const nextScenario = scenarios[currentIndex + 1];
+                window.location.href = '/BurnRate/scenario/' + nextScenario;
+            }
+        });
+
+        // Disable buttons at boundaries
+        if (currentIndex === 0) {
+            $('#prevScenario').prop('disabled', true).css('opacity', '0.3');
+        }
+        if (currentIndex === scenarios.length - 1) {
+            $('#nextScenario').prop('disabled', true).css('opacity', '0.3');
+        }
+
+        // Keyboard navigation (left/right arrows)
+        $(document).on('keydown', function(e) {
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                $('#prevScenario').click();
+            } else if (e.key === 'ArrowRight' && currentIndex < scenarios.length - 1) {
+                $('#nextScenario').click();
+            }
+        });
+
+        // Make sticky nav visible on scroll
+        $(window).on('scroll', function() {
+            const sticky = $('#scenarioNavSticky');
+            if ($(window).scrollTop() > 100) {
+                sticky.addClass('visible');
+            } else {
+                sticky.removeClass('visible');
+            }
+        });
+    })();
+    </script>
+
+    {{> burnrate-param-sidebar}}
+
+    <script>
+    // Inject scenario data for sidebar slider initialization
+    window.scenarioData = {};
+    window.scenarioData['{{scenario.id}}'] = {
+        ira_growth: {{scenario.ira_growth}},
+        sdira_start: {{or scenario.sdira_start 68000}},
+        managed_ira_start: {{scenario.managed_ira_start}},
+        lifestyle_annual: {{scenario.lifestyle_annual}},
+        primary_appreciation: {{scenario.primary_appreciation}},
+        condo_appreciation: {{scenario.condo_appreciation}},
+        memory_care_inflation: {{scenario.memory_care_inflation}},
+        management_fee: {{scenario.management_fee}},
+        rental_income_monthly: {{scenario.rental_income_monthly}},
+        heloc_rate: {{scenario.heloc_rate}},
+        medical_base_monthly: {{or scenario.medical_base_monthly 200}},
+        memory_care_cost: {{scenario.memory_care_cost}},
+        total_mortgage_amount: {{or scenario.total_mortgage_amount 0}},
+        mortgage_split_pct: {{or scenario.mortgage_split_pct 0}},
+        primary_mortgage_rate: {{or scenario.primary_mortgage_rate 0}},
+        condo_mortgage_rate: {{or scenario.condo_mortgage_rate 0}},
+        condo_maintenance: {{or scenario.condo_maintenance 0}},
+        ltc_trigger_year: {{scenario.ltc_trigger_year}},
+        memory_care_year: {{or scenario.memory_care_year 2031}},
+        year_of_passing: {{or scenario.year_of_passing 2040}},
+        sell_condo_upfront: {{or scenario.sell_condo_upfront 0}},
+        roommate_enabled: {{or scenario.roommate_enabled 0}},
+        roommate_monthly: {{or scenario.roommate_monthly 1100}},
+        primary_house_value: {{or scenario.primary_house_value 825000}},
+        condo_value: {{or scenario.condo_value 425000}},
+        rental_increase_rate: {{or scenario.rental_increase_rate 0.04}},
+        ssdi_monthly: {{or scenario.ssdi_monthly 3000}},
+        lifestyle_floor_monthly: {{or scenario.lifestyle_floor_monthly 4000}},
+        charitable_monthly: {{or scenario.charitable_monthly 800}},
+        snt_seed: {{or scenario.snt_seed 10000}},
+        mc_maintenance_monthly: {{or scenario.mc_maintenance_monthly 300}},
+        mc_residual_monthly: {{or scenario.mc_residual_monthly 200}},
+        optimizer_enabled: {{or scenario.optimizer_enabled 0}},
+        trust_type: '{{or scenario.trust_type "non_grantor"}}'
+    };
+    window.currentScenarioId = '{{scenario.id}}';
+    window.projectionData = {{{json projections}}};
+    window.optimizerData = {{#if optimizer}}{{{json optimizer}}}{{else}}null{{/if}};
+    </script>
+    <script>
+    window.instrumentData = {{#if instruments}}{{{json instruments}}}{{else}}[]{{/if}};
+    window.scenarioConfig = {{#if scenario}}{{{json scenario}}}{{else}}{}{{/if}};
+    window.ltcPolicyData = {{#if ltcPolicy}}{{{json ltcPolicy}}}{{else}}null{{/if}};
+    </script>
+    <script src="/static/js/burnrate-param-sidebar.js"></script>
+    <script src="/static/js/debug-sidebar.js"></script>
+    <script>
+    (function() {
+        var table = document.querySelector('.projection-table, table');
+        if (!table) return;
+        var cells = table.querySelectorAll('.debug-cell');
+        cells.forEach(function(cell) {
+            cell.addEventListener('mouseenter', function() { table.classList.add('debug-col-hover'); });
+            cell.addEventListener('mouseleave', function() { table.classList.remove('debug-col-hover'); });
+        });
+    })();
+    </script>
+
+
