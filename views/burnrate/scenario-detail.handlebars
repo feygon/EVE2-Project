@@ -9,7 +9,7 @@
                 <a href="/BurnRate/" class="nav-back-link">&larr; Back to Scenarios</a>
                 <div class="scenario-nav-controls">
                     <button class="nav-arrow" id="prevScenario" title="Previous scenario">&larr;</button>
-                    <h2 class="scenario-nav-title">{{scenario.name}}</h2>
+                    <h2 class="scenario-nav-title">{{navLabel scenario.name}}</h2>
                     <button class="nav-arrow" id="nextScenario" title="Next scenario">&rarr;</button>
                 </div>
             </div>
@@ -19,7 +19,7 @@
             <a href="/BurnRate/" style="color: #66ccff; text-decoration: none; font-size: 13px;">&larr; Back to Scenarios</a>
         </div>
 
-        <h1 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1.4em;">{{scenario.name}}</h1>
+        <h1 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1.4em;">{{navLabel scenario.name}}</h1>
         <p style="color: #999; margin: 0 0 10px 0; font-size: 0.9em;">{{scenario.description}}</p>
 
 <div>
@@ -899,7 +899,7 @@
 
             {{!-- Late summer 2026: Condo rented --}}
             {{#if (eq scenario.condo_disposition "baseline")}}
-            <li style="margin-bottom: 8px;">• support property remains occupied by the support household, and the primary household covers about $6k/yr in carrying costs</li>
+            <li style="margin-bottom: 8px;">• Baseline scenario: C3 occupies condo, A pays C3 carrying costs.</li>
             {{/if}}
 
             {{#if (eq scenario.condo_disposition "rental")}}

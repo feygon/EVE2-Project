@@ -6,6 +6,13 @@
 var express = require('express');
 var router = express.Router();
 var appVersion = require('./package.json').version;
+var fs = require('fs');
+var path = require('path');
+var childProcess = require('child_process');
+var { marked } = require('marked');
+var { reports, validSlugs, getReport, getNavigation } = require('./config/wikiReports');
+
+var REPORTS_DIR = path.join(__dirname, 'docs', 'Reports');
 
 var ALLOWED_PARAMS = [
     'ira_growth', 'lifestyle_annual', 'primary_appreciation',
@@ -75,6 +82,61 @@ router.get('/scenario/:id', function(req, res) {
             optimizer: context.optimizer,
             routeBase: '/BurnRate'
         });
+    });
+});
+
+router.get('/wiki', function(req, res) {
+    var c1Reports = reports.filter(function(r) { return r.audience === 'c1'; });
+    var demoReports = reports.filter(function(r) { return r.audience === 'demo'; });
+    var detailedReports = reports.filter(function(r) { return r.audience === 'detailed'; });
+
+    res.render('nickerson/wiki-index', {
+        layout: 'burnrate',
+        title: 'BurnRate - Reports',
+        c1Reports: c1Reports,
+        demoReports: demoReports,
+        detailedReports: detailedReports,
+        routeBase: '/BurnRate'
+    });
+});
+
+router.get('/wiki/:slug', function(req, res) {
+    var slug = req.params.slug;
+
+    if (!validSlugs.has(slug)) {
+        return res.status(404).send('Report not found');
+    }
+
+    var report = getReport(slug);
+    var nav = getNavigation(slug);
+    var filePath = path.join(REPORTS_DIR, report.filename);
+
+    fs.promises.readFile(filePath, 'utf8').then(function(content) {
+        var html = marked(content);
+        res.render('nickerson/wiki-report', {
+            layout: 'burnrate',
+            title: 'BurnRate - ' + report.title,
+            report: report,
+            content: html,
+            routeBase: '/BurnRate',
+            prevReport: nav.prev,
+            nextReport: nav.next
+        });
+    }).catch(function(err) {
+        console.error('BurnRate wiki read error:', err.message);
+        res.status(404).send('Report file not found: ' + report.filename);
+    });
+});
+
+// Serve PNGs and similar assets from docs/Reports/ for inline wiki images
+router.get('/wiki/img/:filename', function(req, res) {
+    var filename = req.params.filename;
+    if (!/^[\w-]+\.(png|jpg|jpeg|gif)$/i.test(filename)) {
+        return res.status(400).send('Invalid image filename');
+    }
+    var imgPath = path.join(REPORTS_DIR, filename);
+    res.sendFile(imgPath, function(err) {
+        if (err) res.status(404).send('Image not found');
     });
 });
 
@@ -162,7 +224,26 @@ router.post('/scenarios/metrics', function(req, res) {
 
 router.post('/restart', function(req, res) {
     res.json({ status: 'restarting' });
-    console.log('[BurnRate] Restart requested — exiting with code 75');
+    console.log('[BurnRate] Restart requested — relaunching main.js on port 3002');
+
+    // Relaunch the local demo explicitly on port 3002, then terminate this process.
+    var launcher = childProcess.spawn(process.execPath, ['-e', `
+        const { spawn } = require('child_process');
+        setTimeout(function() {
+            const child = spawn(process.execPath, ['main.js', '3002'], {
+                cwd: ${JSON.stringify(__dirname)},
+                detached: true,
+                stdio: 'ignore'
+            });
+            child.unref();
+        }, 1200);
+    `], {
+        cwd: __dirname,
+        detached: true,
+        stdio: 'ignore'
+    });
+
+    launcher.unref();
     setTimeout(function() { process.exit(75); }, 200);
 });
 
