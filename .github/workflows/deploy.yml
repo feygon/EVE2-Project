@@ -39,6 +39,13 @@ jobs:
         shell: bash
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Clean stale server-side backup directories
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+            "find ${{ secrets.DEPLOY_PATH }} -maxdepth 1 -type d -name 'node_modules.backup-*' -exec rm -rf {} + 2>/dev/null || true"
       
       - name: Deploy files via rsync
         run: |
