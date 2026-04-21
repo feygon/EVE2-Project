@@ -10,7 +10,7 @@ var fs = require('fs');
 var path = require('path');
 var childProcess = require('child_process');
 var { marked } = require('marked');
-var { reports, validSlugs, getReport, getNavigation } = require('./config/wikiReports');
+var { reports, validSlugs, getReport, getNavigation } = require('./config/burnrateWikiReports');
 
 var REPORTS_DIR = path.join(__dirname, 'docs', 'Reports');
 
