@@ -24,6 +24,66 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Fail on deployable symlinks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t symlinks < <(git ls-files -s | awk '$1 == "120000" { print $4 }')
+
+          if [ ${#symlinks[@]} -eq 0 ]; then
+            echo "No tracked symlinks found."
+            exit 0
+          fi
+
+          echo "Tracked symlinks found:"
+          printf '  %s\n' "${symlinks[@]}"
+
+          is_excluded_symlink() {
+            case "$1" in
+              data|data/*)
+                return 0
+                ;;
+              views/nickerson|views/nickerson/*)
+                return 0
+                ;;
+              views/layouts/nickerson.handlebars)
+                return 0
+                ;;
+              public/css/nickerson|public/css/nickerson/*|public/css/nickerson.css)
+                return 0
+                ;;
+              public/js/debug-sidebar.js|public/js/param-sidebar.js|public/js/nickerson-scenarios.js|public/js/tooltip-sidebar.js)
+                return 0
+                ;;
+              public/js/nickerson|public/js/nickerson/*)
+                return 0
+                ;;
+              scripts/NickersonCallbacks.js|dbcon_nickerson.js|Nickerson.js)
+                return 0
+                ;;
+              *)
+                return 1
+                ;;
+            esac
+          }
+
+          deployable_symlinks=()
+          for path in "${symlinks[@]}"; do
+            if ! is_excluded_symlink "$path"; then
+              deployable_symlinks+=("$path")
+            fi
+          done
+
+          if [ ${#deployable_symlinks[@]} -gt 0 ]; then
+            echo "ERROR: tracked symlinks in deployable paths are not allowed."
+            echo "Materialize these files before deploying:"
+            printf '  %s\n' "${deployable_symlinks[@]}"
+            exit 1
+          fi
+
+          echo "Only excluded/private-overlay symlinks are present."
       
       # Skip tests for now - no test suite implemented yet
       # - name: Run tests
