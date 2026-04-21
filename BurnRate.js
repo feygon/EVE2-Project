@@ -14,6 +14,11 @@ var { reports, validSlugs, getReport, getNavigation } = require('./config/burnra
 
 var REPORTS_DIR = path.join(__dirname, 'docs', 'Reports');
 
+function formatScenarioTitle(name) {
+    if (typeof name !== 'string') return 'Scenario';
+    return name.replace(/^Sc\.A\s*[—–-]\s*/i, '').replace(/^Scenario\s+A:\s*/i, '');
+}
+
 var ALLOWED_PARAMS = [
     'ira_growth', 'lifestyle_annual', 'primary_appreciation',
     'condo_appreciation', 'memory_care_inflation', 'management_fee',
@@ -34,6 +39,10 @@ var ALLOWED_PARAMS = [
 
 router.use(function(req, res, next) {
     res.locals.appVersion = appVersion;
+    if (req.method === 'GET' && req.path === '/') {
+        res.locals.navScenarios = [];
+        return next();
+    }
     var db = req.app.get('dbBurnRate');
     if (db) {
         try {
@@ -57,6 +66,7 @@ router.get('/', function(req, res) {
             layout: 'burnrate',
             title: 'BurnRate - Scenarios',
             scenarios: context.scenarios,
+            navScenarios: context.scenarios,
             routeBase: '/BurnRate'
         });
     });
@@ -71,7 +81,7 @@ router.get('/scenario/:id', function(req, res) {
     callbacks.getScenarioDetail(res, db, context, scenarioId, function() {
         res.render('burnrate/scenario-detail', {
             layout: 'burnrate',
-            title: 'BurnRate - ' + (context.scenario ? context.scenario.name : 'Scenario'),
+            title: 'BurnRate - ' + (context.scenario ? formatScenarioTitle(context.scenario.name) : 'Scenario'),
             scenario: context.scenario,
             parameters: context.parameters,
             projections: context.projections,
@@ -193,6 +203,7 @@ router.post('/scenarios/metrics', function(req, res) {
     var db = req.app.get('dbBurnRate');
     var callbacks = req.app.get('BurnRateCallbacks');
     var scenarioIds = req.body.scenarioIds || [];
+    var referenceData = null;
 
     var results = {};
     var pending = scenarioIds.length;
@@ -201,12 +212,19 @@ router.post('/scenarios/metrics', function(req, res) {
         return res.json({ success: true, metrics: {} });
     }
 
-    scenarioIds.forEach(function(scenarioId) {
-        var scenario = db.prepare('SELECT ltc_trigger_year, memory_care_year, year_of_passing FROM scenario WHERE id = ?').get(scenarioId);
+    try {
+        referenceData = callbacks.getProjectionReferenceData(db);
+    } catch (err) {
+        console.error('Error loading shared projection reference data:', err);
+    }
 
-        callbacks.getProjections(res, db, scenarioId, function(result) {
+    scenarioIds.forEach(function(scenarioId) {
+        try {
+            const { calculateProjection } = require('./scripts/_projectionEngine');
+            var result = calculateProjection(db, scenarioId, callbacks, { referenceData: referenceData });
             if (result.success) {
                 var metrics = callbacks._calculateMetrics(result.years);
+                var scenario = result.scenario || {};
                 results[scenarioId] = {
                     ...metrics,
                     ltc_trigger_year: scenario.ltc_trigger_year,
@@ -214,11 +232,13 @@ router.post('/scenarios/metrics', function(req, res) {
                     year_of_passing: scenario.year_of_passing || 2040
                 };
             }
-            pending--;
-            if (pending === 0) {
-                res.json({ success: true, metrics: results });
-            }
-        });
+        } catch (err) {
+            console.error('Error calculating bulk BurnRate metrics:', err);
+        }
+        pending--;
+        if (pending === 0) {
+            res.json({ success: true, metrics: results });
+        }
     });
 });
 

@@ -160,6 +160,14 @@ module.exports = {
         }
     },
 
+    /**
+     * Load shared reference data for multiple projection runs in a single request.
+     */
+    getProjectionReferenceData: function(db) {
+        const { loadProjectionReferenceData } = require('./_projectionEngine');
+        return loadProjectionReferenceData(db);
+    },
+
 
     // _evaluateRealEstateLiquidation DELETED — dead code.
     // Logic reimplemented in _decideWithdrawalStrategy.js (lines 140-263).

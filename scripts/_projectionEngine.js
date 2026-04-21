@@ -28,11 +28,28 @@ const { validateQ1Q2Funding } = require('./_validateQ1Q2Funding');
  * @param {string} scenarioId - Scenario ID to load
  * @returns {Object|null} { scenario, rateSet, accounts, instruments, properties, incomeSources, expenses, ltcPolicy } or null if not found
  */
-function _loadScenarioData(db, scenarioId) {
+function loadProjectionReferenceData(db) {
+    const rateSets = db.prepare('SELECT * FROM rate_set').all();
+    const rateSetsById = new Map(rateSets.map(rateSet => [rateSet.id, rateSet]));
+
+    return {
+        rateSetsById,
+        accounts: db.prepare('SELECT * FROM account').all(),
+        instruments: db.prepare('SELECT * FROM financial_instrument').all(),
+        properties: db.prepare('SELECT * FROM real_estate_property').all(),
+        incomeSources: db.prepare('SELECT * FROM income_source').all(),
+        expenses: db.prepare('SELECT * FROM expense').all(),
+        ltcPolicy: db.prepare('SELECT * FROM insurance_policy_ltc WHERE insured_id = ?').get('A')
+    };
+}
+
+function _loadScenarioData(db, scenarioId, referenceData) {
     const scenario = db.prepare('SELECT * FROM scenario WHERE id = ?').get(scenarioId);
     if (!scenario) return null;
 
-    const rateSet = db.prepare('SELECT * FROM rate_set WHERE id = ?').get(scenario.rate_set_id || 'baseline');
+    const rateSetId = scenario.rate_set_id || 'baseline';
+    const rateSet = referenceData?.rateSetsById?.get(rateSetId)
+        || db.prepare('SELECT * FROM rate_set WHERE id = ?').get(rateSetId);
 
     // Get activated entities for this scenario
     const activatedEntities = db.prepare(`
@@ -61,12 +78,12 @@ function _loadScenarioData(db, scenarioId) {
     return {
         scenario,
         rateSet,
-        accounts: db.prepare('SELECT * FROM account').all().filter(a => activeAccounts.has(a.id)),
-        instruments: db.prepare('SELECT * FROM financial_instrument').all().filter(i => activeInstruments.has(i.id)),
-        properties: db.prepare('SELECT * FROM real_estate_property').all().filter(p => activeProperties.has(p.id)),
-        incomeSources: db.prepare('SELECT * FROM income_source').all().filter(i => activeIncomes.has(i.id)),
-        expenses: db.prepare('SELECT * FROM expense').all().filter(e => activeExpenses.has(e.id)),
-        ltcPolicy: db.prepare('SELECT * FROM insurance_policy_ltc WHERE insured_id = ?').get('A')
+        accounts: (referenceData?.accounts || db.prepare('SELECT * FROM account').all()).filter(a => activeAccounts.has(a.id)),
+        instruments: (referenceData?.instruments || db.prepare('SELECT * FROM financial_instrument').all()).filter(i => activeInstruments.has(i.id)),
+        properties: (referenceData?.properties || db.prepare('SELECT * FROM real_estate_property').all()).filter(p => activeProperties.has(p.id)),
+        incomeSources: (referenceData?.incomeSources || db.prepare('SELECT * FROM income_source').all()).filter(i => activeIncomes.has(i.id)),
+        expenses: (referenceData?.expenses || db.prepare('SELECT * FROM expense').all()).filter(e => activeExpenses.has(e.id)),
+        ltcPolicy: referenceData?.ltcPolicy || db.prepare('SELECT * FROM insurance_policy_ltc WHERE insured_id = ?').get('A')
     };
 }
 
@@ -651,8 +668,9 @@ function processYear(s, year, data, callbacks) {
  * @param {Object} callbacks - NickersonCallbacks module (for this._method() calls during transition)
  * @returns {Object} { success, years, outcome, annotations, error }
  */
-function calculateProjection(db, scenarioId, callbacks) {
-    const data = _loadScenarioData(db, scenarioId);
+function calculateProjection(db, scenarioId, callbacks, options) {
+    const referenceData = options?.referenceData || null;
+    const data = _loadScenarioData(db, scenarioId, referenceData);
     if (!data) {
         return { success: false, error: 'Scenario not found' };
     }
@@ -758,7 +776,18 @@ function calculateProjection(db, scenarioId, callbacks) {
         medicaidTriggerYear: s.medicaidTriggerYear, endYear: s.endYear
     });
 
-    const result = { success: true, years: s.years, outcome, annotations };
+    const result = {
+        success: true,
+        years: s.years,
+        outcome,
+        annotations,
+        scenario: {
+            id: scenario.id,
+            ltc_trigger_year: scenario.ltc_trigger_year,
+            memory_care_year: scenario.memory_care_year,
+            year_of_passing: scenario.year_of_passing
+        }
+    };
     if (s.optimizerResult) {
         const initState = initializeScenario(scenario, accounts, properties, rateSet);
         const q1q2 = validateQ1Q2Funding(
@@ -786,4 +815,4 @@ function calculateProjection(db, scenarioId, callbacks) {
     return result;
 }
 
-module.exports = { calculateProjection };
+module.exports = { calculateProjection, loadProjectionReferenceData };
