@@ -12,7 +12,7 @@
 
 ## The Three Scenarios
 
-1. **Baseline**: no trust restructuring. Available liquidity is used directly, and the household remains exposed to later care-cost drawdown.
+1. **Baseline**: no trust restructuring. Person A continues supporting C3 in the Legacy Condo unsustainably, available liquidity is used directly, and the household remains exposed to later care-cost drawdown.
 2. **No Trust Buffer**: liquidity and leverage are used to create more short-term flexibility, but the assets still remain exposed outside the protection trust structure.
 3. **Asset Protection**: the trust-based path, where MAPT and SNT structure, timing, and optimizer behavior work together to protect stability under high care costs.
 

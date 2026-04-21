@@ -349,7 +349,7 @@ The current demo state uses a lightly leveraged protected condo rather than a he
 
 The point of this section is not a single exact percentage. It is the direction of the tradeoff. As leverage rises, pressure rises everywhere else in the plan.
 
-*For detailed year-by-year equity tables at each down payment level and appreciation rate, see: [Down Payment Equity Comparison](down-payment-equity-comparison.md).*
+*Detailed down-payment sensitivity tables are intentionally omitted from the public demo.*
 
 ---
 
