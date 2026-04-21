@@ -35,14 +35,14 @@ jobs:
           chmod 700 ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts || true
         shell: bash
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Clean stale server-side backup directories
         run: |
-          ssh -i ~/.ssh/deploy_key \
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/deploy_key \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
             "find ${{ secrets.DEPLOY_PATH }} -maxdepth 1 -type d -name 'node_modules.backup-*' -exec rm -rf {} + 2>/dev/null || true"
@@ -50,7 +50,7 @@ jobs:
       - name: Deploy files via rsync
         run: |
           rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
+            -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }}" \
             --exclude='.git' \
             --exclude='.env' \
             --exclude='.env.*' \
@@ -102,7 +102,7 @@ jobs:
       # Remove any .env file on server to ensure DirectAdmin env vars are used
       - name: Remove .env file from server
         run: |
-          ssh -i ~/.ssh/deploy_key \
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/deploy_key \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
             "cd ${{ secrets.DEPLOY_PATH }} && rm -f .env && echo '.env file removed if it existed'"
@@ -117,7 +117,7 @@ jobs:
       
       - name: Restart Node.js application
         run: |
-          ssh -i ~/.ssh/deploy_key \
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/deploy_key \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
             "cd ${{ secrets.DEPLOY_PATH }} && touch tmp/restart.txt || (mkdir -p tmp && touch tmp/restart.txt)"
