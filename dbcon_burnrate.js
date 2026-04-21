@@ -9,8 +9,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 const Database = require('better-sqlite3');
 const path = require('path');
+const { cleanupStaleSqliteSidecars } = require('./scripts/sqlite-sidecar-cleanup');
 
 const dbPath = process.env.BURNRATE_DB_PATH || path.join(__dirname, 'burnrate_data', 'burnrate_demo.db');
+
+cleanupStaleSqliteSidecars(dbPath, {
+    logger: process.env.NODE_ENV !== 'production' ? console : null
+});
 
 const db = new Database(dbPath, {
     verbose: process.env.NODE_ENV !== 'production' ? console.log : null,

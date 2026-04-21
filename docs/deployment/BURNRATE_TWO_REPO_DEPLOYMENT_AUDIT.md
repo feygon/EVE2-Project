@@ -1,0 +1,467 @@
+# BurnRate Two-Repo Deployment Audit
+
+**Status:** Verified against scripts, workflows, configs, symlinks, and recent deploy behavior  
+**Verified:** 2026-04-20  
+**Scope:** Public BurnRate demo in `RealFeygon` and private Nickerson/BurnRate app in `BurnRate-Private`
+
+## Purpose
+
+This document is the verified deployment audit for the current two-repo BurnRate architecture.
+
+It is not a generic deployment guide. It records:
+
+- what the deployment automation actually does today
+- which parts are fragile
+- which parts are manual despite appearing automated
+- which existing docs are stale or only partially true
+- which pitfalls repeatedly cause drift or false confidence
+
+## Verified Sources Reviewed
+
+### RealFeygon
+
+- [docs/deployment/DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- [docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md)
+- [docs/deployment/CI_CD_SETUP.md](./CI_CD_SETUP.md)
+- [.github/workflows/deploy.yml](D:/Repos/RealFeygon/.github/workflows/deploy.yml)
+- [.vscode/sftp.json](D:/Repos/RealFeygon/.vscode/sftp.json)
+- [ssh-host-config.txt](D:/Repos/RealFeygon/ssh-host-config.txt)
+
+### BurnRate-Private
+
+- [scripts/deploy.sh](D:/Repos/BurnRate-Private/scripts/deploy.sh)
+- [scripts/apply-prod-migrations.sh](D:/Repos/BurnRate-Private/scripts/apply-prod-migrations.sh)
+- [.github/workflows/deploy.yml](D:/Repos/BurnRate-Private/.github/workflows/deploy.yml)
+- [docs/flowchart-agentic-sdlc.md](D:/Repos/BurnRate-Private/docs/flowchart-agentic-sdlc.md)
+- [docs/ledger-refactor/MORNING-REPORT.md](D:/Repos/BurnRate-Private/docs/ledger-refactor/MORNING-REPORT.md)
+
+## Deployment Topology
+
+The current BurnRate deployment is a **two-repo layered deploy**:
+
+1. `RealFeygon` deploys first.
+2. `BurnRate-Private` deploys second.
+
+This order is mandatory because:
+
+- `RealFeygon` deploy uses `rsync --delete`
+- `BurnRate-Private` deploy is additive and overlays private/shared files on top
+
+If the order is reversed, the `RealFeygon` deploy can delete files that the private overlay depends on.
+
+## Current Automation: What Actually Happens
+
+### RealFeygon GitHub Action
+
+Verified from `.github/workflows/deploy.yml`:
+
+1. Runs on push to `main`
+2. Checks out code on `ubuntu-latest`
+3. Runs `npm install` in CI
+4. Sets up SSH keys in the runner
+5. Cleans stale server-side `node_modules.backup-*` directories
+6. Deploys via `rsync -avz --delete`
+7. Removes any `.env` file on the server
+8. Touches `tmp/restart.txt`
+
+Important exclusions in the public deploy:
+
+- `data`
+- `views/nickerson`
+- `views/layouts/nickerson.handlebars`
+- `dbcon_nickerson.js`
+- `Nickerson.js`
+- `scripts/NickersonCallbacks.js`
+- many Nickerson/private JS/CSS files
+- `package-lock.json`
+
+### BurnRate-Private GitHub Action
+
+Verified from `.github/workflows/deploy.yml`:
+
+1. Runs on push to `main`
+2. Checks out code on `ubuntu-latest`
+3. Sets up SSH keys in the runner
+4. Deploys via additive `rsync -avz`
+5. Touches `tmp/restart.txt`
+
+Important exclusions in the private deploy:
+
+- `data`
+- `package.json`
+- `package-lock.json`
+
+### BurnRate-Private `scripts/deploy.sh`
+
+Verified behavior:
+
+1. Requires both repos to be on `main`
+2. Refuses to proceed if tracked changes are uncommitted
+3. Pushes `RealFeygon` first
+4. Waits for the latest `RealFeygon` GitHub Action to complete
+5. Pushes `BurnRate-Private` second
+6. Waits for the latest `BurnRate-Private` GitHub Action to complete
+7. Attempts post-deploy SSH checks
+8. Touches `tmp/restart.txt`
+
+## Fragile Parts
+
+### 1. `tmp/restart.txt` is not a real restart
+
+This is the single most important operational fact.
+
+`touch tmp/restart.txt` does **not** immediately restart the DirectAdmin Node app in a reliable way for this stack.
+
+What it actually does:
+
+- may signal the app supervisor
+- may be enough for some file reload behaviors
+- is often **not** enough to pick up template, route, or SQLite state changes immediately
+
+What reliably refreshes the app:
+
+1. Stop the Node app in DirectAdmin
+2. Start the Node app again
+
+This is especially important after:
+
+- DB file replacement
+- route/template changes that seem stale after deploy
+- migration runs
+
+### 2. SQLite sidecars can preserve stale state
+
+Relevant files:
+
+- `*.db`
+- `*.db-wal`
+- `*.db-shm`
+
+If a SQLite DB file is replaced on disk but the app does not cleanly reopen it, stale state may persist.
+
+Verified guidance:
+
+- do **not** delete `.wal` / `.shm` while the app is running
+- if a DB file was replaced and behavior still looks stale:
+  1. stop the app
+  2. replace the `.db` file
+  3. remove matching `.db-wal` and `.db-shm`
+  4. start the app
+
+This is not required for every restart. It is only needed when DB freshness is in doubt after a DB replacement.
+
+### 2a. Startup cleanup is now implemented in the DB connectors
+
+Verified current code paths:
+
+- `dbcon_burnrate.js`
+- `dbcon_nickerson.js`
+
+Both now call a shared helper before opening SQLite:
+
+- `scripts/sqlite-sidecar-cleanup.js`
+
+What it does:
+
+- checks for `<db>.db-wal` and `<db>.db-shm`
+- compares their mtimes to the main `.db`
+- removes the sidecars only when the main `.db` is newer than every existing sidecar
+
+Why this helps:
+
+- catches the common “DB file replaced but stale sidecars remain” case automatically at startup
+- reduces the need for manual `.wal` / `.shm` cleanup after deploy
+
+What it does **not** do:
+
+- it does not force a real app restart
+- it does not delete sidecars blindly on every startup
+- it does not replace the need for a DirectAdmin stop/start when the app is stale
+
+Remaining pitfall:
+
+- if the process never truly restarts, this startup cleanup will never run
+- so `tmp/restart.txt` still cannot be treated as a reliable DB refresh mechanism by itself
+
+### 3. Shared symlinked directories create cross-repo drift risk
+
+Verified locally:
+
+- `D:\Repos\RealFeygon\views\nickerson` -> `D:\Repos\BurnRate-Private\views\nickerson`
+- `D:\Repos\RealFeygon\data` -> `D:\Repos\BurnRate-Private\data`
+
+Implications:
+
+- local file inspection in `RealFeygon` can be misleading because some paths are actually private-repo content
+- shared view behavior can change BurnRate and Nickerson simultaneously
+- older private DB lineage can appear to exist on the public side through the symlinked `data` tree
+
+This is a major source of confusion during debugging and RCA.
+
+### 4. Public and private DB lineages are different
+
+Verified:
+
+- `data/burnrate_v5.db` is the older shared/private lineage
+- `burnrate_data/burnrate_demo.db` is the public BurnRate demo lineage
+
+They are not interchangeable.
+
+This means:
+
+- scenario/report drift is not always a DB problem
+- report inventory drift comes from files/config/templates, not scenario DB rows
+- seeing `burnrate_v5.db` on the public side does not mean the public BurnRate route is supposed to use it
+
+### 5. The deploy script’s post-deploy SSH section is stale
+
+Verified problem:
+
+- `scripts/deploy.sh` still defines:
+  - `SSH_CMD="ssh -F $REALFEYGON_DIR/config ..."`
+
+But the current SSH config file is:
+
+- `D:\Repos\RealFeygon\ssh-host-config.txt`
+
+Because of that mismatch, the script’s final SSH verification path can fall back incorrectly and try port `22`, causing:
+
+- `ssh: connect to host ftp.realfeygon.com port 22: Connection timed out`
+
+This does **not** mean the GitHub Action deploy failed.
+It means the script’s final SSH verification layer is stale.
+
+### 6. Package installation is only partially automated
+
+Verified:
+
+- `RealFeygon` CI runs `npm install` in GitHub Actions
+- production deploy does **not** run `npm install` on the server
+- `package-lock.json` is excluded from deploy
+- `BurnRate-Private` excludes both `package.json` and `package-lock.json`
+
+Implication:
+
+- adding a new runtime dependency to `RealFeygon` may still require a real server-side dependency refresh if DirectAdmin does not automatically reinstall packages
+- successful CI install does **not** guarantee the production Node app has the new dependency
+
+This already caused a real issue with `marked`.
+
+### 7. `rsync --delete` is both necessary and dangerous
+
+`RealFeygon` deploy uses `--delete`.
+
+Benefits:
+
+- removes stale public files
+- makes public deploy deterministic
+
+Risks:
+
+- will remove files not represented in the public repo
+- can break the combined app unless the private overlay is reapplied afterward
+- can fail if server-side leftover directories resist deletion
+
+This already caused a real GitHub Actions failure on stale `node_modules.backup-*` directories.
+
+That is why the workflow now includes a pre-rsync cleanup step for those backup directories.
+
+## Automated Parts That Help
+
+### RealFeygon workflow hardening already in place
+
+Verified current mitigations:
+
+- pre-rsync cleanup of `node_modules.backup-*`
+- `ssh-keyscan ... || true`
+- `StrictHostKeyChecking=no`
+- `UserKnownHostsFile=/dev/null`
+
+These make deploys more robust against transient SSH/bootstrap failures.
+
+### BurnRate-Private workflow hardening already in place
+
+Same SSH hardening pattern is now present there too.
+
+## Pitfalls Introduced By Those Automations
+
+### 1. Host authenticity is no longer strongly enforced in CI deploys
+
+Because the workflows now use:
+
+- `StrictHostKeyChecking=no`
+- `UserKnownHostsFile=/dev/null`
+
+the deploys are more reliable, but less strict about host verification.
+
+That is an operational tradeoff, not a free win.
+
+### 2. `ssh-keyscan ... || true` can hide setup fragility
+
+It prevents early failure, which is useful.
+It also means a broken host-key-scan step no longer blocks the workflow, so later SSH/rsync failures become the real signal.
+
+### 3. `deploy.sh` gives a false sense of full completion
+
+The script can:
+
+- successfully push both repos
+- watch both GitHub Actions succeed
+- and still fail in the final SSH stage because its own SSH config path is stale
+
+So “script failed” does **not** automatically mean “deployment failed.”
+
+## Manual Steps That Still Matter
+
+### Reliable deployment sequence
+
+Verified safe sequence:
+
+1. Ensure intended commits exist in `RealFeygon/main`
+2. Ensure intended commits exist in `BurnRate-Private/main`
+3. Push `RealFeygon` first
+4. Wait for its GitHub Action to succeed
+5. Push `BurnRate-Private` second
+6. Wait for its GitHub Action to succeed
+7. If a DB changed and stale data is suspected:
+   - stop DirectAdmin app
+   - replace DB
+   - delete matching `.wal` / `.shm`
+   - start DirectAdmin app
+8. Otherwise, still prefer a real DirectAdmin stop/start if the site appears stale after deploy
+
+### Migrations
+
+Verified from `scripts/apply-prod-migrations.sh`:
+
+- it applies all server-side SQL files in order with `sqlite3`
+- it tolerates errors and continues
+- it touches `tmp/restart.txt`
+- it explicitly warns that you must still manually stop/start the app in DirectAdmin
+
+Fragility:
+
+- the script uses the stale `D:\Repos\RealFeygon\config` SSH path in comments and command construction
+- “continue on error” can hide real migration failures
+
+## Existing Documentation: What Is Stale
+
+### `docs/deployment/DEPLOYMENT_GUIDE.md`
+
+Mostly stale for BurnRate two-repo reality.
+
+Still describes:
+
+- manual SFTP upload as the primary method
+- generic single-repo app deployment
+- server-side `npm install` as the normal post-upload step
+
+Missing:
+
+- two-repo layering
+- `RealFeygon` first / `BurnRate-Private` second
+- `rsync --delete` race condition
+- DirectAdmin restart limitations
+- SQLite sidecar refresh caveat
+
+### `docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md`
+
+Useful as a generic hygiene checklist, but stale for BurnRate deploy specifics.
+
+Missing:
+
+- two-repo order
+- shared symlink realities
+- post-deploy stale-state handling
+- distinction between `data/burnrate_v5.db` and `burnrate_data/burnrate_demo.db`
+
+### `docs/deployment/CI_CD_SETUP.md`
+
+Stale for the current live setup.
+
+Specific mismatches:
+
+- documents SSH host/port assumptions that do not reflect the current SFTP/SSH config
+- documents server-side install/restart assumptions more cleanly than the current DirectAdmin behavior actually provides
+- does not capture the hardened SSH options now in the live workflows
+
+### `scripts/deploy.sh`
+
+Operationally useful, but partially stale:
+
+- outdated SSH config path
+- assumes its final SSH verification is authoritative
+- does not capture the DirectAdmin stop/start requirement clearly enough
+
+### `scripts/apply-prod-migrations.sh`
+
+Closer to reality than the older docs because it explicitly warns that `restart.txt` does not restart Node.
+
+Still stale in one important way:
+
+- references the old SSH config path
+
+## Verified Current Connection Details
+
+From `.vscode/sftp.json`:
+
+- host: `server06.hostwhitelabel.com`
+- port: `27493`
+- username: `realfey`
+- remote path: `/home/realfey/eve2`
+
+From `ssh-host-config.txt`:
+
+- `ftp.realfeygon.com`
+- port `27493`
+- key: `D:\Repos\RealFeygon\.vscode\rsa-key-20251219OpenSSH.ppk`
+
+Manual SSH command:
+
+```powershell
+ssh -F "D:\Repos\RealFeygon\ssh-host-config.txt" ftp.realfeygon.com
+```
+
+## Recommended Operational Source of Truth
+
+Until the older docs are rewritten, use this precedence order:
+
+1. Current GitHub Actions workflow files
+2. Current `scripts/deploy.sh` and `scripts/apply-prod-migrations.sh`
+3. `ssh-host-config.txt` and `.vscode/sftp.json`
+4. This audit document
+5. Older deployment guides only as historical context
+
+## Immediate Documentation Follow-Ups Recommended
+
+1. Update `scripts/deploy.sh` to use `ssh-host-config.txt`
+2. Update `scripts/apply-prod-migrations.sh` to use `ssh-host-config.txt`
+3. Rewrite `docs/deployment/DEPLOYMENT_GUIDE.md` around the two-repo BurnRate architecture
+4. Rewrite `docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md` to include:
+   - repo order
+   - DB refresh rules
+   - DirectAdmin stop/start requirement
+5. Rewrite `docs/deployment/CI_CD_SETUP.md` to match the current workflows instead of the older template
+
+## Bottom Line
+
+The current deployment stack is **partly automated, but not fully self-healing**.
+
+What is reliable:
+
+- pushing `RealFeygon` first
+- pushing `BurnRate-Private` second
+- waiting for both GitHub Actions
+
+What is still manual:
+
+- recognizing stale runtime state
+- doing a real DirectAdmin stop/start
+- handling DB file refresh edge cases
+- treating the script’s final SSH verification failure as a separate issue from the deploy itself
+
+The most dangerous misconception is this:
+
+> A successful GitHub Action plus `touch tmp/restart.txt` does not guarantee the live Node process is actually serving the newly deployed templates or DB files.
+
+That gap is the source of many of the “deployment hell” symptoms observed in this project.
