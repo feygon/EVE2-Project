@@ -319,8 +319,19 @@
             }
         }
         console.log('[BurnRate] Initializing cards for trigger year:', currentTriggerYear);
+        $('.scenario-card').each(function() {
+            const $card = $(this);
+            const disposition = $card.data('disposition');
+            const scenarioId = scenarioMap[disposition];
+
+            if (scenarioId) {
+                $card.data('scenario-id', scenarioId);
+            }
+        });
+
         updateMemoryCareRange(currentTriggerYear);  // Set initial max value
-        updateCardsForTriggerYear(currentTriggerYear);
+        updateTimelineSummary();
+        loadMetricsForAllCards();
     }
 
     /**

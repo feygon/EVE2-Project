@@ -2,7 +2,7 @@
 
 ## What this is
 
-BurnRate is a demo of a private financial estate planning appi for elder trust, retirement, and real estate assets with dynamic budget optimization. It was anonymized and sanitized in a Virtual Machine to empirically ensure sequestration from its original source.
+BurnRate is a demo of a private financial estate planning app for elder trust, retirement, and real estate assets with dynamic budget optimization. It was anonymized and sanitized in a Virtual Machine to empirically ensure sequestration from its original source.
 
 ## What was validated
 
