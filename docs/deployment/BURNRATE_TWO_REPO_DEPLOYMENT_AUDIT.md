@@ -1,7 +1,7 @@
 # BurnRate Two-Repo Deployment Audit
 
 **Status:** Verified against scripts, workflows, configs, symlinks, and recent deploy behavior  
-**Verified:** 2026-04-20  
+**Verified:** 2026-05-10
 **Scope:** Public BurnRate demo in `RealFeygon` and private Nickerson/BurnRate app in `BurnRate-Private`
 
 ## Purpose
@@ -213,23 +213,16 @@ This means:
 - report inventory drift comes from files/config/templates, not scenario DB rows
 - seeing `burnrate_v5.db` on the public side does not mean the public BurnRate route is supposed to use it
 
-### 5. The deploy script’s post-deploy SSH section is stale
+### 5. The deploy script’s post-deploy wording can overstate completion
 
-Verified problem:
+Verified current state:
 
-- `scripts/deploy.sh` still defines:
-  - `SSH_CMD="ssh -F $REALFEYGON_DIR/config ..."`
+- `scripts/deploy.sh` now uses `D:\Repos\RealFeygon\ssh-host-config.txt`
+- `scripts/apply-prod-migrations.sh` now uses `D:\Repos\RealFeygon\ssh-host-config.txt`
+- `scripts/deploy.sh` now labels the final marker step as `Touching restart marker`, not a true app restart
 
-But the current SSH config file is:
-
-- `D:\Repos\RealFeygon\ssh-host-config.txt`
-
-Because of that mismatch, the script’s final SSH verification path can fall back incorrectly and try port `22`, causing:
-
-- `ssh: connect to host ftp.realfeygon.com port 22: Connection timed out`
-
-This does **not** mean the GitHub Action deploy failed.
-It means the script’s final SSH verification layer is stale.
+The old SSH-config-path failure mode has been repaired.
+The old script wording that implied a full DirectAdmin restart has also been repaired.
 
 ### 6. Package installation is only partially automated
 
@@ -307,9 +300,10 @@ The script can:
 
 - successfully push both repos
 - watch both GitHub Actions succeed
-- and still fail in the final SSH stage because its own SSH config path is stale
+- touch `tmp/restart.txt`
+- and still leave the running DirectAdmin process serving stale code or DB state until a real Stop/Start occurs
 
-So “script failed” does **not** automatically mean “deployment failed.”
+So “deploy script completed” does **not** automatically mean “DirectAdmin is serving the fresh build.”
 
 ## Manual Steps That Still Matter
 
@@ -341,8 +335,8 @@ Verified from `scripts/apply-prod-migrations.sh`:
 
 Fragility:
 
-- the script uses the stale `D:\Repos\RealFeygon\config` SSH path in comments and command construction
-- “continue on error” can hide real migration failures
+- the script says "pending migrations" but applies all server-side SQL files in order
+- “continue on error” can hide real migration failures by treating already-applied migrations and broken migrations the same way
 
 ## Existing Documentation: What Is Stale
 
@@ -387,19 +381,18 @@ Specific mismatches:
 
 ### `scripts/deploy.sh`
 
-Operationally useful, but partially stale:
+Operationally useful, but still limited:
 
-- outdated SSH config path
 - assumes its final SSH verification is authoritative
-- does not capture the DirectAdmin stop/start requirement clearly enough
+- touches `tmp/restart.txt` but cannot perform the manual DirectAdmin Stop/Start
 
 ### `scripts/apply-prod-migrations.sh`
 
 Closer to reality than the older docs because it explicitly warns that `restart.txt` does not restart Node.
 
-Still stale in one important way:
+Still misleading in one important way:
 
-- references the old SSH config path
+- says "pending migrations" but applies all server-side SQL files and continues after errors
 
 ## Verified Current Connection Details
 
@@ -434,14 +427,13 @@ Until the older docs are rewritten, use this precedence order:
 
 ## Immediate Documentation Follow-Ups Recommended
 
-1. Update `scripts/deploy.sh` to use `ssh-host-config.txt`
-2. Update `scripts/apply-prod-migrations.sh` to use `ssh-host-config.txt`
-3. Rewrite `docs/deployment/DEPLOYMENT_GUIDE.md` around the two-repo BurnRate architecture
-4. Rewrite `docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md` to include:
+1. Rewrite `docs/deployment/DEPLOYMENT_GUIDE.md` around the two-repo BurnRate architecture
+2. Rewrite `docs/deployment/PRE_DEPLOYMENT_CHECKLIST.md` to include:
    - repo order
    - DB refresh rules
    - DirectAdmin stop/start requirement
-5. Rewrite `docs/deployment/CI_CD_SETUP.md` to match the current workflows instead of the older template
+3. Rewrite `docs/deployment/CI_CD_SETUP.md` to match the current workflows instead of the older template
+4. Replace the migration script's "pending migrations" behavior or make it track applied migrations explicitly
 
 ## Bottom Line
 
