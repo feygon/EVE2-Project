@@ -156,21 +156,21 @@ describe('Handlebars Helpers', () => {
     });
 
     describe('or(...args)', () => {
-        // Test logical OR: at least one truthy value should return true
-        it('should return true if any argument is truthy', () => {
+        // Test logical OR: returns the first truthy value for fallback rendering
+        it('should return the first truthy argument', () => {
             expect(helpers.or(false, true, false)).to.be.true;
-            expect(helpers.or(0, 'string', null)).to.be.true;
+            expect(helpers.or(0, 'string', null)).to.equal('string');
         });
 
-        // Test all falsy: all falsy values should return false (false, 0, null, undefined, '')
-        it('should return false if all arguments are falsy', () => {
-            expect(helpers.or(false, 0, null, undefined, '')).to.be.false;
+        // Test all falsy: returns the last fallback value
+        it('should return the last fallback value if all arguments are falsy', () => {
+            expect(helpers.or(false, 0, null, undefined, '')).to.equal('');
         });
 
         // Test Handlebars compatibility: last argument is options object, should be ignored
         it('should ignore options object (last argument)', () => {
             const options = { fn: () => {}, inverse: () => {} };
-            expect(helpers.or(false, 0, options)).to.be.false;
+            expect(helpers.or(false, 0, options)).to.equal(0);
         });
     });
 

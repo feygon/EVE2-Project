@@ -222,8 +222,11 @@ exports.range = function(start, end) {
 
 // Check if value exists (for conditional rendering)
 exports.or = function(...args) {
-    // Remove the Handlebars options object (last argument)
-    const options = args.pop();
+    // Remove the Handlebars options object when called from a template.
+    const maybeOptions = args[args.length - 1];
+    if (maybeOptions && typeof maybeOptions === 'object' && (maybeOptions.hash || maybeOptions.fn || maybeOptions.inverse)) {
+        args.pop();
+    }
     // Return the first truthy value, or the last value as fallback
     for (const arg of args) {
         if (arg) return arg;
