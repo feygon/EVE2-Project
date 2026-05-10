@@ -132,7 +132,7 @@ app.get('/index.html', (req, res) => {
 });
 
 app.get('/',(req,res)=> {
-	res.redirect(301, "https://www.realfeygon.com/resume")
+	res.redirect(301, '/spa-resume/')
 });
 
 app.use(function(req, res){

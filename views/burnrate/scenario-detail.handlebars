@@ -1115,8 +1115,7 @@
         snt_seed: {{or scenario.snt_seed 10000}},
         mc_maintenance_monthly: {{or scenario.mc_maintenance_monthly 300}},
         mc_residual_monthly: {{or scenario.mc_residual_monthly 200}},
-        optimizer_enabled: {{or scenario.optimizer_enabled 0}},
-        trust_type: '{{or scenario.trust_type "non_grantor"}}'
+        optimizer_enabled: {{or scenario.optimizer_enabled 0}}
     };
     window.currentScenarioId = '{{scenario.id}}';
     window.projectionData = {{{json projections}}};

@@ -62,7 +62,6 @@ function getSeededValue(field, currentValue, scenarioIndex, fieldIndex) {
     if (field === 'ltc_trigger_year') return 2028 + scenarioIndex;
     if (field === 'memory_care_year') return 2031 + scenarioIndex;
     if (field === 'year_of_passing') return 2039 + scenarioIndex;
-    if (field === 'trust_type') return scenarioIndex % 2 === 0 ? 'non_grantor' : 'grantor';
     if (BOOLEAN_LIKE_FIELDS.has(field)) return (scenarioIndex + fieldIndex) % 2;
 
     const numericValue = typeof currentValue === 'number' ? currentValue : Number(currentValue);

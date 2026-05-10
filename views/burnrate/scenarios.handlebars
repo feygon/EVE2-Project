@@ -52,8 +52,7 @@
             snt_seed: {{or this.snt_seed 10000}},
             mc_maintenance_monthly: {{or this.mc_maintenance_monthly 300}},
             mc_residual_monthly: {{or this.mc_residual_monthly 200}},
-            optimizer_enabled: {{or this.optimizer_enabled 0}},
-            trust_type: '{{or this.trust_type "non_grantor"}}'
+            optimizer_enabled: {{or this.optimizer_enabled 0}}
         };
         {{/each}}
     </script>
